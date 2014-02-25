@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_webview_vertical_margin"
+    android:paddingLeft="@dimen/activity_webview_horizontal_margin"
+    android:paddingRight="@dimen/activity_webview_horizontal_margin"
+    android:paddingTop="@dimen/activity_webview_vertical_margin"
+    tools:context=".DailyActivity" >
+	<RelativeLayout
+        android:id="@+id/mytitle"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:background="@color/red" >
+
+        <Button
+            android:id="@+id/button2"
+            android:background="@drawable/back"
+            android:layout_width="40dp"
+		    android:layout_height="40dp"
+		    android:padding="0dp"
+		    android:text=""
+            android:textColor="@color/bg_color" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/share" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/button2"
+            android:layout_alignBottom="@+id/button2"
+            android:layout_toRightOf="@+id/button2"
+            android:text="IELTS PASS"
+            android:textColor="@color/bg_color"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+  	<WebView
+        android:id="@+id/webview"
+        android:layout_below="@+id/mytitle"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" 
+        android:scrollbars="none"/>
+
+</RelativeLayout>

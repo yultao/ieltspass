@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">IELTS PASS</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_vocabulary_detail">VocabularyDetailActivity</string>
+    <string name="title_section1">基本信息</string>
+    <string name="title_section2">词根/词缀/语源</string>
+    <string name="title_section3">例句</string>
+    <string name="title_activity_daily">DailyActivity</string>
+
+</resources>

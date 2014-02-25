@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <!-- 总 style  直接引用  这个   由  tab style  和    Indicator style 组成 -->
+    <style name="StyledAllIndicators" parent="AppTheme">
+        <item name="vpiTabPageIndicatorStyle">@style/CustomTabPageIndicator</item>
+        <item name="vpiUnderlinePageIndicatorStyle">@style/CustomUnderlinePageIndicator</item>
+    </style>
+
+    <!-- tab的 style -->
+    <style name="CustomTabPageIndicator" >
+        <item name="android:textSize">18sp</item>
+		<item name="android:gravity">center</item>
+		<item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+    </style>
+
+    <style name="CustomTabPageIndicator_text" parent="android:TextAppearance.Medium">
+        <item name="android:typeface">monospace</item>
+    </style>
+
+    <!-- 下标的指示器的颜色 -->
+    <style name="CustomUnderlinePageIndicator">
+        <item name="selectedColor">#EB5548</item>
+    </style>
+
+</resources>

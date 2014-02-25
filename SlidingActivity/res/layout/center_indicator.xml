@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff" >
+
+    <RelativeLayout
+        android:id="@+id/mytitle"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:background="@color/red" >
+
+		<Button
+		    android:id="@+id/button2"
+		    android:layout_width="40dp"
+		    android:layout_height="40dp"
+		    android:padding="0dp"
+		    android:text=""
+		    android:background="@drawable/menu"
+		    
+		    android:textColor="@color/bg_color" />
+		
+		<TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/button2"
+            android:layout_alignBottom="@+id/button2"
+            android:layout_toRightOf="@+id/button2"
+            android:text="IELTS PASS"
+            android:textSize="18dp"
+            android:textColor="@color/bg_color"
+            android:textStyle="bold" />
+		
+        
+<Button
+            android:id="@+id/button3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/share" />
+        
+
+        
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/tabs"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/mytitle"
+        android:orientation="vertical" >
+
+        <com.viewpagerindicator.TabPageIndicator
+            android:id="@+id/tab_indicator"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <com.viewpagerindicator.UnderlinePageIndicator
+            android:id="@+id/underline_indicator"
+            android:layout_width="fill_parent"
+            android:layout_height="3dip"/>
+    </LinearLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tabs" />
+
+</RelativeLayout>
