@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">IELTS PASS</string>
+    <string name="app_name">IELTSPASS</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_vocabulary_detail">VocabularyDetailActivity</string>
