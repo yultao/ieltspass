@@ -14,10 +14,10 @@
 		<item name="android:gravity">center</item>
 		<item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">4dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.CustomTabPageIndicator</item>
     </style>
-
-    <style name="CustomTabPageIndicator_text" parent="android:TextAppearance.Medium">
-        <item name="android:typeface">monospace</item>
+	<style name="TextAppearance.CustomTabPageIndicator" parent="Widget">
+        <item name="android:textColor">@color/vpi__light_theme</item>
     </style>
 
     <!-- 下标的指示器的颜色 -->

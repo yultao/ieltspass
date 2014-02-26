@@ -104,7 +104,7 @@ public class CenterFragmentIndicator extends CenterFragment {
 			}
 
 			public void onPageSelected(int position) {
-				
+				tabbPageIndicator.setActiveTab(position);
 				if (myPageChangeListener != null)
 					myPageChangeListener.onPageSelected(position);
 			}

@@ -16,6 +16,9 @@
  */
 package com.viewpagerindicator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import tt.lab.android.ieltspass.R;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
@@ -37,7 +40,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class TabPageIndicator extends HorizontalScrollView implements PageIndicator {
     /** Title text used when no title is provided by the adapter. */
     private static final CharSequence EMPTY_TITLE = "";
-
+    private List<TabView> tabs = new ArrayList<TabView>();
     /**
      * Interface for a callback when the selected tab has been reselected.
      */
@@ -159,7 +162,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         if (iconResId != 0) {
             tabView.setCompoundDrawablesWithIntrinsicBounds(iconResId, 0, 0, 0);
         }
-
+        tabs.add(tabView);
         mTabLayout.addView(tabView, new LinearLayout.LayoutParams(0, MATCH_PARENT, 1));
     }
 
@@ -177,7 +180,13 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         }
     }
 
-    
+    public void setActiveTab(int arg0){
+    	for(TabView tab:tabs){
+    		tab.setTextColor(getResources().getColor(R.color.black));
+    	}
+		tabs.get(arg0).setTextColor(getResources().getColor(R.color.red));
+
+    }
     public void onPageSelected(int arg0) {
         setCurrentItem(arg0);
         if (mListener != null) {
@@ -221,6 +230,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
             }
             addTab(i, title, iconResId);
         }
+        setActiveTab(0);
         if (mSelectedTabIndex > count) {
             mSelectedTabIndex = count - 1;
         }
@@ -264,11 +274,10 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         public TabView(Context context) {
             super(context, null, R.attr.vpiTabPageIndicatorStyle);
         }
-
+        
         
         public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
             // Re-measure if we went beyond our maximum size.
             if (mMaxTabWidth > 0 && getMeasuredWidth() > mMaxTabWidth) {
                 super.onMeasure(MeasureSpec.makeMeasureSpec(mMaxTabWidth, MeasureSpec.EXACTLY),
