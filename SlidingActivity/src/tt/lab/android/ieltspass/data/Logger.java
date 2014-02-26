@@ -17,7 +17,7 @@ public class Logger {
 	private static File logfile;
 	static {
 		String sdDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-		String targetDir = sdDir + "/" + Constants.APP_PATH +"/";
+		String targetDir = sdDir + "/" + Constants.ROOT_PATH +"/";
 		File dir = new File(targetDir);
 		if (!dir.exists()) {
 			dir.mkdirs();

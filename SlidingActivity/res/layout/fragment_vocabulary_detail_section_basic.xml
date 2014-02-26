@@ -44,5 +44,22 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/textView2"
         android:text="TextView" />
-
+	<Button
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView3"
+            android:text="Play"/>
+   <Button
+            android:id="@+id/record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/play"
+            android:text="Record"/>
+	<Button
+            android:id="@+id/play2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/record"
+            android:text="Play mine"/>
 </RelativeLayout>

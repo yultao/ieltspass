@@ -1,5 +1,7 @@
 package tt.lab.android.ieltspass.activity;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
@@ -9,10 +11,15 @@ import tt.lab.android.ieltspass.R.id;
 import tt.lab.android.ieltspass.R.layout;
 import tt.lab.android.ieltspass.R.menu;
 import tt.lab.android.ieltspass.R.string;
+import tt.lab.android.ieltspass.data.Constants;
 import tt.lab.android.ieltspass.data.Database;
+import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.Word;
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -45,6 +52,7 @@ public class VocabularyDetailActivity extends FragmentActivity {
 	 */
 	ViewPager mViewPager;
 	Word word;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -59,11 +67,9 @@ public class VocabularyDetailActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		
+
 		initTitle();
 
-		
-		
 		SectionBasicFragment sectionBasicFragment = new SectionBasicFragment();
 		sectionBasicFragment.setWord(word);
 		pagerItemList.add(sectionBasicFragment);
@@ -95,22 +101,23 @@ public class VocabularyDetailActivity extends FragmentActivity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent=new Intent(Intent.ACTION_SEND);  
-				intent.setType("image/*");//intent.setType("text/plain");  
-				intent.putExtra(Intent.EXTRA_SUBJECT, "好友推荐");  
-				intent.putExtra(Intent.EXTRA_TEXT, "雅思通(IELTS PASS)分享："+word.toString()+" 详见：http://www.ieltspass.com/"+word.getTitle());  
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
-				startActivity(Intent.createChooser(intent, "分享"));  
+				Intent intent = new Intent(Intent.ACTION_SEND);
+				intent.setType("image/*");// intent.setType("text/plain");
+				intent.putExtra(Intent.EXTRA_SUBJECT, "好友推荐");
+				intent.putExtra(Intent.EXTRA_TEXT, "雅思通(IELTS PASS)分享：" + word.toString()
+						+ " 详见：http://www.ieltspass.com/" + word.getTitle());
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(Intent.createChooser(intent, "分享"));
 			}
 		});
 		TextView title = (TextView) findViewById(R.id.textView1);
-		
+
 		Intent intent = this.getIntent();
 		Bundle bundle = intent.getExtras();
 		String string = bundle.getString("title");
 		Map<String, Word> wordMap = Database.getWords();
 		word = wordMap.get(string);
-		
+
 		title.setText(string.toUpperCase());
 	}
 
@@ -199,8 +206,29 @@ public class VocabularyDetailActivity extends FragmentActivity {
 			TextView textView1 = (TextView) rootView.findViewById(R.id.textView1);
 			TextView textView2 = (TextView) rootView.findViewById(R.id.textView2);
 			TextView textView3 = (TextView) rootView.findViewById(R.id.textView3);
+			Button play = (Button) rootView.findViewById(R.id.play);
+			play.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					startPlaying();
+				}
+			});
+			Button record = (Button) rootView.findViewById(R.id.record);
+			record.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+
+				}
+			});
+			Button play2 = (Button) rootView.findViewById(R.id.play2);
+			play2.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+
+				}
+			});
 			if (word == null) {
-				textView1.setText("1" + null);
+				textView1.setText("1");
 			} else {
 
 				dummyTextView.setText(word.getTitle());
@@ -212,6 +240,31 @@ public class VocabularyDetailActivity extends FragmentActivity {
 				textView3.setText(word.getExplanation());
 			}
 			return rootView;
+		}
+
+		private void startPlaying() {
+			String name= Constants.SD_PATH + "/" + Constants.AUDIO_PATH+"/test.mp3";
+			AudioManager am = (AudioManager)this.getActivity().getSystemService(Context.AUDIO_SERVICE);
+			am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+			MediaPlayer player = new MediaPlayer();
+			
+			File file = new File(name);
+			if (file.exists()) {
+				Logger.i(this.getClass().getName(), "Playing "+file.getAbsolutePath());
+				try {
+					player.reset();
+					player.setDataSource(file.getAbsolutePath());
+					player.prepare();
+					player.start();
+				} catch (Exception e) {
+					Logger.i(this.getClass().getName(), "Exception: "+e.getMessage());
+					e.printStackTrace();
+				}
+			} else {
+				Logger.i(this.getClass().getName(), file.getAbsolutePath()+" does not exist.");
+			}
+			Logger.i(this.getClass().getName(), "Release "+file.getAbsolutePath());
+			player.release();
 		}
 	}
 

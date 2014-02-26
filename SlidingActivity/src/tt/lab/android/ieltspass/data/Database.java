@@ -25,8 +25,8 @@ public class Database {
 		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			internal = true;
 		} else {
-			String sdDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-			String targetDir = sdDir + "/" + Constants.APP_PATH + "/";
+			Constants.SD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
+			String targetDir = Constants.SD_PATH + "/" + Constants.ROOT_PATH + "/";
 			File dir = new File(targetDir);
 			if (!dir.exists()) {
 				dir.mkdirs();
@@ -37,6 +37,7 @@ public class Database {
 
 			// 第一次初始化将预装文件复制到SD卡，以后就用这个文件
 			if (!file.exists()) {
+				long t1 = System.currentTimeMillis();
 				try {
 					InputStream is = Constants.assetManager.open(Constants.DATA_NAME);
 					OutputStream os = new FileOutputStream(wordFileName);
@@ -50,8 +51,10 @@ public class Database {
 					internal = false;
 				} catch (Exception e) {
 					internal = true;
-					Logger.i(Database.class.getName(), "Copy failed: : " + e.getMessage());
+					Logger.i(Database.class.getName(), "Copy failed: " + e.getMessage());
 				}
+				long t2 = System.currentTimeMillis();
+				Logger.i(Database.class.getName(), "Copy succeeded: " + (t2-t1));
 			} else {
 				internal = false;
 			}
