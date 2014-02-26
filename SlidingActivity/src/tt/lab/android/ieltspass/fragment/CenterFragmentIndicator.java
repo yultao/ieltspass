@@ -25,7 +25,7 @@ import com.viewpagerindicator.UnderlinePageIndicator;
 public class CenterFragmentIndicator extends CenterFragment {
 	private List<String> titles = new ArrayList<String>(); // æ ‡é¢˜
 	private Button button2, button3;
-	private static final String VOCABULARY = "词汇语法";
+	private static final String VOCABULARY = "词汇例句";
 	private static final String LSRW = "听说读写";
 	private static final String DAILY = "每日一练";
 	private TabPageIndicator tabbPageIndicator; //
@@ -71,11 +71,11 @@ public class CenterFragmentIndicator extends CenterFragment {
 		PageFragmentOther pageOther = new PageFragmentOther();
 		pagerItemList.add(pageOther);
 		pagerItemList.add(pageVocabulary);
-		pagerItemList.add(pageLSRW);
+		//pagerItemList.add(pageLSRW);
 		
 		titles.add(DAILY);
 		titles.add(VOCABULARY);
-		titles.add(LSRW);
+		//titles.add(LSRW);
 		
 		
 
