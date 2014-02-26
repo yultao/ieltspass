@@ -1,5 +1,6 @@
 package tt.lab.android.ieltspass.activity;
 
+import tt.lab.android.ieltspass.data.Constants;
 import tt.lab.android.ieltspass.fragment.CenterFragment;
 import tt.lab.android.ieltspass.fragment.CenterFragmentIndicator;
 import tt.lab.android.ieltspass.fragment.CenterFragmentPager;
@@ -8,6 +9,7 @@ import tt.lab.android.ieltspass.fragment.LeftFragment;
 import tt.lab.android.ieltspass.fragment.RightFragment;
 import tt.lab.android.ieltspass.fragment.CenterFragment.PageChangeListener;
 import tt.lab.android.ieltspass.view.SlidingMenuRelativeLayout;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,17 +27,15 @@ public class SlidingActivity extends FragmentActivity {
 	private RightFragment rightFragment;
 	private CenterFragment centerFragment;
 	private boolean isExit;
-
+	
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		setContentView(R.layout.main);
-		try {
+		Constants.assetManager = getAssets();
+		
 			init();
 			initListener();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void init() {

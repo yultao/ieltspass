@@ -10,6 +10,7 @@ import java.util.Map;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.activity.VocabularyDetailActivity;
 import tt.lab.android.ieltspass.data.Database;
+import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.Word;
 import android.content.Context;
 import android.content.Intent;
@@ -46,7 +47,7 @@ public class PageFragmentVocabulary extends Fragment {
 	private SearchView searchView;
 
 	private boolean filterSpinnerInited;
-
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		context = this.getActivity();
 		view = inflater.inflate(R.layout.page_vocabulary, null);
@@ -223,6 +224,7 @@ public class PageFragmentVocabulary extends Fragment {
 	}
 
 	private void sort() {
+		long t1 = System.currentTimeMillis();
 		try {
 
 			switch (sortSpinner.getSelectedItemPosition()) {
@@ -304,7 +306,8 @@ public class PageFragmentVocabulary extends Fragment {
 		} catch (Exception e) {
 			Log.e("sort", "e: " + e.getMessage());
 		}
-
+		long t2 = System.currentTimeMillis();
+		Logger.i(this.getClass().getName(), "sort: "+(t2-t1)+" ms.");
 	}
 
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -312,7 +315,7 @@ public class PageFragmentVocabulary extends Fragment {
 	}
 
 	private void initData() {
-
+		long t1 = System.currentTimeMillis();
 		Map<String, Word> wordMap = Database.getWords();
 		if (wordMap.size() == 0) {
 			for (int i = 0; i < 100; i++) {
@@ -359,7 +362,8 @@ public class PageFragmentVocabulary extends Fragment {
 		}
 
 		currentData = listData0;
-
+		long t2 = System.currentTimeMillis();
+		Logger.i(this.getClass().getName(), "initData: "+(t2-t1)+" ms.");
 	}
 
 }
