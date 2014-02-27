@@ -71,11 +71,11 @@ public class CenterFragmentIndicator extends CenterFragment {
 		PageFragmentOther pageOther = new PageFragmentOther();
 		pagerItemList.add(pageOther);
 		pagerItemList.add(pageVocabulary);
-		//pagerItemList.add(pageLSRW);
+		pagerItemList.add(pageLSRW);
 		
 		titles.add(DAILY);
 		titles.add(VOCABULARY);
-		//titles.add(LSRW);
+		titles.add(LSRW);
 		
 		
 
@@ -83,14 +83,13 @@ public class CenterFragmentIndicator extends CenterFragment {
 		mPager.setAdapter(adapter);
 		
 		
-		// å¾—åˆ°æŒ‡ç¤ºï¿½?		
 		tabbPageIndicator = (TabPageIndicator) view.findViewById(R.id.tab_indicator);
 		tabbPageIndicator.setViewPager(mPager);
 		// ä¸‹æ ‡
 		underlinePageIndicator = (UnderlinePageIndicator) view.findViewById(R.id.underline_indicator);
 		underlinePageIndicator.setViewPager(mPager);
 		underlinePageIndicator.setFades(false);
-		// è®¾ç½®æŒ‡ç¤ºï¿½?		
+	
 		tabbPageIndicator.setOnPageChangeListener(underlinePageIndicator);
 
 		underlinePageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {

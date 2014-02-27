@@ -98,6 +98,7 @@ public class PageFragmentVocabulary extends Fragment {
 
 	private void initSearchView() {
 		searchView = (SearchView) view.findViewById(R.id.searchView1);
+		
 		searchView.setOnQueryTextListener(new OnQueryTextListener() {
 
 			@Override
@@ -212,6 +213,8 @@ public class PageFragmentVocabulary extends Fragment {
 		simpleAdapter = new SimpleAdapter(context, currentData, R.layout.page_vocabulary_vlist, new String[] { "title",
 				"phon", "info", "img" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
 		listView.setAdapter(simpleAdapter);
+		
+		searchView.setQueryHint("共"+currentData.size()+"条");
 	}
 
 	private void filter() {

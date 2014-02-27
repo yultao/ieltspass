@@ -28,6 +28,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +39,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class VocabularyDetailActivity extends FragmentActivity {
+	private static final String TAG = VocabularyDetailActivity.class.getName();
 	ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
+
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide fragments for each of the sections. We use a
 	 * {@link android.support.v4.app.FragmentPagerAdapter} derivative, which will keep every loaded fragment in memory.
@@ -52,6 +55,12 @@ public class VocabularyDetailActivity extends FragmentActivity {
 	 */
 	ViewPager mViewPager;
 	Word word;
+
+	SectionBasicFragment sectionBasicFragment;
+
+	private Button btnPlayStop;
+	private boolean playing;
+	private MediaPlayer player;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +78,38 @@ public class VocabularyDetailActivity extends FragmentActivity {
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
 		initTitle();
+		try {
+			TextView textViewTitle = (TextView) findViewById(R.id.textViewTitle);
+			TextView textViewPhoetic = (TextView) findViewById(R.id.textViewPhoetic);
+			TextView textViewDate = (TextView) findViewById(R.id.textViewDate);
+			btnPlayStop = (Button) findViewById(R.id.btnPlay);
+			
+			
+			textViewTitle.setText(word.getTitle());
+			textViewPhoetic.setText(word.getPhoneticSymbol());
+			textViewDate.setText(word.getDate());
+			btnPlayStop.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (playing) {
+						stopPlaying();
+					} else {
+						startPlaying();
+					}
+				}
+			});
+			
 
-		SectionBasicFragment sectionBasicFragment = new SectionBasicFragment();
+		} catch (Exception e) {
+			Logger.i(TAG, "Exception: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		initFragement();
+	}
+
+	private void initFragement() {
+		sectionBasicFragment = new SectionBasicFragment();
 		sectionBasicFragment.setWord(word);
 		pagerItemList.add(sectionBasicFragment);
 
@@ -125,6 +164,96 @@ public class VocabularyDetailActivity extends FragmentActivity {
 		NavUtils.navigateUpTo(this, new Intent(this, SlidingActivity.class));
 	}
 
+	private void refreshButtonText() {
+		if (playing) {
+			btnPlayStop.setText("Stop");
+		} else {
+			btnPlayStop.setText("Start");
+		}
+	}
+
+	private void startPlaying() {
+		String name = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/test.mp3";
+		// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
+		// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+		player = new MediaPlayer();
+
+		/* 当MediaPlayer.OnCompletionLister会运行的Listener */
+		player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+			// @Override
+			/* 覆盖文件播出完毕事件 */
+			public void onCompletion(MediaPlayer arg0) {
+				playing = false;
+				try {
+					/*
+					 * 解除资源与MediaPlayer的赋值关系 让资源可以为其它程序利用
+					 */
+					player.release();
+					/* 改变TextView为播放结束 */
+					// tv.setText("音乐播发结束!");
+
+				} catch (Exception e) {
+					// tv.setText(e.toString());
+					e.printStackTrace();
+				}
+				refreshButtonText();
+			}
+		});
+
+		/* 当MediaPlayer.OnErrorListener会运行的Listener */
+		player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+			@Override
+			/* 覆盖错误处理事件 */
+			public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
+				playing = false;
+				try {
+					/* 发生错误时也解除资源与MediaPlayer的赋值 */
+					player.release();
+					// tv.setText("播放发生异常!");
+				} catch (Exception e) {
+					// tv.setText(e.toString());
+					e.printStackTrace();
+				}
+				refreshButtonText();
+				return false;
+			}
+		});
+
+		File file = new File(name);
+		if (file.exists()) {
+			Logger.i(this.getClass().getName(), "Playing " + file.getAbsolutePath());
+			try {
+				player.reset();
+				player.setDataSource(file.getAbsolutePath());
+				player.prepare();
+				player.start();
+				playing = true;
+				refreshButtonText();
+			} catch (Exception e) {
+				Logger.i(this.getClass().getName(), "Exception: " + e.getMessage());
+				e.printStackTrace();
+			}
+		} else {
+			Logger.i(this.getClass().getName(), file.getAbsolutePath() + " does not exist.");
+		}
+		Logger.i(this.getClass().getName(), "Release " + file.getAbsolutePath());
+
+	}
+
+	private void stopPlaying() {
+		playing = false;
+		try {
+			/* 发生错误时也解除资源与MediaPlayer的赋值 */
+			if (player != null)
+				player.release();
+			// tv.setText("播放发生异常!");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		refreshButtonText();
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -155,9 +284,6 @@ public class VocabularyDetailActivity extends FragmentActivity {
 
 		@Override
 		public Fragment getItem(int position) {
-			// getItem is called to instantiate the fragment for the given page.
-			// Return a DummySectionFragment (defined as a static inner class
-			// below) with the page number as its lone argument.
 			Fragment fragment = pagerItemList.get(position);
 			return fragment;
 		}
@@ -183,8 +309,25 @@ public class VocabularyDetailActivity extends FragmentActivity {
 		}
 	}
 
+	private void back() {
+		stopPlaying();
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			back();
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	/**
+	 * @author taog
+	 * 
+	 */
 	public static class SectionBasicFragment extends Fragment {
 		private Word word;
+
 		/**
 		 * The fragment argument representing the section number for this fragment.
 		 */
@@ -206,27 +349,7 @@ public class VocabularyDetailActivity extends FragmentActivity {
 			TextView textView1 = (TextView) rootView.findViewById(R.id.textView1);
 			TextView textView2 = (TextView) rootView.findViewById(R.id.textView2);
 			TextView textView3 = (TextView) rootView.findViewById(R.id.textView3);
-			Button play = (Button) rootView.findViewById(R.id.play);
-			play.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					startPlaying();
-				}
-			});
-			Button record = (Button) rootView.findViewById(R.id.record);
-			record.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
 
-				}
-			});
-			Button play2 = (Button) rootView.findViewById(R.id.play2);
-			play2.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-
-				}
-			});
 			if (word == null) {
 				textView1.setText("1");
 			} else {
@@ -242,30 +365,6 @@ public class VocabularyDetailActivity extends FragmentActivity {
 			return rootView;
 		}
 
-		private void startPlaying() {
-			String name= Constants.SD_PATH + "/" + Constants.AUDIO_PATH+"/test.mp3";
-			AudioManager am = (AudioManager)this.getActivity().getSystemService(Context.AUDIO_SERVICE);
-			am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
-			MediaPlayer player = new MediaPlayer();
-			
-			File file = new File(name);
-			if (file.exists()) {
-				Logger.i(this.getClass().getName(), "Playing "+file.getAbsolutePath());
-				try {
-					player.reset();
-					player.setDataSource(file.getAbsolutePath());
-					player.prepare();
-					player.start();
-				} catch (Exception e) {
-					Logger.i(this.getClass().getName(), "Exception: "+e.getMessage());
-					e.printStackTrace();
-				}
-			} else {
-				Logger.i(this.getClass().getName(), file.getAbsolutePath()+" does not exist.");
-			}
-			Logger.i(this.getClass().getName(), "Release "+file.getAbsolutePath());
-			player.release();
-		}
 	}
 
 	/**
