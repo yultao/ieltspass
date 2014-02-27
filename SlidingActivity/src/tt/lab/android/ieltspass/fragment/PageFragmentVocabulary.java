@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import tt.lab.android.ieltspass.R;
-import tt.lab.android.ieltspass.activity.VocabularyDetailActivity;
+import tt.lab.android.ieltspass.activity.VocabularyActivity;
 import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.Word;
@@ -50,7 +50,7 @@ public class PageFragmentVocabulary extends Fragment {
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		context = this.getActivity();
-		view = inflater.inflate(R.layout.page_vocabulary, null);
+		view = inflater.inflate(R.layout.fragement_vocabulary, null);
 
 		/*
 		 * simpleAdapter.registerDataSetObserver(new DataSetObserver() { public void onChanged() {
@@ -88,7 +88,7 @@ public class PageFragmentVocabulary extends Fragment {
 				Log.i("onItemClick", "position: " + position + ", id: " + id);
 				Map<String, Object> item = (Map<String, Object>) simpleAdapter.getItem(position);
 				Intent intent = new Intent();
-				intent.setClass(getActivity(), VocabularyDetailActivity.class);
+				intent.setClass(getActivity(), VocabularyActivity.class);
 				intent.putExtra("title", item.get("title").toString());
 				startActivity(intent);
 
@@ -210,7 +210,7 @@ public class PageFragmentVocabulary extends Fragment {
 	 * @param data
 	 */
 	private void resetData() {
-		simpleAdapter = new SimpleAdapter(context, currentData, R.layout.page_vocabulary_vlist, new String[] { "title",
+		simpleAdapter = new SimpleAdapter(context, currentData, R.layout.fragement_vocabulary_vlist, new String[] { "title",
 				"phon", "info", "img" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
 		listView.setAdapter(simpleAdapter);
 		

@@ -1,6 +1,9 @@
 package tt.lab.android.ieltspass.fragment;
 
 import tt.lab.android.ieltspass.R;
+import tt.lab.android.ieltspass.activity.ListeningActivity;
+import tt.lab.android.ieltspass.activity.SettingsActivity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,7 +27,7 @@ public class PageFragmentLSRW extends Fragment {
 	View view;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		view = inflater.inflate(R.layout.page_lsrw, null);
+		view = inflater.inflate(R.layout.fragement_lsrw, null);
 		initExpandableList();
 		return view;
 	}
@@ -156,6 +159,10 @@ public class PageFragmentLSRW extends Fragment {
 
 				Toast.makeText(PageFragmentLSRW.this.getActivity(),
 						"你点击了" + adapter.getChild(groupPosition, childPosition), Toast.LENGTH_SHORT).show();
+				Intent intent = new Intent();
+				intent.setClass(getActivity(), ListeningActivity.class);
+				intent.putExtra("title", "");
+				startActivity(intent);
 				return false;
 			}
 		});

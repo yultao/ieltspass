@@ -24,7 +24,7 @@ import com.viewpagerindicator.UnderlinePageIndicator;
 
 public class CenterFragmentIndicator extends CenterFragment {
 	private List<String> titles = new ArrayList<String>(); // æ ‡é¢˜
-	private Button button2, button3;
+	private Button menuButton, shareButton;
 	private static final String VOCABULARY = "词汇例句";
 	private static final String LSRW = "听说读写";
 	private static final String DAILY = "每日一练";
@@ -41,15 +41,15 @@ public class CenterFragmentIndicator extends CenterFragment {
 	}
 
 	private void initTitle(View view) {
-		button2 = (Button) view.findViewById(R.id.button2);
-		button2.setOnClickListener(new OnClickListener() {
+		menuButton = (Button) view.findViewById(R.id.menuButton);
+		menuButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				((SlidingActivity) getActivity()).showLeft();
 			}
 		});
-		button3 = (Button) view.findViewById(R.id.button3);
-		button3.setOnClickListener(new OnClickListener() {
+		shareButton = (Button) view.findViewById(R.id.shareButton);
+		shareButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				Intent intent=new Intent(Intent.ACTION_SEND);  
@@ -68,7 +68,7 @@ public class CenterFragmentIndicator extends CenterFragment {
 		PageFragmentVocabulary pageVocabulary = new PageFragmentVocabulary();
 		PageFragmentLSRW pageLSRW = new PageFragmentLSRW();
 
-		PageFragmentOther pageOther = new PageFragmentOther();
+		PageFragmentDaily pageOther = new PageFragmentDaily();
 		pagerItemList.add(pageOther);
 		pagerItemList.add(pageVocabulary);
 		pagerItemList.add(pageLSRW);

@@ -106,11 +106,11 @@ public class DailyActivity extends Activity {
 		Intent intent = this.getIntent();
 		Bundle bundle = intent.getExtras();
 		final String string = bundle.getString("title");
-		TextView title = (TextView) findViewById(R.id.textView1);
+		TextView title = (TextView) findViewById(R.id.titleText);
 		title.setText(string);
 		
 		
-		Button back = (Button) findViewById(R.id.button2);
+		Button back = (Button) findViewById(R.id.menuButton);
 		back.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -118,7 +118,7 @@ public class DailyActivity extends Activity {
 				navigateUp();
 			}
 		});
-		Button share = (Button) findViewById(R.id.button3);
+		Button share = (Button) findViewById(R.id.shareButton);
 		share.setOnClickListener(new OnClickListener() {
 
 			@Override

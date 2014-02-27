@@ -7,7 +7,7 @@
     <!--  -->
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/titleText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
@@ -32,7 +32,7 @@
             android:text="Button" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/menuButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -41,11 +41,11 @@
             android:text="Button" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/shareButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_toRightOf="@+id/button2"
+            android:layout_toRightOf="@+id/menuButton"
             android:text="Button" />
 
         <Button

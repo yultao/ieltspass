@@ -7,7 +7,7 @@ import java.util.Map;
 
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.activity.DailyActivity;
-import tt.lab.android.ieltspass.activity.VocabularyDetailActivity;
+import tt.lab.android.ieltspass.activity.VocabularyActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,11 +20,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class PageFragmentOther extends Fragment {
+public class PageFragmentDaily extends Fragment {
 	private ListView listView;
 	private View view;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		view = inflater.inflate(R.layout.page_other, null);
+		view = inflater.inflate(R.layout.fragement_daily, null);
 		initList();
 		return view;
 	}

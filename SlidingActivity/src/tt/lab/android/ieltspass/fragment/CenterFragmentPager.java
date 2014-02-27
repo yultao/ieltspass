@@ -30,8 +30,8 @@ public class CenterFragmentPager extends CenterFragment {
 		// showRight = (Button) mView.findViewById(R.id.showRight);
 
 		button1 = (Button) view.findViewById(R.id.button1);
-		button2 = (Button) view.findViewById(R.id.button2);
-		button3 = (Button) view.findViewById(R.id.button3);
+		button2 = (Button) view.findViewById(R.id.menuButton);
+		button3 = (Button) view.findViewById(R.id.shareButton);
 
 		button4 = (Button) view.findViewById(R.id.button4);
 		if (TAB) {
@@ -46,7 +46,7 @@ public class CenterFragmentPager extends CenterFragment {
 		mPager = (ViewPager) view.findViewById(R.id.pager);
 
 		PageFragmentVocabulary page1 = new PageFragmentVocabulary();
-		PageFragmentOther page2 = new PageFragmentOther();
+		PageFragmentDaily page2 = new PageFragmentDaily();
 		PageFragmentLSRW page3 = new PageFragmentLSRW();
 		pagerItemList.add(page1);
 		pagerItemList.add(page2);

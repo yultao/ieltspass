@@ -18,6 +18,7 @@ import tt.lab.android.ieltspass.data.Word;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -38,8 +39,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class VocabularyDetailActivity extends FragmentActivity {
-	private static final String TAG = VocabularyDetailActivity.class.getName();
+public class VocabularyActivity extends FragmentActivity {
+	private static final String TAG = VocabularyActivity.class.getName();
 	ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 
 	/**
@@ -127,7 +128,9 @@ public class VocabularyDetailActivity extends FragmentActivity {
 	}
 
 	private void initTitle() {
-		Button back = (Button) findViewById(R.id.button2);
+		Button back = (Button) findViewById(R.id.menuButton);
+		// back.setBackground(Resources.getSystem().getDrawable(R.drawable.back));
+		back.setBackground(getResources().getDrawable(R.drawable.back));
 		back.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -135,7 +138,7 @@ public class VocabularyDetailActivity extends FragmentActivity {
 				navigateUp();
 			}
 		});
-		Button share = (Button) findViewById(R.id.button3);
+		Button share = (Button) findViewById(R.id.shareButton);
 		share.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -149,7 +152,7 @@ public class VocabularyDetailActivity extends FragmentActivity {
 				startActivity(Intent.createChooser(intent, "分享"));
 			}
 		});
-		TextView title = (TextView) findViewById(R.id.textView1);
+		TextView title = (TextView) findViewById(R.id.titleText);
 
 		Intent intent = this.getIntent();
 		Bundle bundle = intent.getExtras();
@@ -344,9 +347,9 @@ public class VocabularyDetailActivity extends FragmentActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-			View rootView = inflater.inflate(R.layout.fragment_vocabulary_detail_section_basic, container, false);
+			View rootView = inflater.inflate(R.layout.fragment_vocabulary_section_basic, container, false);
 			TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-			TextView textView1 = (TextView) rootView.findViewById(R.id.textView1);
+			TextView textView1 = (TextView) rootView.findViewById(R.id.titleText);
 			TextView textView2 = (TextView) rootView.findViewById(R.id.textView2);
 			TextView textView3 = (TextView) rootView.findViewById(R.id.textView3);
 
@@ -381,7 +384,7 @@ public class VocabularyDetailActivity extends FragmentActivity {
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_vocabulary_detail_dummy, container, false);
+			View rootView = inflater.inflate(R.layout.fragment_vocabulary_dummy, container, false);
 			TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
 			dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
 			return rootView;

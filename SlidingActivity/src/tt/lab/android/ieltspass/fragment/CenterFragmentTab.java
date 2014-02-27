@@ -41,7 +41,7 @@ public class CenterFragmentTab extends CenterFragment {
 		}
 
 		final Fragment pageFragment1 = new PageFragmentVocabulary();
-		final Fragment pageFragment2 = new PageFragmentOther();
+		final Fragment pageFragment2 = new PageFragmentDaily();
 		final Fragment pageFragment3 = new PageFragmentLSRW();
 
 		switchTab(R.id.tab1, pageFragment1, VOCABULARY);// 默认页替换成page1

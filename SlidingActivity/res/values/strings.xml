@@ -9,5 +9,6 @@
     <string name="title_section2">词根/词缀/语源</string>
     <string name="title_section3">例句</string>
     <string name="title_activity_daily">DailyActivity</string>
+    <string name="title_activity_listening">ListeningActivity</string>
 
 </resources>

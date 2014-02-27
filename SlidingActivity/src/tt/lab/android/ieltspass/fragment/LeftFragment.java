@@ -3,6 +3,7 @@ package tt.lab.android.ieltspass.fragment;
 
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.activity.LoginActivity;
+import tt.lab.android.ieltspass.activity.SettingsActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,19 @@ public class LeftFragment extends Fragment {
 			public void onClick(View v) {
 				Intent intent = new Intent();
 				intent.setClass(getActivity(), LoginActivity.class);
+				intent.putExtra("title", "");
+				startActivity(intent);
+			}
+			
+		});
+		
+		TextView setting = (TextView)view.findViewById(R.id.my_draft_box_textview);
+		setting.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.setClass(getActivity(), SettingsActivity.class);
 				intent.putExtra("title", "");
 				startActivity(intent);
 			}
