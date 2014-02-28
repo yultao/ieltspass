@@ -16,17 +16,19 @@
 		    android:textColor="@color/bg_color" />
 		
 		<TextView
-            android:id="@+id/titleText"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/menuButton"
-            android:layout_alignBottom="@+id/menuButton"
-            android:layout_toRightOf="@+id/menuButton"
-            android:text="IELTS PASS"
-            android:textSize="18dp"
-            android:textColor="@color/bg_color"
-            android:textStyle="bold" />
-		
+		    android:id="@+id/titleText"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_alignBaseline="@+id/menuButton"
+		    android:layout_alignBottom="@+id/menuButton"
+		    android:layout_toRightOf="@+id/menuButton"
+		    android:layout_toLeftOf="@+id/shareButton"
+		    android:ellipsize="end"
+		    android:maxLines="1"
+		    android:text="IELTS PASS"
+		    android:textColor="@color/bg_color"
+		    android:textSize="18dp"
+		    android:textStyle="bold" />
         
 		<Button
             android:id="@+id/shareButton"

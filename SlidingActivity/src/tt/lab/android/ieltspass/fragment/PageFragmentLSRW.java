@@ -42,6 +42,7 @@ public class PageFragmentLSRW extends Fragment {
 			int[] logos = new int[] { R.drawable.wei, R.drawable.shu, R.drawable.wu, R.drawable.shu };
 			// 设置组视图的显示文字
 			private String[] generalsTypes = new String[] { "听", "说", "读", "写" };
+			
 			private String[][] generals = new String[][] {
 					{ "剑桥雅思1", "剑桥雅思2", "剑桥雅思3", "剑桥雅思4", "剑桥雅思5", "剑桥雅思6", "剑桥雅思7", "剑桥雅思8", "剑桥雅思9" },
 					{ "Part1", "Part2", "Part3" },
@@ -49,6 +50,37 @@ public class PageFragmentLSRW extends Fragment {
 					{ "剑桥雅思1", "剑桥雅思2", "剑桥雅思3", "剑桥雅思4", "剑桥雅思5", "剑桥雅思6", "剑桥雅思7", "剑桥雅思8", "剑桥雅思9" }
 
 			};
+			{
+				
+				String[] listening = new String[36]; 
+				for(int i=0;i<9;i++){
+					for (int j=0;j<4;j++){
+						listening[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"听力";
+					}
+				}
+				String[] speaking = new String[36]; 
+				for(int i=0;i<9;i++){
+					for (int j=0;j<4;j++){
+						speaking[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"口语";
+					}
+				}
+				String[] reading = new String[36]; 
+				for(int i=0;i<9;i++){
+					for (int j=0;j<4;j++){
+						reading[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"阅读";
+					}
+				}
+				String[] writing = new String[36]; 
+				for(int i=0;i<9;i++){
+					for (int j=0;j<4;j++){
+						writing[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"写作";
+					}
+				}
+				generals[0] = listening;
+				generals[1] = speaking;
+				generals[2] = reading;
+				generals[3] = writing;
+			}
 
 			// 子视图图思
 			/*
@@ -63,9 +95,8 @@ public class PageFragmentLSRW extends Fragment {
 				TextView textView = new TextView(PageFragmentLSRW.this.getActivity());
 				textView.setLayoutParams(lp);
 				textView.setGravity(Gravity.CENTER_VERTICAL);
-				textView.setPadding(36, 0, 0, 0);
-				textView.setTextSize(20);
-				textView.setTextColor(Color.BLACK);
+				textView.setPadding(10, 0, 0, 0);
+				textView.setTextSize(18);
 				return textView;
 			}
 
@@ -112,7 +143,7 @@ public class PageFragmentLSRW extends Fragment {
 				logo.setPadding(60, 0, 0, 0);
 				ll.addView(logo);
 				TextView textView = getTextView();
-				textView.setTextColor(Color.BLACK);
+				//textView.setTextColor(Color.BLACK);
 				textView.setText(getGroup(groupPosition).toString());
 				ll.addView(textView);
 
@@ -128,6 +159,7 @@ public class PageFragmentLSRW extends Fragment {
 				// generallogo.setImageResource(generallogos[groupPosition][childPosition]);
 				ll.addView(generallogo);
 				TextView textView = getTextView();
+				//textView.setTextColor(getResources().getColor(R.color.text_color));
 				textView.setText(getChild(groupPosition, childPosition).toString());
 				ll.addView(textView);
 				return ll;
@@ -146,8 +178,7 @@ public class PageFragmentLSRW extends Fragment {
 		expandableListView.setOnItemClickListener(new OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				Toast.makeText(PageFragmentLSRW.this.getActivity(),
-						"你点击了" + arg0 + ", " + arg1 + ", " + arg2 + ", " + arg3, Toast.LENGTH_SHORT).show();
+				//Toast.makeText(PageFragmentLSRW.this.getActivity(),"你点击了" + arg0 + ", " + arg1 + ", " + arg2 + ", " + arg3, Toast.LENGTH_SHORT).show();
 
 			}
 
@@ -157,8 +188,7 @@ public class PageFragmentLSRW extends Fragment {
 
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-				Toast.makeText(PageFragmentLSRW.this.getActivity(),
-						"你点击了" + adapter.getChild(groupPosition, childPosition), Toast.LENGTH_SHORT).show();
+				//Toast.makeText(PageFragmentLSRW.this.getActivity(),	"你点击了" + adapter.getChild(groupPosition, childPosition), Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent();
 				intent.setClass(getActivity(), ListeningActivity.class);
 				intent.putExtra("title", adapter.getChild(groupPosition, childPosition).toString());
