@@ -33,17 +33,17 @@
             android:layout_below="@+id/seekBar1" >
 
             <TextView
-                android:id="@+id/textView1"
+                android:id="@+id/currentPosition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_marginLeft="7dp"
+                android:layout_marginLeft="14dp"
                 android:text="00:00"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

@@ -351,7 +351,7 @@ public class VocabularyActivity extends FragmentActivity {
 			TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
 			TextView textView1 = (TextView) rootView.findViewById(R.id.titleText);
 			TextView textView2 = (TextView) rootView.findViewById(R.id.textView2);
-			TextView textView3 = (TextView) rootView.findViewById(R.id.textView3);
+			TextView textView3 = (TextView) rootView.findViewById(R.id.duration);
 
 			if (word == null) {
 				textView1.setText("1");

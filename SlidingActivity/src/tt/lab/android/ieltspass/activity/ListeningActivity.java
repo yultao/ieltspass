@@ -43,12 +43,11 @@ public class ListeningActivity extends FragmentActivity {
 	 */
 	ViewPager mViewPager;
 	private Button btnPlayStop;
-	private boolean playing;
 	private MediaPlayer player;
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private Handler handler = new Handler();
 	private SeekBar seekBar;
-	private TextView textView1, textView3;
+	private TextView currentPosition, duration;
 	private File file;
 
 	@Override
@@ -57,48 +56,18 @@ public class ListeningActivity extends FragmentActivity {
 		setContentView(R.layout.activity_listening);
 		initPager();
 		initFragement();
-
 		initTitle();
 		initControls();
 		initPlayer();
 	}
 
-	private void initControls() {
-		seekBar = (SeekBar) findViewById(R.id.seekBar1);
-		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				// fromUser判断是用户改变的滑块的值
-				if (fromUser == true) {
-					player.seekTo(progress);
-				}
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-			}
-		});
-		seekBar.setEnabled(false);
-
-		btnPlayStop = (Button) findViewById(R.id.button1);
-		btnPlayStop.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (playing) {
-					stopPlaying();
-				} else {
-					startPlaying();
-				}
-			}
-		});
-
-		textView1 = (TextView) findViewById(R.id.textView1);
-		textView3 = (TextView) findViewById(R.id.textView3);
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		
 	}
+
+	
 
 	private void initPager() {
 		// Create the adapter that will return a fragment for each of the three
@@ -171,34 +140,10 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void navigateUp() {
-		player.release();
+		release();
 		NavUtils.navigateUpTo(this, new Intent(this, SlidingActivity.class));
 	}
-
-	private void refreshButtonText() {
-		if (playing) {
-			btnPlayStop.setText("Stop");
-		} else {
-			btnPlayStop.setText("Start");
-		}
-	}
-
-	private Runnable updateProgressThread = new Runnable() {
-		public void run() {
-			// 获得歌曲现在播放位置并设置成播放进度条的值
-			try {
-				int currentPosition = player.getCurrentPosition();
-				seekBar.setProgress(currentPosition);
-				textView1.setText(formatTime(currentPosition));
-				// 每次延迟100毫秒再启动线程
-				handler.postDelayed(updateProgressThread, 100);
-			} catch (Exception e) {
-				Logger.i(TAG, "updateProgressThread: " + e.getMessage());
-			}
-
-		}
-	};
-
+	
 	private void initPlayer() {
 		// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
 		// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
@@ -215,7 +160,9 @@ public class ListeningActivity extends FragmentActivity {
 			// @Override
 			/* 覆盖文件播出完毕事件 */
 			public void onCompletion(MediaPlayer arg0) {
-				stopPlaying();
+				pause();
+				//seekBar.setProgress(0);
+				//currentPosition.setText(formatTime(0));
 			}
 		});
 
@@ -224,7 +171,7 @@ public class ListeningActivity extends FragmentActivity {
 			@Override
 			/* 覆盖错误处理事件 */
 			public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
-				stopPlaying();
+				pause();
 				return false;
 			}
 		});
@@ -233,11 +180,11 @@ public class ListeningActivity extends FragmentActivity {
 		Logger.i(TAG, "Playing " + file.getAbsolutePath());
 		if (file.exists()) {
 			try {
-				seekBar.setEnabled(true);
 				player.reset();
 				player.setDataSource(file.getAbsolutePath());
 				player.prepare();
-				textView3.setText(formatTime(player.getDuration()));
+				duration.setText(formatTime(player.getDuration()));
+				seekBar.setMax(player.getDuration());
 			} catch (Exception e) {
 				Logger.i(TAG, "startPlaying: " + e.getMessage());
 				e.printStackTrace();
@@ -245,39 +192,119 @@ public class ListeningActivity extends FragmentActivity {
 		}
 	}
 
-	private void startPlaying() {
-		Logger.i(TAG, "startPlaying I");
+	private void initControls() {
+		seekBar = (SeekBar) findViewById(R.id.seekBar1);
+		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				
+				// fromUser判断是用户改变的滑块的值
+				try {
+
+					if (fromUser == true) {
+						Logger.i(TAG, "onProgressChanged: fromUser: "+progress);
+						player.seekTo(progress);
+						currentPosition.setText(formatTime(progress));
+					}
+				} catch (Exception e) {
+					Logger.i(TAG, "onProgressChanged: E: "+e.getMessage());
+				}
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			}
+		});
+
+		btnPlayStop = (Button) findViewById(R.id.button1);
+		btnPlayStop.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (player.isPlaying()) {
+					pause();
+				} else {
+					start();
+				}
+			}
+		});
+
+		currentPosition = (TextView) findViewById(R.id.currentPosition);
+		duration = (TextView) findViewById(R.id.duration);
+	}
+	
+	private void refreshButtonText() {
+		if (player.isPlaying()) {
+			btnPlayStop.setText("Stop");
+		} else {
+			btnPlayStop.setText("Start");
+		}
+	}
+
+	private Runnable updateProgressThread = new Runnable() {
+		public void run() {
+			// 获得歌曲现在播放位置并设置成播放进度条的值
+			try {
+				int cp = player.getCurrentPosition();
+				seekBar.setProgress(cp);
+				currentPosition.setText(formatTime(cp));
+				// 每次延迟100毫秒再启动线程
+				handler.postDelayed(updateProgressThread, 100);
+			} catch (Exception e) {
+				Logger.i(TAG, "updateProgressThread: " + e.getMessage());
+			}
+
+		}
+	};
+
+	
+	private void start() {
+		Logger.i(TAG, "start I");
 		try {
-			player.seekTo(seekBar.getProgress());
+			//player.seekTo(seekBar.getProgress());
 			player.start();
-			playing = true;
 			handler.post(updateProgressThread);
-			seekBar.setMax(player.getDuration());
-			textView1.setText(formatTime(player.getCurrentPosition()));
+			
+			currentPosition.setText(formatTime(player.getCurrentPosition()));
 			refreshButtonText();
 
 		} catch (Exception e) {
-			Logger.i(TAG, "startPlaying: " + e.getMessage());
+			Logger.i(TAG, "start: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
 
-	private void stopPlaying() {
-		Logger.i(TAG, "stopPlaying I");
+	private void pause() {
+		Logger.i(TAG, "pause I");
 		try {
-			playing = false;
 			/* 发生错误时也解除资源与MediaPlayer的赋值 */
 			player.pause();
 			// tv.setText("播放发生异常!");
 			handler.removeCallbacks(updateProgressThread);
 			refreshButtonText();
 		} catch (Exception e) {
-			Logger.i(TAG, "stopPlaying: " + e.getMessage());
+			Logger.i(TAG, "pause: E: " + e.getMessage());
 			e.printStackTrace();
 		}
-		Logger.i(TAG, "stopPlaying O");
+		Logger.i(TAG, "pause O");
 	}
-
+	private void release() {
+		Logger.i(TAG, "release I");
+		try {
+			/* 发生错误时也解除资源与MediaPlayer的赋值 */
+			player.release();
+			// tv.setText("播放发生异常!");
+			handler.removeCallbacks(updateProgressThread);
+			refreshButtonText();
+		} catch (Exception e) {
+			Logger.i(TAG, "release: E: " + e.getMessage());
+			e.printStackTrace();
+		}
+		Logger.i(TAG, "release O");
+	}
 	private String formatTime(int l) {
 		String str = "";
 		int hour = 0;
@@ -301,15 +328,10 @@ public class ListeningActivity extends FragmentActivity {
 		return str;
 	}
 
-	private void back() {
-		stopPlaying();
-	}
-
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			back();
-			player.release();
+			release();
 		}
 		return super.onKeyDown(keyCode, event);
 	}

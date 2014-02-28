@@ -161,7 +161,7 @@ public class PageFragmentLSRW extends Fragment {
 						"你点击了" + adapter.getChild(groupPosition, childPosition), Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent();
 				intent.setClass(getActivity(), ListeningActivity.class);
-				intent.putExtra("title", "");
+				intent.putExtra("title", adapter.getChild(groupPosition, childPosition).toString());
 				startActivity(intent);
 				return false;
 			}

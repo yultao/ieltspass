@@ -405,6 +405,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int cat=0x7f0a0033;
         public static final int center_frame=0x7f0a0020;
         public static final int controls=0x7f0a002b;
+        public static final int currentPosition=0x7f0a000e;
+        public static final int duration=0x7f0a000f;
         public static final int email=0x7f0a0017;
         public static final int expandableListView1=0x7f0a002d;
         public static final int grade_textview=0x7f0a0039;
@@ -452,9 +454,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int tab_indicator=0x7f0a0022;
         public static final int tabhost=0x7f0a0025;
         public static final int tabs=0x7f0a0021;
-        public static final int textView1=0x7f0a000e;
         public static final int textView2=0x7f0a0031;
-        public static final int textView3=0x7f0a000f;
         public static final int textViewDate=0x7f0a001d;
         public static final int textViewPhoetic=0x7f0a001e;
         public static final int textViewTitle=0x7f0a001c;
