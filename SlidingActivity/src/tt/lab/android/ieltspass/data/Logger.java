@@ -15,14 +15,14 @@ public class Logger {
 	
 	private static File logfile;
 	static {
-		String sdDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-		String targetDir = sdDir + "/" + Constants.ROOT_PATH +"/";
+		
+		String targetDir = Constants.SD_PATH + "/" + Constants.LOG_PATH;
 		File dir = new File(targetDir);
 		if (!dir.exists()) {
 			dir.mkdirs();
 		}
 		
-		String logfilePath = targetDir + Constants.LOG_NAME;
+		String logfilePath = targetDir +"/"+ getFormatedDate().substring(0, 10)+".txt";
 		logfile = new File(logfilePath);
 	}
 	public static String getFormatedDate(){

@@ -109,7 +109,7 @@ public class PageFragmentLSRW extends Fragment {
 				ll.setOrientation(0);
 				ImageView logo = new ImageView(PageFragmentLSRW.this.getActivity());
 				logo.setImageResource(logos[groupPosition]);
-				logo.setPadding(40, 0, 0, 0);
+				logo.setPadding(60, 0, 0, 0);
 				ll.addView(logo);
 				TextView textView = getTextView();
 				textView.setTextColor(Color.BLACK);

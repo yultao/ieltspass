@@ -238,9 +238,9 @@ public class ListeningActivity extends FragmentActivity {
 	
 	private void refreshButtonText() {
 		if (player.isPlaying()) {
-			btnPlayStop.setText("Stop");
+			btnPlayStop.setBackground(getResources().getDrawable(R.drawable.pause));
 		} else {
-			btnPlayStop.setText("Start");
+			btnPlayStop.setBackground(getResources().getDrawable(R.drawable.play));
 		}
 	}
 

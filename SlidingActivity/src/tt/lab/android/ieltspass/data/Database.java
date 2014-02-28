@@ -16,31 +16,32 @@ import android.content.res.AssetManager;
 import android.os.Environment;
 
 public class Database {
+	private static final String TAG= Database.class.getName();
 	private static Map<String, Word> words = new HashMap<String, Word>();
 	private static boolean internal;
 
 	static {
-		String wordFileName = null;
+		String dataFileName = null;
 
 		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			internal = true;
 		} else {
-			Constants.SD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
-			String targetDir = Constants.SD_PATH + "/" + Constants.ROOT_PATH + "/";
-			File dir = new File(targetDir);
+			String  dataPath = Constants.SD_PATH+"/"+Constants.DATA_PATH;
+			Logger.i(TAG, "dataPath: "+dataPath);
+			File dir = new File(dataPath);
+			
 			if (!dir.exists()) {
 				dir.mkdirs();
 			}
-
-			wordFileName = targetDir + Constants.DATA_NAME;
-			File file = new File(wordFileName);
+			dataFileName = dataPath  +"/"+Constants.DATA_NAME;
+			File dataFile = new File(dataFileName);
 
 			// 第一次初始化将预装文件复制到SD卡，以后就用这个文件
-			if (!file.exists()) {
+			if (!dataFile.exists()) {
 				long t1 = System.currentTimeMillis();
 				try {
 					InputStream is = Constants.assetManager.open(Constants.DATA_NAME);
-					OutputStream os = new FileOutputStream(wordFileName);
+					OutputStream os = new FileOutputStream(dataFileName);
 					byte[] buffer = new byte[1024];
 					int len;
 					while ((len = is.read(buffer)) != -1) {
@@ -51,17 +52,50 @@ public class Database {
 					internal = false;
 				} catch (Exception e) {
 					internal = true;
-					Logger.i(Database.class.getName(), "Copy failed: " + e.getMessage());
+					Logger.i(Database.class.getName(), "Copy DATA failed: " + e.getMessage());
 				}
 				long t2 = System.currentTimeMillis();
-				Logger.i(Database.class.getName(), "Copy succeeded: " + (t2-t1));
+				Logger.i(Database.class.getName(), "Copy DATA completed: " + (t2-t1));
 			} else {
 				internal = false;
 			}
+			
+			
+			String audioPath = Constants.SD_PATH+"/"+Constants.AUDIO_PATH;
+			Logger.i(TAG, "audioPath: "+audioPath);
+			File audioDir = new File(audioPath);
+			if (!audioDir.exists()) {
+				audioDir.mkdirs();
+			}
+			
+			String audioFileName = audioPath+"/" +Constants.AUDIO_NAME;
+			File audioFile = new File(audioFileName);
+
+			// 第一次初始化将预装文件复制到SD卡，以后就用这个文件
+			if (!audioFile.exists()) {
+				long t1 = System.currentTimeMillis();
+				try {
+					InputStream is = Constants.assetManager.open(Constants.AUDIO_NAME);
+					OutputStream os = new FileOutputStream(audioFileName);
+					byte[] buffer = new byte[1024];
+					int len;
+					while ((len = is.read(buffer)) != -1) {
+						os.write(buffer, 0, len);
+					}
+					is.close();
+					os.close();
+				} catch (Exception e) {
+					Logger.i(Database.class.getName(), "Copy AUDIO failed: " + e.getMessage());
+				}
+				long t2 = System.currentTimeMillis();
+				Logger.i(Database.class.getName(), "Copy AUDIO completed: " + (t2-t1));
+			} 
+			
+			Logger.i(TAG, "internal: " + internal);
 		}
 		try {
 			InputStream is = internal ? Constants.assetManager.open(Constants.DATA_NAME) : new FileInputStream(
-					wordFileName);
+					dataFileName);
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 			String s = null;
 			while ((s = bufferedReader.readLine()) != null) {
