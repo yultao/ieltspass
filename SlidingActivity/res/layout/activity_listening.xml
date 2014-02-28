@@ -1,18 +1,92 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ListeningActivity" >
-	<include 
-		android:id="@+id/title"
-		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content"
-		layout="@layout/title">
-	</include>
-    <TextView
-        android:layout_width="wrap_content"
+    android:background="#fff" >
+
+    <include
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
-        android:text="@string/hello_world" />
+        layout="@layout/title" >
+    </include>
+
+    <RelativeLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="5dp"
+        android:layout_below="@+id/title" >
+
+        <SeekBar
+            android:id="@+id/seekBar1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="10dp" />
+
+        <RelativeLayout
+            android:id="@+id/player1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/seekBar1" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="7dp"
+                android:text="00:00"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="7dp"
+                android:text="00:00"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/player2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/player1" >
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Start" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <android.support.v4.view.ViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/linearLayout1"
+        
+        tools:context=".ListeningActivity" >
+
+        <!-- This title strip will display the currently visible page title, as well as the page titles for adjacent pages. -->
+
+        <android.support.v4.view.PagerTitleStrip
+            android:id="@+id/pager_title_strip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bg_color"
+            android:padding="10dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp" />
+    </android.support.v4.view.ViewPager>
 
 </RelativeLayout>

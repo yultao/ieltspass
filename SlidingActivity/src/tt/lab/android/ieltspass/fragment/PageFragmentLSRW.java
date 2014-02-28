@@ -27,7 +27,7 @@ public class PageFragmentLSRW extends Fragment {
 	View view;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		view = inflater.inflate(R.layout.fragement_lsrw, null);
+		view = inflater.inflate(R.layout.fragment_lsrw, null);
 		initExpandableList();
 		return view;
 	}

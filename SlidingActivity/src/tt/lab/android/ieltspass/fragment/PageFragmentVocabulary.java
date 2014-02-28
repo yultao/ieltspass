@@ -50,7 +50,7 @@ public class PageFragmentVocabulary extends Fragment {
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		context = this.getActivity();
-		view = inflater.inflate(R.layout.fragement_vocabulary, null);
+		view = inflater.inflate(R.layout.fragment_vocabulary, null);
 
 		/*
 		 * simpleAdapter.registerDataSetObserver(new DataSetObserver() { public void onChanged() {
@@ -210,7 +210,7 @@ public class PageFragmentVocabulary extends Fragment {
 	 * @param data
 	 */
 	private void resetData() {
-		simpleAdapter = new SimpleAdapter(context, currentData, R.layout.fragement_vocabulary_vlist, new String[] { "title",
+		simpleAdapter = new SimpleAdapter(context, currentData, R.layout.fragment_vocabulary_vlist, new String[] { "title",
 				"phon", "info", "img" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
 		listView.setAdapter(simpleAdapter);
 		

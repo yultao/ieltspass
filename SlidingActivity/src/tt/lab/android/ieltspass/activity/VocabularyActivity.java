@@ -41,7 +41,7 @@ import android.widget.TextView;
 
 public class VocabularyActivity extends FragmentActivity {
 	private static final String TAG = VocabularyActivity.class.getName();
-	ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
+	
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide fragments for each of the sections. We use a
@@ -58,7 +58,7 @@ public class VocabularyActivity extends FragmentActivity {
 	Word word;
 
 	SectionBasicFragment sectionBasicFragment;
-
+	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private Button btnPlayStop;
 	private boolean playing;
 	private MediaPlayer player;
@@ -66,7 +66,7 @@ public class VocabularyActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_vocabulary_detail);
+		setContentView(R.layout.activity_vocabulary);
 		ActionBar actionBar = getActionBar();
 		if (actionBar != null)
 			actionBar.setDisplayHomeAsUpEnabled(true);

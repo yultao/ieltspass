@@ -2,10 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_webview_vertical_margin"
-    android:paddingLeft="@dimen/activity_webview_horizontal_margin"
-    android:paddingRight="@dimen/activity_webview_horizontal_margin"
-    android:paddingTop="@dimen/activity_webview_vertical_margin"
     tools:context=".DailyActivity" >
 	<RelativeLayout
         android:id="@+id/mytitle"

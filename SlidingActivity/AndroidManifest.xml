@@ -47,6 +47,14 @@
             android:label="@string/title_activity_settings" >
         </activity>
         <activity
+            android:name="tt.lab.android.ieltspass.activity.Listening2Activity"
+            android:label="@string/title_activity_listening" >
+        </activity>
+        <activity
+            android:name="tt.lab.android.ieltspass.activity.ListeningActivity"
+            android:label="@string/title_activity_listening3" >
+        </activity>
+        <activity
             android:name="tt.lab.android.ieltspass.activity.ListeningActivity"
             android:label="@string/title_activity_listening" >
         </activity>

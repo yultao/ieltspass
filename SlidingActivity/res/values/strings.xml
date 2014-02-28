@@ -8,7 +8,11 @@
     <string name="title_section1">基本信息</string>
     <string name="title_section2">词根/词缀/语源</string>
     <string name="title_section3">例句</string>
+    <string name="title_listening_section1">剑桥原题</string>
+    <string name="title_listening_section2">答案讲解</string>
+    <string name="title_listening_section3">听力原文</string>
     <string name="title_activity_daily">DailyActivity</string>
     <string name="title_activity_listening">ListeningActivity</string>
+    <string name="title_activity_listening3">Listening3Activity</string>
 
 </resources>

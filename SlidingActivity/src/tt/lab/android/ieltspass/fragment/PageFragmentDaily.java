@@ -24,7 +24,7 @@ public class PageFragmentDaily extends Fragment {
 	private ListView listView;
 	private View view;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		view = inflater.inflate(R.layout.fragement_daily, null);
+		view = inflater.inflate(R.layout.fragment_daily, null);
 		initList();
 		return view;
 	}
