@@ -14,6 +14,7 @@ import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.fragment.PageFragmentLSRW;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.os.Bundle;
 import android.os.Handler;
@@ -190,7 +191,7 @@ public class ListeningActivity extends FragmentActivity {
 				player.reset();
 				player.setDataSource(file.getAbsolutePath());
 				player.prepare();
-				duration.setText(formatTimeMillis(player.getDuration()));
+				duration.setText(formatTimeSecond(player.getDuration()));
 				seekBar.setMax(player.getDuration());
 			} catch (Exception e) {
 				Logger.i(TAG, "initPlayer: " + e.getMessage());
@@ -211,7 +212,7 @@ public class ListeningActivity extends FragmentActivity {
 					if (fromUser == true) {
 						Logger.i(TAG, "onProgressChanged: fromUser: " + progress);
 						player.seekTo(progress);
-						currentPosition.setText(formatTimeMillis(progress));
+						currentPosition.setText(formatTimeSecond(progress));
 					}
 				} catch (Exception e) {
 					Logger.i(TAG, "onProgressChanged: E: " + e.getMessage());
@@ -253,9 +254,9 @@ public class ListeningActivity extends FragmentActivity {
 			try {
 				int cp = player.getCurrentPosition();
 				seekBar.setProgress(cp);
-				currentPosition.setText(formatTimeMillis(cp));
+				currentPosition.setText(formatTimeSecond(cp));
 				// 每次延迟100毫秒再启动线程
-				handler.postDelayed(updateProgressThread, 1);
+				handler.postDelayed(updateProgressThread, 100);
 			} catch (Exception e) {
 				Logger.i(TAG, "updateProgressThread: " + e.getMessage());
 			}
@@ -270,7 +271,7 @@ public class ListeningActivity extends FragmentActivity {
 			player.start();
 			handler.post(updateProgressThread);
 
-			currentPosition.setText(formatTimeMillis(player.getCurrentPosition()));
+			currentPosition.setText(formatTimeSecond(player.getCurrentPosition()));
 			refreshButtonText();
 
 		} catch (Exception e) {
@@ -308,14 +309,40 @@ public class ListeningActivity extends FragmentActivity {
 		}
 		Logger.i(TAG, "release O");
 	}
-
-	private String formatTime1(int l) {
+	private static int formatTimeInt(String time) {
+		//03:02:01.83
+		String[] split1 = time.split("[.]");
+		String hour = "0";
+		String minute = "0";
+		String second ="0";
+		String millis = "0";
+		if(split1.length==2){//02:03.83
+			millis = split1[1];
+			String[] split2 = split1[0].split(":");
+			if(split2.length==2){//02:01
+				minute=split2[0];
+				second = split2[1];
+			} else if (split2.length==3){//01:02:03
+				hour = split2[0];
+				minute=split2[1];
+				second = split2[2];	
+			}
+		}
+		
+		int milliseonds = Integer.parseInt(hour)*60*60*1000 + 
+				Integer.parseInt(minute)*60*1000+
+				Integer.parseInt(second)*1000+
+				Integer.parseInt(millis)*10;
+		
+		return milliseonds;
+	}
+	private static String formatTimeSecond(int timeInt) {
 		String str = "";
 		int hour = 0;
 		int minute = 0;
 		int second = 0;
 
-		second = l / 1000;
+		second = timeInt / 1000;
 
 		if (second >= 60) {
 			minute = second / 60;
@@ -419,16 +446,24 @@ public class ListeningActivity extends FragmentActivity {
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
 		ScrollView scrollView1;
-		Map<String, TextView> lyricsTextViewMap = new HashMap<String, TextView>();
+		Map<String, Map<String,Object>> lyricsTextViewMap = new HashMap<String, Map<String,Object>>();
+		List<Map<String, Object>> lyricsTextViewList = new ArrayList<Map<String, Object>>();
 		Handler handler = new Handler();
 		TextView lastTextView = null;
 		MediaPlayer player;
-
+		int currentIndex = 0;
 		public DummySectionFragment() {
 		}
 
 		public void setPlayer(MediaPlayer player) {
 			this.player = player;
+			this.player.setOnCompletionListener(new OnCompletionListener() {
+				
+				@Override
+				public void onCompletion(MediaPlayer mp) {
+					currentIndex = 0;
+				}
+			});
 		}
 
 		@Override
@@ -439,11 +474,23 @@ public class ListeningActivity extends FragmentActivity {
 			LinearLayout linearLayout1 = (LinearLayout) rootView.findViewById(R.id.linearLayout1);
 			try {
 				List<Map<String, String>> lyricsList = Database.getLyrics();
-				for (Map<String,String> sentence : lyricsList) {
-
-					TextView tv = createTextView(sentence.get("time")+": "+sentence.get("word"));
-					linearLayout1.addView(tv);
-					lyricsTextViewMap.put(sentence.get("time"), tv);
+				for (int i=0;i<lyricsList.size();i++) {
+					Map<String,String> sentence = lyricsList.get(i);
+					String time = sentence.get("time");
+					String word = sentence.get("word");
+					TextView textView = createTextView(time+": "+word);
+					linearLayout1.addView(textView);
+					
+					Map<String, Object> m = new HashMap<String, Object>();
+					m.put("time", time);
+					m.put("text", textView);
+					lyricsTextViewList.add(m);
+					
+					Map<String, Object> mm = new HashMap<String, Object>();
+					mm.put("index", i);
+					mm.put("text", textView);
+					lyricsTextViewList.add(mm);
+					lyricsTextViewMap.put(time, mm);
 				}
 				handler.post(updateLyricsThread);
 			} catch (Exception e) {
@@ -452,44 +499,73 @@ public class ListeningActivity extends FragmentActivity {
 			return rootView;
 		}
 
-		int r = 0;
+		
 		private Runnable updateLyricsThread = new Runnable() {
 			public void run() {
 				try {
-					int cp = player.getCurrentPosition();
-
-					String formatTimeMillis = formatTimeMillis(cp);
-					TextView textView = lyricsTextViewMap.get(formatTimeMillis);
-					if (textView != null) {
-						// int r = (int)(Math.random()*lyrics.size()-1);
-						if (lastTextView != null) {
-							lastTextView.setBackgroundColor(getResources().getColor(R.color.no_color));
-						}
-						lastTextView = textView; 
-						textView.setBackgroundColor(getResources().getColor(R.color.green));
-						scrollView1.requestChildFocus(textView,textView);
-					}
+					
+					//Algorithm 1
 					/*
-					 * 
-					 * if (r == lyricsTextViewList.size()) r = 0;
-					 * 
-					 * int real = r + 5;
-					 * 
-					 * if (real >= lyricsTextViewList.size()) { real = lyricsTextViewList.size() - 1; } TextView
-					 * textView = lyricsTextViewList.get(r);
-					 * 
-					 * lastTextView = textView; textView.setBackgroundColor(getResources().getColor(R.color.green));
-					 * TextView scrollTo = lyricsTextViewList.get(real); scrollView1.requestChildFocus(scrollTo,
-					 * scrollTo);
-					 * 
-					 * r++;
-					 */
-					handler.postDelayed(updateLyricsThread, 1);
+					int cp = player.getCurrentPosition();
+					String formatTimeSecond = formatTimeSecond(cp);
+					
+					Map<String, Object> map = lyricsTextViewMap.get(formatTimeSecond);
+					
+					if (map != null) {
+						if (lastTextView != null) {
+							lastTextView.setTextColor(getResources().getColor(R.color.sub_text_color));
+						}
+						TextView textView = (TextView)map.get("text");
+						textView.setTextColor(getResources().getColor(R.color.red));
+						lastTextView = textView; 
+						
+						
+						int index = Integer.parseInt((String)map.get("index"));
+						int real = index + 5;
+						if (real >= lyricsTextViewList.size()) { 
+							real = lyricsTextViewList.size() - 1; 
+						}
+						TextView toScroll = (TextView)lyricsTextViewList.get(real).get("text");
+						scrollView1.requestChildFocus(toScroll,toScroll);
+					}
+					*/
+					
+					//Algorithm 2
+					
+					if (currentIndex < lyricsTextViewList.size()) {
+						Map<String, Object> map = lyricsTextViewList.get(currentIndex);
+						String time = (String)map.get("time");
+						
+						int timeInt = formatTimeInt(time);
+						int cp = player.getCurrentPosition();
+						if(cp>=timeInt){
+							
+							TextView textView = (TextView)map.get("text");
+							if (lastTextView != null) {
+								lastTextView.setTextColor(getResources().getColor(R.color.sub_text_color));
+							}
+							lastTextView = textView; 
+							
+							int real = currentIndex + 5;
+							if (real >= lyricsTextViewList.size()) { 
+								real = lyricsTextViewList.size() - 1; 
+							}
+							TextView toScroll = (TextView)lyricsTextViewList.get(real).get("text");
+							textView.setTextColor(getResources().getColor(R.color.red));
+							
+							scrollView1.requestChildFocus(toScroll,toScroll);
+							currentIndex++;
+						}
+					}
+					/**/
+					handler.postDelayed(updateLyricsThread, 100);
 				} catch (Exception e) {
 					Logger.i(TAG, "updateLyricsThread e: " + e.getMessage());
 				}
 
 			}
+
+			
 		};
 
 		private TextView createTextView(String text) {

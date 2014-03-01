@@ -101,13 +101,14 @@ public class Database {
 			String s = null;
 			while ((s = bufferedReader.readLine()) != null) {
 
-				String wordInfo = s.trim();
-				if (wordInfo.length() != 0 && wordInfo.startsWith("[")) {
+				String ss = s.trim();
+				if (ss.length() != 0 && ss.startsWith("[")) {
 					//[02:01.83]我却受控在你手里
 					//[02:06.44]
-					String time = wordInfo.substring(wordInfo.indexOf("[") + 1, wordInfo.indexOf("]"));
-					String word = wordInfo.substring(wordInfo.indexOf("]") + 1);
+					String time = ss.substring(ss.indexOf("[") + 1, ss.indexOf("]"));
+					String word = ss.substring(ss.indexOf("]") + 1).trim();
 					Map<String, String> m = new HashMap<String, String>();
+					time = time.substring(0,time.indexOf("."));
 					m.put("time", time);
 					m.put("word", word);
 					lyrics.add(m);
