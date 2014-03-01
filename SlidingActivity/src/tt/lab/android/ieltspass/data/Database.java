@@ -9,15 +9,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.content.res.AssetManager;
 import android.os.Environment;
 
 public class Database {
-	private static final String TAG= Database.class.getName();
+	private static final String TAG = Database.class.getName();
 	private static Map<String, Word> words = new HashMap<String, Word>();
+	private static List<Map<String,String>> lyrics = new ArrayList<Map<String,String>>();
 	private static boolean internal;
 
 	static {
@@ -26,73 +29,18 @@ public class Database {
 		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			internal = true;
 		} else {
-			String  dataPath = Constants.SD_PATH+"/"+Constants.DATA_PATH;
-			Logger.i(TAG, "dataPath: "+dataPath);
-			File dir = new File(dataPath);
-			
-			if (!dir.exists()) {
-				dir.mkdirs();
-			}
-			dataFileName = dataPath  +"/"+Constants.DATA_NAME;
-			File dataFile = new File(dataFileName);
-
-			// 第一次初始化将预装文件复制到SD卡，以后就用这个文件
-			if (!dataFile.exists()) {
-				long t1 = System.currentTimeMillis();
-				try {
-					InputStream is = Constants.assetManager.open(Constants.DATA_NAME);
-					OutputStream os = new FileOutputStream(dataFileName);
-					byte[] buffer = new byte[1024];
-					int len;
-					while ((len = is.read(buffer)) != -1) {
-						os.write(buffer, 0, len);
-					}
-					is.close();
-					os.close();
-					internal = false;
-				} catch (Exception e) {
-					internal = true;
-					Logger.i(Database.class.getName(), "Copy DATA failed: " + e.getMessage());
-				}
-				long t2 = System.currentTimeMillis();
-				Logger.i(Database.class.getName(), "Copy DATA completed: " + (t2-t1));
-			} else {
-				internal = false;
-			}
-			
-			
-			String audioPath = Constants.SD_PATH+"/"+Constants.AUDIO_PATH;
-			Logger.i(TAG, "audioPath: "+audioPath);
-			File audioDir = new File(audioPath);
-			if (!audioDir.exists()) {
-				audioDir.mkdirs();
-			}
-			
-			String audioFileName = audioPath+"/" +Constants.AUDIO_NAME;
-			File audioFile = new File(audioFileName);
-
-			// 第一次初始化将预装文件复制到SD卡，以后就用这个文件
-			if (!audioFile.exists()) {
-				long t1 = System.currentTimeMillis();
-				try {
-					InputStream is = Constants.assetManager.open(Constants.AUDIO_NAME);
-					OutputStream os = new FileOutputStream(audioFileName);
-					byte[] buffer = new byte[1024];
-					int len;
-					while ((len = is.read(buffer)) != -1) {
-						os.write(buffer, 0, len);
-					}
-					is.close();
-					os.close();
-				} catch (Exception e) {
-					Logger.i(Database.class.getName(), "Copy AUDIO failed: " + e.getMessage());
-				}
-				long t2 = System.currentTimeMillis();
-				Logger.i(Database.class.getName(), "Copy AUDIO completed: " + (t2-t1));
-			} 
+			dataFileName = initVocabulary();
+			initData(Constants.AUDIO_PATH, Constants.AUDIO_NAME);
+			initData(Constants.AUDIO_PATH, Constants.LRC_NAME);
 			
 			Logger.i(TAG, "internal: " + internal);
 		}
+		
+		parseWord(dataFileName);
+		parseLyrics();
+	}
+
+	private static void parseWord(String dataFileName) {
 		try {
 			InputStream is = internal ? Constants.assetManager.open(Constants.DATA_NAME) : new FileInputStream(
 					dataFileName);
@@ -145,7 +93,110 @@ public class Database {
 		}
 	}
 
+	private static void parseLyrics() {
+		try {
+			InputStream is = internal ? Constants.assetManager.open(Constants.LRC_NAME) : new FileInputStream(
+					Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + Constants.LRC_NAME);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+			String s = null;
+			while ((s = bufferedReader.readLine()) != null) {
+
+				String wordInfo = s.trim();
+				if (wordInfo.length() != 0 && wordInfo.startsWith("[")) {
+					//[02:01.83]我却受控在你手里
+					//[02:06.44]
+					String time = wordInfo.substring(wordInfo.indexOf("[") + 1, wordInfo.indexOf("]"));
+					String word = wordInfo.substring(wordInfo.indexOf("]") + 1);
+					Map<String, String> m = new HashMap<String, String>();
+					m.put("time", time);
+					m.put("word", word);
+					lyrics.add(m);
+				}
+			}
+			is.close();
+			bufferedReader.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.i(Database.class.getName(), "Exception: " + e.getMessage());
+		}
+	}
+
+	private static void initData(String path, String name) {
+		String audioPath = Constants.SD_PATH + "/" + path;
+		Logger.i(TAG, "audioPath: " + audioPath);
+		File audioDir = new File(audioPath);
+		if (!audioDir.exists()) {
+			audioDir.mkdirs();
+		}
+
+		String audioFileName = audioPath + "/" + name;
+		File audioFile = new File(audioFileName);
+
+		// 第一次初始化将预装文件复制到SD卡，以后就用这个文件
+		if (!audioFile.exists()) {
+			long t1 = System.currentTimeMillis();
+			try {
+				InputStream is = Constants.assetManager.open(name);
+				OutputStream os = new FileOutputStream(audioFileName);
+				byte[] buffer = new byte[1024];
+				int len;
+				while ((len = is.read(buffer)) != -1) {
+					os.write(buffer, 0, len);
+				}
+				is.close();
+				os.close();
+			} catch (Exception e) {
+				Logger.i(Database.class.getName(), "Copy AUDIO failed: " + e.getMessage());
+			}
+			long t2 = System.currentTimeMillis();
+			Logger.i(Database.class.getName(), "Copy AUDIO completed: " + (t2 - t1));
+		}
+	}
+
+	private static String initVocabulary() {
+		String dataFileName;
+		String dataPath = Constants.SD_PATH + "/" + Constants.DATA_PATH;
+		Logger.i(TAG, "dataPath: " + dataPath);
+		File dir = new File(dataPath);
+
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+		dataFileName = dataPath + "/" + Constants.DATA_NAME;
+		File dataFile = new File(dataFileName);
+
+		// 第一次初始化将预装文件复制到SD卡，以后就用这个文件
+		if (!dataFile.exists()) {
+			long t1 = System.currentTimeMillis();
+			try {
+				InputStream is = Constants.assetManager.open(Constants.DATA_NAME);
+				OutputStream os = new FileOutputStream(dataFileName);
+				byte[] buffer = new byte[1024];
+				int len;
+				while ((len = is.read(buffer)) != -1) {
+					os.write(buffer, 0, len);
+				}
+				is.close();
+				os.close();
+				internal = false;
+			} catch (Exception e) {
+				internal = true;
+				Logger.i(Database.class.getName(), "Copy DATA failed: " + e.getMessage());
+			}
+			long t2 = System.currentTimeMillis();
+			Logger.i(Database.class.getName(), "Copy DATA completed: " + (t2 - t1));
+		} else {
+			internal = false;
+		}
+		return dataFileName;
+	}
+
 	public static Map<String, Word> getWords() {
 		return words;
+	}
+
+	public static List<Map<String, String>> getLyrics() {
+		return lyrics;
 	}
 }

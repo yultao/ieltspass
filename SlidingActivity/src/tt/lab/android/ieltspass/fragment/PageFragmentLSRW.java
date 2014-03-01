@@ -53,26 +53,14 @@ public class PageFragmentLSRW extends Fragment {
 			{
 				
 				String[] listening = new String[36]; 
-				for(int i=0;i<9;i++){
-					for (int j=0;j<4;j++){
-						listening[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"听力";
-					}
-				}
 				String[] speaking = new String[36]; 
-				for(int i=0;i<9;i++){
-					for (int j=0;j<4;j++){
-						speaking[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"口语";
-					}
-				}
 				String[] reading = new String[36]; 
-				for(int i=0;i<9;i++){
-					for (int j=0;j<4;j++){
-						reading[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"阅读";
-					}
-				}
 				String[] writing = new String[36]; 
 				for(int i=0;i<9;i++){
 					for (int j=0;j<4;j++){
+						listening[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"听力";
+						speaking[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"口语";
+						reading[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"阅读";
 						writing[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"写作";
 					}
 				}
@@ -91,7 +79,7 @@ public class PageFragmentLSRW extends Fragment {
 			 */
 			// 自己定义思��获得文字信息的方思
 			TextView getTextView() {
-				AbsListView.LayoutParams lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 64);
+				AbsListView.LayoutParams lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 64);
 				TextView textView = new TextView(PageFragmentLSRW.this.getActivity());
 				textView.setLayoutParams(lp);
 				textView.setGravity(Gravity.CENTER_VERTICAL);
@@ -143,7 +131,7 @@ public class PageFragmentLSRW extends Fragment {
 				logo.setPadding(60, 0, 0, 0);
 				ll.addView(logo);
 				TextView textView = getTextView();
-				//textView.setTextColor(Color.BLACK);
+				textView.setTextColor(Color.BLACK);
 				textView.setText(getGroup(groupPosition).toString());
 				ll.addView(textView);
 
@@ -159,7 +147,7 @@ public class PageFragmentLSRW extends Fragment {
 				// generallogo.setImageResource(generallogos[groupPosition][childPosition]);
 				ll.addView(generallogo);
 				TextView textView = getTextView();
-				//textView.setTextColor(getResources().getColor(R.color.text_color));
+				textView.setTextColor(getResources().getColor(R.color.sub_text_color));
 				textView.setText(getChild(groupPosition, childPosition).toString());
 				ll.addView(textView);
 				return ll;
