@@ -16,8 +16,6 @@ public class Constants {
 	public static final String DATA_NAME="word.txt";
 	
 	public static final String AUDIO_PATH=ROOT_PATH+"/AUDIO";
-	public static final String AUDIO_NAME="test.mp3";
-	public static final String LRC_NAME=AUDIO_NAME+".lrc";
 	public static final String LOG_PATH=ROOT_PATH+"/LOG";
 	public static  AssetManager assetManager;
 	

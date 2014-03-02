@@ -1,8 +1,12 @@
 package tt.lab.android.ieltspass.fragment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.activity.ListeningActivity;
 import tt.lab.android.ieltspass.activity.SettingsActivity;
+import tt.lab.android.ieltspass.data.LsrwItem;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -37,39 +41,49 @@ public class PageFragmentLSRW extends Fragment {
 	}
 
 	private void initExpandableList() {
+		
 		final ExpandableListAdapter adapter = new BaseExpandableListAdapter() {
 			// 设置组视图的图片
 			int[] logos = new int[] { R.drawable.wei, R.drawable.shu, R.drawable.wu, R.drawable.shu };
 			// 设置组视图的显示文字
 			private String[] generalsTypes = new String[] { "听", "说", "读", "写" };
-			
-			private String[][] generals = new String[][] {
-					{ "剑桥雅思1", "剑桥雅思2", "剑桥雅思3", "剑桥雅思4", "剑桥雅思5", "剑桥雅思6", "剑桥雅思7", "剑桥雅思8", "剑桥雅思9" },
-					{ "Part1", "Part2", "Part3" },
-					{ "剑桥雅思1", "剑桥雅思2", "剑桥雅思3", "剑桥雅思4", "剑桥雅思5", "剑桥雅思6", "剑桥雅思7", "剑桥雅思8", "剑桥雅思9" },
-					{ "剑桥雅思1", "剑桥雅思2", "剑桥雅思3", "剑桥雅思4", "剑桥雅思5", "剑桥雅思6", "剑桥雅思7", "剑桥雅思8", "剑桥雅思9" }
-
-			};
+			private LsrwItem[][] generals = new LsrwItem[4][];
 			{
+				LsrwItem[] listeningItems = new LsrwItem[4];
+				LsrwItem lsrwItem = new LsrwItem();
+				lsrwItem.setTitle("剑桥雅思6测试1听力-Section2");
+				lsrwItem.setType(1);
+				lsrwItem.setValue("C6T1S2.mp3");
+				lsrwItem.setLyrics("C6T1S2.lrc");
+				listeningItems[0]=lsrwItem;
 				
-				String[] listening = new String[36]; 
-				String[] speaking = new String[36]; 
-				String[] reading = new String[36]; 
-				String[] writing = new String[36]; 
-				for(int i=0;i<9;i++){
-					for (int j=0;j<4;j++){
-						listening[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"听力";
-						speaking[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"口语";
-						reading[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"阅读";
-						writing[i*4+j] = "剑桥雅思"+(i+1)+"测试"+(j+1)+"写作";
-					}
-				}
-				generals[0] = listening;
-				generals[1] = speaking;
-				generals[2] = reading;
-				generals[3] = writing;
+				lsrwItem = new LsrwItem();
+				lsrwItem.setTitle("剑桥雅思6测试1听力-Section3");
+				lsrwItem.setType(1);
+				lsrwItem.setValue("C6T1S3.mp3");
+				lsrwItem.setLyrics("C6T1S3.lrc");
+				listeningItems[1]=lsrwItem;
+				
+				lsrwItem = new LsrwItem();
+				lsrwItem.setTitle("王菲 - 棋子");
+				lsrwItem.setType(1);
+				lsrwItem.setValue("qizi.mp3");
+				lsrwItem.setLyrics("qizi.lrc");
+				listeningItems[2]=lsrwItem;
+				
+				
+				lsrwItem = new LsrwItem();
+				lsrwItem.setTitle("王铮亮 - 时间都去哪儿了");
+				lsrwItem.setType(1);
+				lsrwItem.setValue("Time.mp3");
+				lsrwItem.setLyrics("Time.lrc");
+				listeningItems[3]=lsrwItem;
+				
+				generals[0]=listeningItems;
+				generals[1]=listeningItems;
+				generals[2]=listeningItems;
+				generals[3]=listeningItems;
 			}
-
 			// 子视图图思
 			/*
 			 * public int[][] generallogos = new int[][] { { R.drawable.xiahoudun, R.drawable.zhenji, R.drawable.xuchu,
@@ -77,7 +91,6 @@ public class PageFragmentLSRW extends Fragment {
 			 * R.drawable.liubei, R.drawable.zhugeliang, R.drawable.huangyueying, R.drawable.zhaoyun }, {
 			 * R.drawable.lvmeng, R.drawable.luxun, R.drawable.sunquan, R.drawable.zhouyu, R.drawable.sunshangxiang } };
 			 */
-			// 自己定义思��获得文字信息的方思
 			TextView getTextView() {
 				AbsListView.LayoutParams lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 64);
 				TextView textView = new TextView(PageFragmentLSRW.this.getActivity());
@@ -94,27 +107,22 @@ public class PageFragmentLSRW extends Fragment {
 			}
 
 			public Object getGroup(int groupPosition) {
-				// TODO Auto-generated method stub
 				return generalsTypes[groupPosition];
 			}
 
 			public long getGroupId(int groupPosition) {
-				// TODO Auto-generated method stub
 				return groupPosition;
 			}
 
 			public int getChildrenCount(int groupPosition) {
-				// TODO Auto-generated method stub
 				return generals[groupPosition].length;
 			}
 
 			public Object getChild(int groupPosition, int childPosition) {
-				// TODO Auto-generated method stub
 				return generals[groupPosition][childPosition];
 			}
 
 			public long getChildId(int groupPosition, int childPosition) {
-				// TODO Auto-generated method stub
 				return childPosition;
 			}
 
@@ -123,7 +131,7 @@ public class PageFragmentLSRW extends Fragment {
 			}
 
 			public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-				// TODO Auto-generated method stub
+
 				LinearLayout ll = new LinearLayout(PageFragmentLSRW.this.getActivity());
 				ll.setOrientation(0);
 				ImageView logo = new ImageView(PageFragmentLSRW.this.getActivity());
@@ -140,7 +148,6 @@ public class PageFragmentLSRW extends Fragment {
 
 			public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView,
 					ViewGroup parent) {
-				// TODO Auto-generated method stub
 				LinearLayout ll = new LinearLayout(PageFragmentLSRW.this.getActivity());
 				ll.setOrientation(0);
 				ImageView generallogo = new ImageView(PageFragmentLSRW.this.getActivity());
@@ -158,7 +165,7 @@ public class PageFragmentLSRW extends Fragment {
 				return true;
 			}
 
-		};
+		};//End of adapter
 
 		ExpandableListView expandableListView = (ExpandableListView) view.findViewById(R.id.expandableListView1);
 		expandableListView.setAdapter(adapter);
@@ -179,8 +186,18 @@ public class PageFragmentLSRW extends Fragment {
 				//Toast.makeText(PageFragmentLSRW.this.getActivity(),	"你点击了" + adapter.getChild(groupPosition, childPosition), Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent();
 				intent.setClass(getActivity(), ListeningActivity.class);
-				intent.putExtra("title", adapter.getChild(groupPosition, childPosition).toString());
-				startActivity(intent);
+				LsrwItem lsrwItem = (LsrwItem)adapter.getChild(groupPosition, childPosition);
+
+				switch (lsrwItem.getType()){
+				case 1:
+					intent.putExtra("title", lsrwItem.getTitle());
+					intent.putExtra("type",lsrwItem.getType()); 
+					intent.putExtra("audio",lsrwItem.getValue()); 
+					intent.putExtra("lyrics",lsrwItem.getLyrics()); 
+					startActivity(intent);
+					break;
+				}
+				
 				return false;
 			}
 		});

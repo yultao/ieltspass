@@ -11,11 +11,8 @@ import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.data.Constants;
 import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.Logger;
-import tt.lab.android.ieltspass.fragment.PageFragmentLSRW;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -24,14 +21,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -59,18 +54,18 @@ public class ListeningActivity extends FragmentActivity {
 	private SeekBar seekBar;
 	private TextView currentPosition, duration;
 	private File file;
-
+	private String titleStr;
+	private static String lyrics;
+	private String audio;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_listening);
 		initPager();
-
 		initTitle();
 		initControls();
 		initPlayer();
 		initFragement();
-		
 		start();
 	}
 
@@ -118,9 +113,10 @@ public class ListeningActivity extends FragmentActivity {
 
 		Intent intent = this.getIntent();
 		Bundle bundle = intent.getExtras();
-		String string = bundle.getString("title");
-
-		title.setText(string.toUpperCase());
+		titleStr = bundle.getString("title");
+		lyrics = bundle.getString("lyrics");
+		audio = bundle.getString("audio");
+		title.setText(titleStr.toUpperCase());
 	}
 
 	private void initFragement() {
@@ -129,7 +125,7 @@ public class ListeningActivity extends FragmentActivity {
 		Bundle args = new Bundle();
 		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 1);
 		fragment.setArguments(args);
-		fragment.setPlayer(player);
+		fragment.setPlayer(player,seekBar);
 		pagerItemList.add(fragment);
 
 		fragment = new DummySectionFragment();
@@ -167,6 +163,7 @@ public class ListeningActivity extends FragmentActivity {
 			// @Override
 			/* 覆盖文件播出完毕事件 */
 			public void onCompletion(MediaPlayer arg0) {
+				Logger.i(TAG,"onCompletion " +arg0.isPlaying());
 				pause();
 			}
 		});
@@ -180,7 +177,7 @@ public class ListeningActivity extends FragmentActivity {
 				return false;
 			}
 		});
-		String name = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/test.mp3";
+		String name = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/"+audio;
 		file = new File(name);
 		Logger.i(TAG, "initPlayer " + file.getAbsolutePath());
 		if (file.exists()) {
@@ -242,6 +239,7 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void refreshButtonText() {
+		Logger.i(TAG,"refreshButtonText player.isPlaying "+player.isPlaying());
 		btnPlayStop.setBackground(getResources().getDrawable(player.isPlaying() ? R.drawable.pause : R.drawable.play));
 	}
 
@@ -278,7 +276,7 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void pause() {
-		Logger.i(TAG, "pause I");
+		Logger.i(TAG, "pause I ");
 		try {
 			/* 发生错误时也解除资源与MediaPlayer的赋值 */
 			player.pause();
@@ -448,20 +446,14 @@ public class ListeningActivity extends FragmentActivity {
 		Handler handler = new Handler();
 		TextView lastTextView = null;
 		MediaPlayer player;
-		int currentIndex = 0;
-
+		SeekBar seekBar;
+		
 		public DummySectionFragment() {
 		}
 
-		public void setPlayer(MediaPlayer player) {
+		public void setPlayer(MediaPlayer player, SeekBar seekBar) {
 			this.player = player;
-			this.player.setOnCompletionListener(new OnCompletionListener() {
-
-				@Override
-				public void onCompletion(MediaPlayer mp) {
-					currentIndex = 0;
-				}
-			});
+			this.seekBar = seekBar;
 		}
 
 		@Override
@@ -471,7 +463,7 @@ public class ListeningActivity extends FragmentActivity {
 			scrollView1 = (ScrollView) rootView.findViewById(R.id.scrollView1);
 			LinearLayout linearLayout1 = (LinearLayout) rootView.findViewById(R.id.linearLayout1);
 			try {
-				List<Map<String, String>> lyricsList = Database.getLyrics();
+				List<Map<String, String>> lyricsList = Database.parseLyrics(lyrics);
 				for (int i = 0; i < lyricsList.size(); i++) {
 					Map<String, String> sentence = lyricsList.get(i);
 					String time = sentence.get("time");
@@ -503,6 +495,7 @@ public class ListeningActivity extends FragmentActivity {
 
 					// Algorithm 1
 					int cp = player.getCurrentPosition();
+					cp = seekBar.getProgress();
 					String formatTimeSecond = formatTimeSecond(cp);
 
 					Map<String, Object> map = lyricsTextViewMap.get(formatTimeSecond);

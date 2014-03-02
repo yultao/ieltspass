@@ -20,7 +20,7 @@ import android.os.Environment;
 public class Database {
 	private static final String TAG = Database.class.getName();
 	private static Map<String, Word> words = new HashMap<String, Word>();
-	private static List<Map<String,String>> lyrics = new ArrayList<Map<String,String>>();
+	
 	private static boolean internal;
 
 	static {
@@ -30,14 +30,13 @@ public class Database {
 			internal = true;
 		} else {
 			dataFileName = initVocabulary();
-			initData(Constants.AUDIO_PATH, Constants.AUDIO_NAME);
-			initData(Constants.AUDIO_PATH, Constants.LRC_NAME);
+			//initData(Constants.AUDIO_PATH, Constants.AUDIO_NAME);
+			//initData(Constants.AUDIO_PATH, Constants.LRC_NAME);
 			
 			Logger.i(TAG, "internal: " + internal);
 		}
 		
 		parseWord(dataFileName);
-		parseLyrics();
 	}
 
 	private static void parseWord(String dataFileName) {
@@ -93,25 +92,28 @@ public class Database {
 		}
 	}
 
-	private static void parseLyrics() {
+	public static List<Map<String,String>> parseLyrics(String lyricsName) {
+		List<Map<String,String>> lyrics = new ArrayList<Map<String,String>>();
 		try {
-			InputStream is = internal ? Constants.assetManager.open(Constants.LRC_NAME) : new FileInputStream(
-					Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + Constants.LRC_NAME);
+			InputStream is = new FileInputStream(Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + lyricsName);
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 			String s = null;
 			while ((s = bufferedReader.readLine()) != null) {
-
-				String ss = s.trim();
-				if (ss.length() != 0 && ss.startsWith("[")) {
-					//[02:01.83]我却受控在你手里
-					//[02:06.44]
-					String time = ss.substring(ss.indexOf("[") + 1, ss.indexOf("]"));
-					String word = ss.substring(ss.indexOf("]") + 1).trim();
-					Map<String, String> m = new HashMap<String, String>();
-					time = time.substring(0,time.indexOf("."));
-					m.put("time", time);
-					m.put("word", word);
-					lyrics.add(m);
+				try{
+					String ss = s.trim();
+					if (ss.length() != 0 && ss.startsWith("[")) {
+						//[02:01.83]我却受控在你手里
+						//[02:06.44]
+						String time = ss.substring(ss.indexOf("[") + 1, ss.indexOf("]"));
+						String word = ss.substring(ss.indexOf("]") + 1).trim();
+						Map<String, String> m = new HashMap<String, String>();
+						time = time.substring(0,time.indexOf("."));
+						m.put("time", time);
+						m.put("word", word);
+						lyrics.add(m);
+					}
+				}catch (Exception e){
+					Logger.i(TAG, "parseLyrics E: "+e.getMessage());
 				}
 			}
 			is.close();
@@ -121,6 +123,7 @@ public class Database {
 			e.printStackTrace();
 			Logger.i(Database.class.getName(), "Exception: " + e.getMessage());
 		}
+		return lyrics;
 	}
 
 	private static void initData(String path, String name) {
@@ -197,7 +200,4 @@ public class Database {
 		return words;
 	}
 
-	public static List<Map<String, String>> getLyrics() {
-		return lyrics;
-	}
 }
