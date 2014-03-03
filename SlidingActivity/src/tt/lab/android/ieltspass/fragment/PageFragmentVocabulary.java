@@ -81,6 +81,7 @@ public class PageFragmentVocabulary extends Fragment {
 
 	private void initListView() {
 		listView = (ListView) view.findViewById(R.id.listView1);
+		
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override

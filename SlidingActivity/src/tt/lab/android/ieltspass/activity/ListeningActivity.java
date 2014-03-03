@@ -130,23 +130,18 @@ public class ListeningActivity extends FragmentActivity {
 		fragmentLyrics.setPlayer(player,seekBar, lyrics);
 		pagerItemList.add(fragmentLyrics);
 
-		DummySectionFragment fragment = new DummySectionFragment();
-		args = new Bundle();
-		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 2);
-		fragment.setArguments(args);
-		pagerItemList.add(fragment);
+//		DummySectionFragment fragment = new DummySectionFragment();
+//		args = new Bundle();
+//		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 2);
+//		fragment.setArguments(args);
+//		pagerItemList.add(fragment);
+//
+//		fragment = new DummySectionFragment();
+//		args = new Bundle();
+//		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 3);
+//		fragment.setArguments(args);
+//		pagerItemList.add(fragment);
 
-		fragment = new DummySectionFragment();
-		args = new Bundle();
-		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 3);
-		fragment.setArguments(args);
-		pagerItemList.add(fragment);
-
-		fragment = new DummySectionFragment();
-		args = new Bundle();
-		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 4);
-		fragment.setArguments(args);
-		pagerItemList.add(fragment);
 	}
 
 	private void navigateUp() {
@@ -165,7 +160,7 @@ public class ListeningActivity extends FragmentActivity {
 			// @Override
 			/* 覆盖文件播出完毕事件 */
 			public void onCompletion(MediaPlayer arg0) {
-				Logger.i(TAG,"onCompletion " +arg0.isPlaying());
+				seekBar.setProgress(0);
 				pause();
 			}
 		});
@@ -204,12 +199,11 @@ public class ListeningActivity extends FragmentActivity {
 
 				// fromUser判断是用户改变的滑块的值
 				try {
-
+					//Logger.i(TAG, "onProgressChanged: fromUser: " +  progress +", "+fromUser);
 					if (fromUser == true) {
-						//Logger.i(TAG, "onProgressChanged: fromUser: " + progress);
 						player.seekTo(progress);
-						currentPosition.setText(Utilities.formatTime(progress));
 					}
+					currentPosition.setText(Utilities.formatTime(progress));
 				} catch (Exception e) {
 					Logger.i(TAG, "onProgressChanged: E: " + e.getMessage());
 				}
@@ -241,7 +235,6 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void refreshButtonText() {
-		Logger.i(TAG,"refreshButtonText player.isPlaying "+player.isPlaying());
 		btnPlayStop.setBackground(getResources().getDrawable(player.isPlaying() ? R.drawable.pause : R.drawable.play));
 	}
 
@@ -251,9 +244,7 @@ public class ListeningActivity extends FragmentActivity {
 			try {
 				int cp = player.getCurrentPosition();
 				seekBar.setProgress(cp);
-				currentPosition.setText(Utilities.formatTime(cp));
-				// 每次延迟100毫秒再启动线程
-				handler.postDelayed(updateProgressThread, 10);
+				handler.postDelayed(updateProgressThread, 500);//No need to update UI so frequently, 500 is enough.
 			} catch (Exception e) {
 				Logger.i(TAG, "updateProgressThread: " + e.getMessage());
 			}
@@ -262,7 +253,7 @@ public class ListeningActivity extends FragmentActivity {
 	};
 
 	private void start() {
-		Logger.i(TAG, "start I");
+		//Logger.i(TAG, "start I");
 		try {
 			// player.seekTo(seekBar.getProgress());
 			player.start();
@@ -275,10 +266,11 @@ public class ListeningActivity extends FragmentActivity {
 			Logger.i(TAG, "start: " + e.getMessage());
 			e.printStackTrace();
 		}
+		//Logger.i(TAG, "start O");
 	}
 
 	private void pause() {
-		Logger.i(TAG, "pause I ");
+		//Logger.i(TAG, "pause I ");
 		try {
 			/* 发生错误时也解除资源与MediaPlayer的赋值 */
 			player.pause();
@@ -289,17 +281,24 @@ public class ListeningActivity extends FragmentActivity {
 			Logger.i(TAG, "pause: E: " + e.getMessage());
 			e.printStackTrace();
 		}
-		Logger.i(TAG, "pause O");
+		//Logger.i(TAG, "pause O");
 	}
 
 	private void release() {
 		Logger.i(TAG, "release I");
 		try {
-			/* 发生错误时也解除资源与MediaPlayer的赋值 */
+
+			Logger.i(TAG, "release: 0: ");
+			refreshButtonText();
+			Logger.i(TAG, "release: 1: ");
 			player.release();
+			Logger.i(TAG, "release: 2: "+updateProgressThread);
+			
+
 			// tv.setText("播放发生异常!");
 			handler.removeCallbacks(updateProgressThread);
-			refreshButtonText();
+			Logger.i(TAG, "release: 3: ");
+			
 		} catch (Exception e) {
 			Logger.i(TAG, "release: E: " + e.getMessage());
 			e.printStackTrace();
@@ -342,7 +341,7 @@ public class ListeningActivity extends FragmentActivity {
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
-			return 3;
+			return pagerItemList.size();
 		}
 
 		@Override
@@ -387,7 +386,7 @@ public class ListeningActivity extends FragmentActivity {
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_listening_dummy, container, false);
+			View rootView = inflater.inflate(R.layout.fragment_listening_lyrics, container, false);
 
 			scrollView1 = (ScrollView) rootView.findViewById(R.id.scrollView1);
 			LinearLayout linearLayout1 = (LinearLayout) rootView.findViewById(R.id.linearLayout);

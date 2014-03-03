@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import tt.lab.android.ieltspass.model.lyrics.Lyrics;
 import tt.lab.android.ieltspass.model.lyrics.Sentence;
@@ -16,7 +17,7 @@ public class Utilities {
 	}
 
 	public static int parseTime(String time) {
-		Logger.i(TAG, "parseTime I: " + time);
+		//Logger.i(TAG, "parseTime I: " + time);
 		// 03:02:01.83
 		String[] split1 = time.split("[.]");
 		String hour = "0";
@@ -39,7 +40,7 @@ public class Utilities {
 		int millisceonds = Integer.parseInt(hour) * 60 * 60 * 1000 + Integer.parseInt(minute) * 60 * 1000
 				+ Integer.parseInt(second) * 1000 + Integer.parseInt(millis) * 10;
 
-		Logger.i(TAG, "parseTime O: " + millisceonds);
+		//Logger.i(TAG, "parseTime O: " + millisceonds);
 		return millisceonds;
 	}
 
@@ -105,7 +106,7 @@ public class Utilities {
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 			String s = null;
 			Sentence previousSentence = null;
-			int index = 0;
+			//int index = 0;
 			while ((s = bufferedReader.readLine()) != null) {
 				try {
 					String ss = s.trim();
@@ -115,11 +116,10 @@ public class Utilities {
 						String time = ss.substring(ss.indexOf("[") + 1, ss.indexOf("]"));
 						String text = ss.substring(ss.indexOf("]") + 1).trim();
 						Sentence sentence = new Sentence();
-						sentence.setIndex(index++);
+						sentence.setIndex(lyrics.getSentenceCount());
 						sentence.setRaw(ss);
 						sentence.setStart(Utilities.parseTime(time));
-						time = time.substring(0, time.indexOf("."));//remove milliseconds
-						sentence.setTime(time);
+						sentence.setTime(time.substring(0, time.indexOf(".")));//remove milliseconds
 						sentence.setText(text);
 						if (previousSentence != null) {
 							previousSentence.setNextSentence(sentence);
@@ -140,5 +140,79 @@ public class Utilities {
 			Logger.i(TAG, "parseLyrics Exception: " + e.getMessage());
 		}
 		return lyrics;
+	}
+	
+	/**
+	 * Search a point.
+	 * This is not accurate, as it can only find sentences once a second. 
+	 * @param cp
+	 * @return
+	 */
+	public static Sentence findSentenceHash(Lyrics lyrics, int cp) {
+		String formatedTime = Utilities.formatTime(cp);
+		return lyrics.getSentence(formatedTime);
+	}
+	//public static int c=0;
+	/**
+	 * Search a range.
+	 * @param cp
+	 * @return
+	 */
+	public static Sentence findSentenceSimple(List<Sentence> sentences, int cp) {
+		
+		Sentence s = null;
+		boolean b = false;
+		for (int i = 0; i < sentences.size(); i++) {
+			Sentence sentence = sentences.get(i);
+			///c=i;
+			if (sentence.getStart() <= cp && cp < sentence.getEnd()){
+				s= sentence;
+				b=true;
+				break;
+			}
+		}
+		
+		//Logger.i(TAG, "findSentenceSimple: "+b+", "+c);
+		return s;
+	}
+	
+	/**
+	 * Search a range.
+	 * @param cp
+	 * @return
+	 */
+	public static Sentence findSentenceBinary(List<Sentence> sentences, int cp) {
+		 
+		//c++;
+		Sentence s = null;
+		int middle = sentences.size()/2;
+		//Logger.i(TAG, "findSentenceBinary: "+c+", "+middle+", "+cp);
+		Sentence middleSentence = sentences.get(middle);
+		//Logger.i(TAG, "findSentenceBinary: "+middleSentence.getStart()+" ~ "+middleSentence.getEnd());
+		if(cp<middleSentence.getStart()){
+			//Logger.i(TAG, "findSentenceBinary: left "+(sentences.size()>1));
+			if(sentences.size()>1){
+				s = findSentenceBinary(sentences.subList(0, middle),cp);	
+			}
+			
+		} else if(cp==middleSentence.getStart()){
+			//Logger.i(TAG, "findSentenceBinary: middle a");
+			s =sentences.get(middle);
+		} else if(cp>middleSentence.getStart() && cp<middleSentence.getEnd()){
+			//Logger.i(TAG, "findSentenceBinary: middle b");
+			s =sentences.get(middle);
+			
+		//} else if(middle==0){
+			//Logger.i(TAG, "findSentenceBinary: middle c");
+			//s =sentences.get(middle);
+		} else {
+			//Logger.i(TAG, "findSentenceBinary: right "+(sentences.size()>1));
+			if(sentences.size()>1){
+				s = findSentenceBinary(sentences.subList(middle, sentences.size()),cp);	
+			}
+			
+		}
+		
+		return s;
 	}
 }
