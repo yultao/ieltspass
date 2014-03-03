@@ -346,6 +346,7 @@ public class PageFragmentVocabulary extends Fragment {
 			} 
 			listData0.add(map);
 		}
+		currentData = listData0;
 		
 	}
 	private void initData2() {
