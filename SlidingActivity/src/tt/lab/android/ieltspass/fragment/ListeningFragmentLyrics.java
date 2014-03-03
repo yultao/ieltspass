@@ -1,12 +1,6 @@
 package tt.lab.android.ieltspass.fragment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import tt.lab.android.ieltspass.R;
-import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.Utilities;
 import tt.lab.android.ieltspass.model.lyrics.Lyrics;
@@ -17,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
