@@ -40,56 +40,56 @@ public class Database {
 	}
 
 	private static void parseWord(String dataFileName) {
-		try {
-			InputStream is = internal ? Constants.assetManager.open(Constants.DATA_NAME) : new FileInputStream(
-					dataFileName);
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-			String s = null;
-			while ((s = bufferedReader.readLine()) != null) {
-
-				String wordInfo = s.trim();
-				if (wordInfo.length() != 0) {
-
-					String[] split = wordInfo.split("\t\t");
-					Word word = new Word();
-
-					String title = "";
-					String phoneticSymbol = "/ /";
-					String category = "";
-					String date = "";
-					String explanation = "";
-
-					if (split.length == 5) {
-						title = split[0];
-						phoneticSymbol = split[1];
-						category = split[2];
-						date = split[3];
-						explanation = split[4];
-
-					} else if (split.length == 4) {
-						title = split[0];
-						category = split[1];
-						date = split[2];
-						explanation = split[3];
-					}
-					if (!title.trim().equals("")) {
-
-						word.setTitle(title);
-						word.setCategory(category);
-						word.setDate(date);
-						word.setPhoneticSymbol(phoneticSymbol);
-						word.setExplanation(explanation.replace("\t", "\n"));
-						words.put(title, word);
-					}
-				}
-			}
-			is.close();
-			bufferedReader.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			Logger.i(Database.class.getName(), "Exception: " + e.getMessage());
-		}
+//		try {
+//			InputStream is = internal ? Constants.assetManager.open(Constants.DATA_NAME) : new FileInputStream(
+//					dataFileName);
+//			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+//			String s = null;
+//			while ((s = bufferedReader.readLine()) != null) {
+//
+//				String wordInfo = s.trim();
+//				if (wordInfo.length() != 0) {
+//
+//					String[] split = wordInfo.split("\t\t");
+//					Word word = new Word();
+//
+//					String title = "";
+//					String phoneticSymbol = "/ /";
+//					String category = "";
+//					String date = "";
+//					String explanation = "";
+//
+//					if (split.length == 5) {
+//						title = split[0];
+//						phoneticSymbol = split[1];
+//						category = split[2];
+//						date = split[3];
+//						explanation = split[4];
+//
+//					} else if (split.length == 4) {
+//						title = split[0];
+//						category = split[1];
+//						date = split[2];
+//						explanation = split[3];
+//					}
+//					if (!title.trim().equals("")) {
+//
+//						word.setTitle(title);
+//						word.setCategory(category);
+//						word.setDate(date);
+//						word.setPhoneticSymbol(phoneticSymbol);
+//						word.setExplanation(explanation.replace("\t", "\n"));
+//						words.put(title, word);
+//					}
+//				}
+//			}
+//			is.close();
+//			bufferedReader.close();
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			Logger.i(Database.class.getName(), "Exception: " + e.getMessage());
+//		}
 	}
 
 	public static List<Map<String,String>> parseLyrics(String lyricsName) {

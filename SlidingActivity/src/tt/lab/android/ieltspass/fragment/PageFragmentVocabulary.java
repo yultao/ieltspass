@@ -12,6 +12,7 @@ import tt.lab.android.ieltspass.activity.VocabularyActivity;
 import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.Word;
+import tt.lab.android.ieltspass.data.WordsDao;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -317,10 +318,41 @@ public class PageFragmentVocabulary extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 	}
-
 	private void initData() {
+		WordsDao wordsDao = new WordsDao(context); 
+		List<Word> wordList = wordsDao.getWordList();
+		for (Word word: wordList) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("title", word.getWord_vacabulary());
+			map.put("phon", word.getBE_phonetic_symbol());
+			map.put("info", word.getCn_explanation());
+			map.put("category", word.getCategory());
+			
+			if ("1.很生".equals(word.getCategory())) {
+				map.put("img", String.valueOf(R.drawable.category_1));
+				listData1.add(map);
+			} else if ("2.较生".equals(word.getCategory())) {
+				map.put("img", String.valueOf(R.drawable.category_2));
+				listData2.add(map);
+			} else if ("3.一般".equals(word.getCategory())) {
+				map.put("img", String.valueOf(R.drawable.category_3));
+				listData3.add(map);
+			} else if ("4.较熟".equals(word.getCategory())) {
+				map.put("img", String.valueOf(R.drawable.category_4));
+				listData4.add(map);
+			} else if ("5.很熟".equals(word.getCategory())) {
+				map.put("img", String.valueOf(R.drawable.category_5));
+				listData5.add(map);
+			} 
+			listData0.add(map);
+		}
+		
+	}
+	private void initData2() {
+		/*
 		long t1 = System.currentTimeMillis();
 		Map<String, Word> wordMap = Database.getWords();
+		
 		if (wordMap.size() == 0) {
 			for (int i = 0; i < 100; i++) {
 				Map<String, Object> map = new HashMap<String, Object>();
@@ -368,6 +400,7 @@ public class PageFragmentVocabulary extends Fragment {
 		currentData = listData0;
 		long t2 = System.currentTimeMillis();
 		Logger.i(this.getClass().getName(), "initData: "+(t2-t1)+" ms.");
+		*/
 	}
 
 }

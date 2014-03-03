@@ -62,17 +62,22 @@ public class WordsDao {
         return word;
     }
 
-    public List<String> getWordList() {
+    public List<Word> getWordList() {
 
-        List<String> wordList = new ArrayList<String>();
+        List<Word> wordList = new ArrayList<Word>();
         SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
-        Cursor cursor = db.rawQuery("select word_vacabulary from words ", null);
+        Cursor cursor = db.rawQuery("select word_vacabulary, BE_phonetic_symbol，Cn_explanation, category from words ", null);
         while (cursor.moveToNext()) {
-            String word = cursor.getString(0);
+            Word word = new Word();
+            word.setWord_vacabulary(cursor.getString(0));
+            word.setBE_phonetic_symbol(cursor.getString(1));
+            word.setCn_explanation(cursor.getString(2));
+            word.setCategory(cursor.getString(3));
             wordList.add(word);
         }
         return wordList;
     }
+    
 }
 
 

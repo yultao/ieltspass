@@ -86,9 +86,9 @@ public class VocabularyActivity extends FragmentActivity {
 			btnPlayStop = (Button) findViewById(R.id.btnPlay);
 			
 			
-			textViewTitle.setText(word.getTitle());
-			textViewPhoetic.setText(word.getPhoneticSymbol());
-			textViewDate.setText(word.getDate());
+			textViewTitle.setText(word.getWord_vacabulary());
+			textViewPhoetic.setText(word.getBE_phonetic_symbol());
+			textViewDate.setText(word.getCategory());
 			btnPlayStop.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -147,7 +147,7 @@ public class VocabularyActivity extends FragmentActivity {
 				intent.setType("image/*");// intent.setType("text/plain");
 				intent.putExtra(Intent.EXTRA_SUBJECT, "好友推荐");
 				intent.putExtra(Intent.EXTRA_TEXT, "雅思通(IELTS PASS)分享：" + word.toString()
-						+ " 详见：http://www.ieltspass.com/" + word.getTitle());
+						+ " 详见：http://www.ieltspass.com/" + word.getWord_vacabulary());
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(Intent.createChooser(intent, "分享"));
 			}
@@ -352,19 +352,19 @@ public class VocabularyActivity extends FragmentActivity {
 			TextView textView1 = (TextView) rootView.findViewById(R.id.titleText);
 			TextView textView2 = (TextView) rootView.findViewById(R.id.textView2);
 			TextView textView3 = (TextView) rootView.findViewById(R.id.duration);
-
-			if (word == null) {
-				textView1.setText("1");
-			} else {
-
-				dummyTextView.setText(word.getTitle());
-
-				textView1.setText(word.getPhoneticSymbol());
-
-				textView2.setText(word.getDate());
-
-				textView3.setText(word.getExplanation());
-			}
+			textView1.setText("1");
+//			if (word == null) {
+//				
+//			} else {
+//
+//				dummyTextView.setText(word.);
+//
+//				textView1.setText(word.getPhoneticSymbol());
+//
+//				textView2.setText(word.getDate());
+//
+//				textView3.setText(word.getExplanation());
+//			}
 			return rootView;
 		}
 
