@@ -11,6 +11,8 @@ import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.data.Constants;
 import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.Logger;
+import tt.lab.android.ieltspass.data.Utilities;
+import tt.lab.android.ieltspass.fragment.ListeningFragmentLyrics;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -55,7 +57,7 @@ public class ListeningActivity extends FragmentActivity {
 	private TextView currentPosition, duration;
 	private File file;
 	private String titleStr;
-	private static String lyrics;
+	private String lyrics;
 	private String audio;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -121,14 +123,14 @@ public class ListeningActivity extends FragmentActivity {
 
 	private void initFragement() {
 
-		DummySectionFragment fragment = new DummySectionFragment();
+		ListeningFragmentLyrics fragmentLyrics = new ListeningFragmentLyrics();
 		Bundle args = new Bundle();
 		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 1);
-		fragment.setArguments(args);
-		fragment.setPlayer(player,seekBar);
-		pagerItemList.add(fragment);
+		fragmentLyrics.setArguments(args);
+		fragmentLyrics.setPlayer(player,seekBar, lyrics);
+		pagerItemList.add(fragmentLyrics);
 
-		fragment = new DummySectionFragment();
+		DummySectionFragment fragment = new DummySectionFragment();
 		args = new Bundle();
 		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 2);
 		fragment.setArguments(args);
@@ -185,7 +187,7 @@ public class ListeningActivity extends FragmentActivity {
 				player.reset();
 				player.setDataSource(file.getAbsolutePath());
 				player.prepare();
-				duration.setText(formatTimeSecond(player.getDuration()));
+				duration.setText(Utilities.formatTime(player.getDuration()));
 				seekBar.setMax(player.getDuration());
 			} catch (Exception e) {
 				Logger.i(TAG, "initPlayer: " + e.getMessage());
@@ -204,9 +206,9 @@ public class ListeningActivity extends FragmentActivity {
 				try {
 
 					if (fromUser == true) {
-						Logger.i(TAG, "onProgressChanged: fromUser: " + progress);
+						//Logger.i(TAG, "onProgressChanged: fromUser: " + progress);
 						player.seekTo(progress);
-						currentPosition.setText(formatTimeSecond(progress));
+						currentPosition.setText(Utilities.formatTime(progress));
 					}
 				} catch (Exception e) {
 					Logger.i(TAG, "onProgressChanged: E: " + e.getMessage());
@@ -249,9 +251,9 @@ public class ListeningActivity extends FragmentActivity {
 			try {
 				int cp = player.getCurrentPosition();
 				seekBar.setProgress(cp);
-				currentPosition.setText(formatTimeSecond(cp));
+				currentPosition.setText(Utilities.formatTime(cp));
 				// 每次延迟100毫秒再启动线程
-				handler.postDelayed(updateProgressThread, 100);
+				handler.postDelayed(updateProgressThread, 10);
 			} catch (Exception e) {
 				Logger.i(TAG, "updateProgressThread: " + e.getMessage());
 			}
@@ -266,7 +268,7 @@ public class ListeningActivity extends FragmentActivity {
 			player.start();
 			handler.post(updateProgressThread);
 
-			currentPosition.setText(formatTimeSecond(player.getCurrentPosition()));
+			currentPosition.setText(Utilities.formatTime(player.getCurrentPosition()));
 			refreshButtonText();
 
 		} catch (Exception e) {
@@ -305,81 +307,7 @@ public class ListeningActivity extends FragmentActivity {
 		Logger.i(TAG, "release O");
 	}
 
-	private static int formatTimeInt(String time) {
-		// 03:02:01.83
-		String[] split1 = time.split("[.]");
-		String hour = "0";
-		String minute = "0";
-		String second = "0";
-		String millis = "0";
-		if (split1.length == 2) {// 02:03.83
-			millis = split1[1];
-			String[] split2 = split1[0].split(":");
-			if (split2.length == 2) {// 02:01
-				minute = split2[0];
-				second = split2[1];
-			} else if (split2.length == 3) {// 01:02:03
-				hour = split2[0];
-				minute = split2[1];
-				second = split2[2];
-			}
-		}
-
-		int milliseonds = Integer.parseInt(hour) * 60 * 60 * 1000 + Integer.parseInt(minute) * 60 * 1000
-				+ Integer.parseInt(second) * 1000 + Integer.parseInt(millis) * 10;
-
-		return milliseonds;
-	}
-
-	private static String formatTimeSecond(int timeInt) {
-		String str = "";
-		int hour = 0;
-		int minute = 0;
-		int second = 0;
-
-		second = timeInt / 1000;
-
-		if (second >= 60) {
-			minute = second / 60;
-			second = second % 60;
-		}
-		if (minute >= 60) {
-			hour = minute / 60;
-			minute = minute % 60;
-		}
-		str = (minute > 9 ? "" + minute : "0" + minute) + ":" + (second > 9 ? "" + second : "0" + second);
-		if (hour > 0) {
-			str = (hour > 9 ? "" + hour : "0" + hour) + ":" + str;
-		}
-		return str;
-	}
-
-	private static String formatTimeMillis(int timeInt) {
-		String str = "";
-		int hour = 0;
-		int minute = 0;
-		int second = 0;
-		int millis = 0;
-		// 11123
-		millis = timeInt % 1000;
-		millis /= 10;
-		second = timeInt / 1000;
-
-		if (second >= 60) {
-			minute = second / 60;
-			second = second % 60;
-		}
-		if (minute >= 60) {
-			hour = minute / 60;
-			minute = minute % 60;
-		}
-		str = (minute > 9 ? "" + minute : "0" + minute) + ":" + (second > 9 ? "" + second : "0" + second) + "."
-				+ (millis > 9 ? "" + millis : "0" + millis);
-		if (hour > 0) {
-			str = (hour > 9 ? "" + hour : "0" + hour) + ":" + str;
-		}
-		return str;
-	}
+	
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -447,13 +375,14 @@ public class ListeningActivity extends FragmentActivity {
 		TextView lastTextView = null;
 		MediaPlayer player;
 		SeekBar seekBar;
-		
+		private String lyrics;
 		public DummySectionFragment() {
 		}
 
-		public void setPlayer(MediaPlayer player, SeekBar seekBar) {
+		public void setPlayer(MediaPlayer player, SeekBar seekBar, String lyrics) {
 			this.player = player;
 			this.seekBar = seekBar;
+			this.lyrics = lyrics;
 		}
 
 		@Override
@@ -461,7 +390,7 @@ public class ListeningActivity extends FragmentActivity {
 			View rootView = inflater.inflate(R.layout.fragment_listening_dummy, container, false);
 
 			scrollView1 = (ScrollView) rootView.findViewById(R.id.scrollView1);
-			LinearLayout linearLayout1 = (LinearLayout) rootView.findViewById(R.id.linearLayout1);
+			LinearLayout linearLayout1 = (LinearLayout) rootView.findViewById(R.id.linearLayout);
 			try {
 				List<Map<String, String>> lyricsList = Database.parseLyrics(lyrics);
 				for (int i = 0; i < lyricsList.size(); i++) {
@@ -469,7 +398,7 @@ public class ListeningActivity extends FragmentActivity {
 					String time = sentence.get("time");
 					String word = sentence.get("word");
 					
-					TextView textView = createTextView( word);
+					TextView textView = createTextView(time+": "+ word);
 					linearLayout1.addView(textView);
 
 					Map<String, Object> m = new HashMap<String, Object>();
@@ -496,9 +425,9 @@ public class ListeningActivity extends FragmentActivity {
 					// Algorithm 1
 					int cp = player.getCurrentPosition();
 					cp = seekBar.getProgress();
-					String formatTimeSecond = formatTimeSecond(cp);
+					String formatedTime = Utilities.formatTime(cp);
 
-					Map<String, Object> map = lyricsTextViewMap.get(formatTimeSecond);
+					Map<String, Object> map = lyricsTextViewMap.get(formatedTime);
 
 					if (map != null) {
 						
@@ -553,7 +482,7 @@ public class ListeningActivity extends FragmentActivity {
 					 * 
 					 * scrollView1.requestChildFocus(textView,textView); currentIndex++; } }
 					 */
-					handler.postDelayed(updateLyricsThread, 100);
+					handler.postDelayed(updateLyricsThread, 10);
 				} catch (Exception e) {
 					Logger.i(TAG, "updateLyricsThread e: " + e.getMessage());
 				}

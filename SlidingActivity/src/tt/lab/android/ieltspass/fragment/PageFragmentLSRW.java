@@ -49,27 +49,43 @@ public class PageFragmentLSRW extends Fragment {
 			private String[] generalsTypes = new String[] { "听", "说", "读", "写" };
 			private LsrwItem[][] generals = new LsrwItem[4][];
 			{
-				LsrwItem[] listeningItems = new LsrwItem[4];
+				LsrwItem[] listeningItems = new LsrwItem[6];
+				int i=0;
 				LsrwItem lsrwItem = new LsrwItem();
+				lsrwItem.setTitle("剑桥雅思6测试1听力-Section1");
+				lsrwItem.setType(1);
+				lsrwItem.setValue("C6T1S1.mp3");
+				lsrwItem.setLyrics("C6T1S1.lrc");
+				listeningItems[i++]=lsrwItem;
+				
+				lsrwItem = new LsrwItem();
 				lsrwItem.setTitle("剑桥雅思6测试1听力-Section2");
 				lsrwItem.setType(1);
 				lsrwItem.setValue("C6T1S2.mp3");
 				lsrwItem.setLyrics("C6T1S2.lrc");
-				listeningItems[0]=lsrwItem;
+				listeningItems[i++]=lsrwItem;
 				
 				lsrwItem = new LsrwItem();
 				lsrwItem.setTitle("剑桥雅思6测试1听力-Section3");
 				lsrwItem.setType(1);
 				lsrwItem.setValue("C6T1S3.mp3");
 				lsrwItem.setLyrics("C6T1S3.lrc");
-				listeningItems[1]=lsrwItem;
+				listeningItems[i++]=lsrwItem;
 				
+				
+				lsrwItem = new LsrwItem();
+				lsrwItem.setTitle("剑桥雅思6测试1听力-Section4");
+				lsrwItem.setType(1);
+				lsrwItem.setValue("C6T1S4.mp3");
+				lsrwItem.setLyrics("C6T1S4.lrc");
+				listeningItems[i++]=lsrwItem;
+
 				lsrwItem = new LsrwItem();
 				lsrwItem.setTitle("王菲 - 棋子");
 				lsrwItem.setType(1);
 				lsrwItem.setValue("qizi.mp3");
 				lsrwItem.setLyrics("qizi.lrc");
-				listeningItems[2]=lsrwItem;
+				listeningItems[i++]=lsrwItem;
 				
 				
 				lsrwItem = new LsrwItem();
@@ -77,7 +93,7 @@ public class PageFragmentLSRW extends Fragment {
 				lsrwItem.setType(1);
 				lsrwItem.setValue("Time.mp3");
 				lsrwItem.setLyrics("Time.lrc");
-				listeningItems[3]=lsrwItem;
+				listeningItems[i++]=lsrwItem;
 				
 				generals[0]=listeningItems;
 				generals[1]=listeningItems;

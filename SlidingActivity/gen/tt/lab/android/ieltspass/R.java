@@ -418,7 +418,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int info=0x7f0a0035;
         public static final int left_frame=0x7f0a0040;
         public static final int line=0x7f0a0042;
-        public static final int linearLayout1=0x7f0a000b;
+        public static final int linearLayout=0x7f0a000b;
         public static final int listView=0x7f0a0043;
         public static final int listView1=0x7f0a0028;
         public static final int login=0x7f0a0018;

@@ -93,7 +93,7 @@ public class Database {
 	}
 
 	public static List<Map<String,String>> parseLyrics(String lyricsName) {
-		List<Map<String,String>> lyrics = new ArrayList<Map<String,String>>();
+		List<Map<String,String>> lyricsList = new ArrayList<Map<String,String>>();
 		try {
 			InputStream is = new FileInputStream(Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + lyricsName);
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
@@ -108,9 +108,10 @@ public class Database {
 						String word = ss.substring(ss.indexOf("]") + 1).trim();
 						Map<String, String> m = new HashMap<String, String>();
 						time = time.substring(0,time.indexOf("."));
+						//time = time.substring(0,time.length()-1);
 						m.put("time", time);
 						m.put("word", word);
-						lyrics.add(m);
+						lyricsList.add(m);
 					}
 				}catch (Exception e){
 					Logger.i(TAG, "parseLyrics E: "+e.getMessage());
@@ -123,7 +124,7 @@ public class Database {
 			e.printStackTrace();
 			Logger.i(Database.class.getName(), "Exception: " + e.getMessage());
 		}
-		return lyrics;
+		return lyricsList;
 	}
 
 	private static void initData(String path, String name) {
