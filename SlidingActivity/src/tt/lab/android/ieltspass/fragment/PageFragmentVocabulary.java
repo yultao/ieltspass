@@ -343,7 +343,9 @@ public class PageFragmentVocabulary extends Fragment {
 			} else if ("5.很熟".equals(word.getCategory())) {
 				map.put("img", String.valueOf(R.drawable.category_5));
 				listData5.add(map);
-			} 
+			} else {
+				map.put("img", String.valueOf(R.drawable.category_0));
+			}
 			listData0.add(map);
 		}
 		currentData = listData0;

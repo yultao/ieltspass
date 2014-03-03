@@ -54,21 +54,27 @@ public class PageFragmentLSRW extends Fragment {
 				LsrwItem lsrwItem = new LsrwItem();
 				lsrwItem.setTitle("剑桥雅思6测试1听力-Section1");
 				lsrwItem.setType(1);
-				lsrwItem.setValue("C6T1S1.mp3");
+				lsrwItem.setQuestions("C1T1S1.Q.html");
+				lsrwItem.setAnswers("C6T1S1.A.html");
+				lsrwItem.setAudio("C6T1S1.mp3");
 				lsrwItem.setLyrics("C6T1S1.lrc");
 				listeningItems[i++]=lsrwItem;
 				
 				lsrwItem = new LsrwItem();
 				lsrwItem.setTitle("剑桥雅思6测试1听力-Section2");
 				lsrwItem.setType(1);
-				lsrwItem.setValue("C6T1S2.mp3");
+				lsrwItem.setQuestions("C6T1S2.Q.html");
+				lsrwItem.setAnswers("C6T1S2.A.html");
+				lsrwItem.setAudio("C6T1S2.mp3");
 				lsrwItem.setLyrics("C6T1S2.lrc");
 				listeningItems[i++]=lsrwItem;
 				
 				lsrwItem = new LsrwItem();
 				lsrwItem.setTitle("剑桥雅思6测试1听力-Section3");
 				lsrwItem.setType(1);
-				lsrwItem.setValue("C6T1S3.mp3");
+				lsrwItem.setQuestions("C6T1S3.Q.html");
+				lsrwItem.setAnswers("C6T1S3.A.html");
+				lsrwItem.setAudio("C6T1S3.mp3");
 				lsrwItem.setLyrics("C6T1S3.lrc");
 				listeningItems[i++]=lsrwItem;
 				
@@ -76,14 +82,16 @@ public class PageFragmentLSRW extends Fragment {
 				lsrwItem = new LsrwItem();
 				lsrwItem.setTitle("剑桥雅思6测试1听力-Section4");
 				lsrwItem.setType(1);
-				lsrwItem.setValue("C6T1S4.mp3");
+				lsrwItem.setQuestions("C6T1S4.Q.html");
+				lsrwItem.setAnswers("C6T1S4.A.html");
+				lsrwItem.setAudio("C6T1S4.mp3");
 				lsrwItem.setLyrics("C6T1S4.lrc");
 				listeningItems[i++]=lsrwItem;
 
 				lsrwItem = new LsrwItem();
 				lsrwItem.setTitle("王菲 - 棋子");
 				lsrwItem.setType(1);
-				lsrwItem.setValue("qizi.mp3");
+				lsrwItem.setAudio("qizi.mp3");
 				lsrwItem.setLyrics("qizi.lrc");
 				listeningItems[i++]=lsrwItem;
 				
@@ -91,7 +99,7 @@ public class PageFragmentLSRW extends Fragment {
 				lsrwItem = new LsrwItem();
 				lsrwItem.setTitle("王铮亮 - 时间都去哪儿了");
 				lsrwItem.setType(1);
-				lsrwItem.setValue("Time.mp3");
+				lsrwItem.setAudio("Time.mp3");
 				lsrwItem.setLyrics("Time.lrc");
 				listeningItems[i++]=lsrwItem;
 				
@@ -208,8 +216,10 @@ public class PageFragmentLSRW extends Fragment {
 				case 1:
 					intent.putExtra("title", lsrwItem.getTitle());
 					intent.putExtra("type",lsrwItem.getType()); 
-					intent.putExtra("audio",lsrwItem.getValue()); 
+					intent.putExtra("audio",lsrwItem.getAudio()); 
 					intent.putExtra("lyrics",lsrwItem.getLyrics()); 
+					intent.putExtra("questions",lsrwItem.getQuestions()); 
+					intent.putExtra("answers",lsrwItem.getAnswers());
 					startActivity(intent);
 					break;
 				}

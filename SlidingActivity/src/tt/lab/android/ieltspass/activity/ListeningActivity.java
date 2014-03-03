@@ -12,7 +12,9 @@ import tt.lab.android.ieltspass.data.Constants;
 import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.Utilities;
+import tt.lab.android.ieltspass.fragment.ListeningFragmentAnswers;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentLyrics;
+import tt.lab.android.ieltspass.fragment.ListeningFragmentQuestions;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -56,25 +58,29 @@ public class ListeningActivity extends FragmentActivity {
 	private SeekBar seekBar;
 	private TextView currentPosition, duration;
 	private File file;
-	private String titleStr;
+	private String title;
 	private String lyrics;
 	private String audio;
+	private String questions;
+	private String answers;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_listening);
+		Intent intent = this.getIntent();
+		Bundle bundle = intent.getExtras();
+		title = bundle.getString("title");
+		lyrics = bundle.getString("lyrics");
+		audio = bundle.getString("audio");
+		questions = bundle.getString("questions");
+		answers = bundle.getString("answers");
+		
 		initPager();
 		initTitle();
 		initControls();
 		initPlayer();
 		initFragement();
 		start();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-
 	}
 
 	private void initPager() {
@@ -111,18 +117,16 @@ public class ListeningActivity extends FragmentActivity {
 				startActivity(Intent.createChooser(intent, "分享"));
 			}
 		});
-		TextView title = (TextView) findViewById(R.id.titleText);
-
-		Intent intent = this.getIntent();
-		Bundle bundle = intent.getExtras();
-		titleStr = bundle.getString("title");
-		lyrics = bundle.getString("lyrics");
-		audio = bundle.getString("audio");
-		title.setText(titleStr.toUpperCase());
+		TextView titleText = (TextView) findViewById(R.id.titleText);
+		titleText.setText(title.toUpperCase());
 	}
 
 	private void initFragement() {
 
+		ListeningFragmentQuestions fragmentQuestions = new ListeningFragmentQuestions();
+		fragmentQuestions.setQuestions(questions);
+		pagerItemList.add(fragmentQuestions);
+		
 		ListeningFragmentLyrics fragmentLyrics = new ListeningFragmentLyrics();
 		Bundle args = new Bundle();
 		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 1);
@@ -130,17 +134,9 @@ public class ListeningActivity extends FragmentActivity {
 		fragmentLyrics.setPlayer(player,seekBar, lyrics);
 		pagerItemList.add(fragmentLyrics);
 
-//		DummySectionFragment fragment = new DummySectionFragment();
-//		args = new Bundle();
-//		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 2);
-//		fragment.setArguments(args);
-//		pagerItemList.add(fragment);
-//
-//		fragment = new DummySectionFragment();
-//		args = new Bundle();
-//		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 3);
-//		fragment.setArguments(args);
-//		pagerItemList.add(fragment);
+		ListeningFragmentAnswers fragmentAnswers = new ListeningFragmentAnswers();
+		fragmentAnswers.setAnswers(answers);
+		pagerItemList.add(fragmentAnswers);
 
 	}
 
@@ -285,25 +281,25 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void release() {
-		Logger.i(TAG, "release I");
+		//Logger.i(TAG, "release I");
 		try {
 
-			Logger.i(TAG, "release: 0: ");
+			//Logger.i(TAG, "release: 0: ");
 			refreshButtonText();
-			Logger.i(TAG, "release: 1: ");
+			//Logger.i(TAG, "release: 1: ");
 			player.release();
-			Logger.i(TAG, "release: 2: "+updateProgressThread);
+			//Logger.i(TAG, "release: 2: "+updateProgressThread);
 			
 
 			// tv.setText("播放发生异常!");
 			handler.removeCallbacks(updateProgressThread);
-			Logger.i(TAG, "release: 3: ");
+			//Logger.i(TAG, "release: 3: ");
 			
 		} catch (Exception e) {
 			Logger.i(TAG, "release: E: " + e.getMessage());
 			e.printStackTrace();
 		}
-		Logger.i(TAG, "release O");
+		//Logger.i(TAG, "release O");
 	}
 
 	
