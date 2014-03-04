@@ -47,7 +47,7 @@ public class CenterFragmentPager extends CenterFragment {
 
 		PageFragmentVocabulary page1 = new PageFragmentVocabulary();
 		PageFragmentDaily page2 = new PageFragmentDaily();
-		PageFragmentLSRW page3 = new PageFragmentLSRW();
+		PageFragmentLSRW1 page3 = new PageFragmentLSRW1();
 		pagerItemList.add(page1);
 		pagerItemList.add(page2);
 		pagerItemList.add(page3);

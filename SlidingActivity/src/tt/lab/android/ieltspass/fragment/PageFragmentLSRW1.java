@@ -27,11 +27,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PageFragmentLSRW extends Fragment {
+public class PageFragmentLSRW1 extends Fragment {
 	View view;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		view = inflater.inflate(R.layout.fragment_lsrw, null);
+		view = inflater.inflate(R.layout.fragment_lsrw_tab, null);
 		initExpandableList();
 		return view;
 	}
@@ -117,7 +117,7 @@ public class PageFragmentLSRW extends Fragment {
 			 */
 			TextView getTextView() {
 				AbsListView.LayoutParams lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 64);
-				TextView textView = new TextView(PageFragmentLSRW.this.getActivity());
+				TextView textView = new TextView(PageFragmentLSRW1.this.getActivity());
 				textView.setLayoutParams(lp);
 				textView.setGravity(Gravity.CENTER_VERTICAL);
 				textView.setPadding(10, 0, 0, 0);
@@ -156,9 +156,9 @@ public class PageFragmentLSRW extends Fragment {
 
 			public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
-				LinearLayout ll = new LinearLayout(PageFragmentLSRW.this.getActivity());
+				LinearLayout ll = new LinearLayout(PageFragmentLSRW1.this.getActivity());
 				ll.setOrientation(0);
-				ImageView logo = new ImageView(PageFragmentLSRW.this.getActivity());
+				ImageView logo = new ImageView(PageFragmentLSRW1.this.getActivity());
 				logo.setImageResource(logos[groupPosition]);
 				logo.setPadding(60, 0, 0, 0);
 				ll.addView(logo);
@@ -172,9 +172,9 @@ public class PageFragmentLSRW extends Fragment {
 
 			public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView,
 					ViewGroup parent) {
-				LinearLayout ll = new LinearLayout(PageFragmentLSRW.this.getActivity());
+				LinearLayout ll = new LinearLayout(PageFragmentLSRW1.this.getActivity());
 				ll.setOrientation(0);
-				ImageView generallogo = new ImageView(PageFragmentLSRW.this.getActivity());
+				ImageView generallogo = new ImageView(PageFragmentLSRW1.this.getActivity());
 				// generallogo.setImageResource(generallogos[groupPosition][childPosition]);
 				ll.addView(generallogo);
 				TextView textView = getTextView();

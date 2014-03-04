@@ -66,7 +66,7 @@ public class CenterFragmentIndicator extends CenterFragment {
 		mPager = (ViewPager) view.findViewById(R.id.pager);
 
 		PageFragmentVocabulary pageVocabulary = new PageFragmentVocabulary();
-		PageFragmentLSRW pageLSRW = new PageFragmentLSRW();
+		PageFragmentLSRWTabHost pageLSRW = new PageFragmentLSRWTabHost();
 
 		PageFragmentDaily pageOther = new PageFragmentDaily();
 		pagerItemList.add(pageOther);

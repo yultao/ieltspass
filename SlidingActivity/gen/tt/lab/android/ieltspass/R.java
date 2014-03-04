@@ -405,14 +405,13 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int btnPlay=0x7f0a001e;
         public static final int button1=0x7f0a0010;
         public static final int button4=0x7f0a0023;
-        public static final int button5=0x7f0a002b;
         public static final int cat=0x7f0a0033;
         public static final int center_frame=0x7f0a001f;
-        public static final int controls=0x7f0a002a;
+        public static final int controls=0x7f0a002c;
         public static final int currentPosition=0x7f0a000e;
         public static final int duration=0x7f0a000f;
         public static final int email=0x7f0a0016;
-        public static final int expandableListView1=0x7f0a002c;
+        public static final int expandableListView1=0x7f0a002a;
         public static final int grade_textview=0x7f0a0039;
         public static final int head_view=0x7f0a0037;
         public static final int img=0x7f0a0032;
@@ -455,6 +454,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int tab1=0x7f0a0025;
         public static final int tab2=0x7f0a0026;
         public static final int tab3=0x7f0a0027;
+        public static final int tab4=0x7f0a002b;
         public static final int tab_indicator=0x7f0a0021;
         public static final int tabhost=0x7f0a0024;
         public static final int tabs=0x7f0a0020;
@@ -490,18 +490,19 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int fragment_listening_answers=0x7f030009;
         public static final int fragment_listening_lyrics=0x7f03000a;
         public static final int fragment_listening_questions=0x7f03000b;
-        public static final int fragment_lsrw=0x7f03000c;
-        public static final int fragment_vocabulary=0x7f03000d;
-        public static final int fragment_vocabulary_dummy=0x7f03000e;
-        public static final int fragment_vocabulary_section_basic=0x7f03000f;
-        public static final int fragment_vocabulary_vlist=0x7f030010;
-        public static final int left=0x7f030011;
-        public static final int left_frame=0x7f030012;
-        public static final int line=0x7f030013;
-        public static final int main=0x7f030014;
-        public static final int right=0x7f030015;
-        public static final int right_frame=0x7f030016;
-        public static final int title=0x7f030017;
+        public static final int fragment_lsrw_tab=0x7f03000c;
+        public static final int fragment_lsrw_tabhost=0x7f03000d;
+        public static final int fragment_vocabulary=0x7f03000e;
+        public static final int fragment_vocabulary_dummy=0x7f03000f;
+        public static final int fragment_vocabulary_section_basic=0x7f030010;
+        public static final int fragment_vocabulary_vlist=0x7f030011;
+        public static final int left=0x7f030012;
+        public static final int left_frame=0x7f030013;
+        public static final int line=0x7f030014;
+        public static final int main=0x7f030015;
+        public static final int right=0x7f030016;
+        public static final int right_frame=0x7f030017;
+        public static final int title=0x7f030018;
     }
     public static final class menu {
         public static final int daily=0x7f0d0000;

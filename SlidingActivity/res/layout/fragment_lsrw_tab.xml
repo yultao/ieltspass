@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/bg_color" >
 
-    <!--  -->
+    <!--  
 
     <TextView
         android:id="@+id/titleText"
@@ -55,12 +55,11 @@
             android:layout_weight="1"
             android:text="Button" />
     </LinearLayout>
-
+	-->
     <ExpandableListView
         android:id="@+id/expandableListView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/controls"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
     </ExpandableListView>
