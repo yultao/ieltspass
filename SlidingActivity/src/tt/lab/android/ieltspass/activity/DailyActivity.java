@@ -135,7 +135,7 @@ public class DailyActivity extends Activity {
 	}
 
 	private void navigateUp() {
-		NavUtils.navigateUpTo(this, new Intent(this, SlidingActivity.class));
+		NavUtils.navigateUpTo(this, new Intent(this, LaunchActivity.class));
 	}
 
 	@Override

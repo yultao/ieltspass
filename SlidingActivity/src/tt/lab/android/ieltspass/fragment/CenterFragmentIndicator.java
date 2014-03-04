@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tt.lab.android.ieltspass.R;
-import tt.lab.android.ieltspass.activity.SlidingActivity;
+import tt.lab.android.ieltspass.activity.LaunchActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -45,7 +45,7 @@ public class CenterFragmentIndicator extends CenterFragment {
 		menuButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				((SlidingActivity) getActivity()).showLeft();
+				((LaunchActivity) getActivity()).showLeft();
 			}
 		});
 		shareButton = (Button) view.findViewById(R.id.shareButton);
@@ -66,7 +66,7 @@ public class CenterFragmentIndicator extends CenterFragment {
 		mPager = (ViewPager) view.findViewById(R.id.pager);
 
 		PageFragmentVocabulary pageVocabulary = new PageFragmentVocabulary();
-		PageFragmentLSRWTabHost pageLSRW = new PageFragmentLSRWTabHost();
+		PageFragmentLSRW pageLSRW = new PageFragmentLSRW();
 
 		PageFragmentDaily pageOther = new PageFragmentDaily();
 		pagerItemList.add(pageOther);

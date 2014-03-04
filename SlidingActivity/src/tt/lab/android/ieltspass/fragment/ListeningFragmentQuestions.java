@@ -20,7 +20,7 @@ public class ListeningFragmentQuestions extends Fragment {
 		webView = (WebView) rootView.findViewById(R.id.webview);
 		WebSettings webSettings = webView.getSettings();
 		webSettings.setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
-		webView.loadUrl("file:///android_asset/cambridge/"+questions);
+		webView.loadUrl("file:///android_asset/cambridge/listening/"+questions);
 		return rootView;
 	}
 

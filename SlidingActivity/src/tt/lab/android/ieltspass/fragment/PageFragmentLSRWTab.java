@@ -1,11 +1,8 @@
 package tt.lab.android.ieltspass.fragment;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.activity.ListeningActivity;
-import tt.lab.android.ieltspass.activity.SettingsActivity;
+import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.LsrwItem;
 import android.content.Intent;
 import android.graphics.Color;
@@ -16,19 +13,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class PageFragmentLSRWTab extends Fragment {
-	View view;
+	private String TAG = PageFragmentLSRWTab.class.getName();
+	private View view;
 	private int type;
 
 	public PageFragmentLSRWTab() {
@@ -54,7 +49,13 @@ public class PageFragmentLSRWTab extends Fragment {
 		ExpandableListView expandableListView = (ExpandableListView) view.findViewById(R.id.expandableListView1);
 		final ExpandableListAdapter adapter = new ExpandableListAdapter();
 		expandableListView.setAdapter(adapter);
-
+		expandableListView.setOnGroupExpandListener(new OnGroupExpandListener() {
+			
+			@Override
+			public void onGroupExpand(int groupPosition) {
+				Logger.i(TAG, "onGroupExpand: "+groupPosition);
+			}
+		});
 		// 设置item点击的监听器
 		expandableListView.setOnChildClickListener(new OnChildClickListener() {
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
@@ -81,7 +82,48 @@ public class PageFragmentLSRWTab extends Fragment {
 			}
 		});
 	}
-
+	public void reload(int type) {
+		//this.setType(type);
+		//initData();
+	}
+	private LsrwItem[][]  initData() {
+		LsrwItem[][] generals = new LsrwItem[9][];
+		String t = null;
+		switch (type){
+		case 1:
+			t = "听力";
+			break;
+		case 2:
+			t = "口语";
+			break;
+		case 3:
+			t = "阅读";
+			break;
+		case 4:
+			t = "写作";
+			break;
+		}
+		for(int i=0;i<9;i++){
+			LsrwItem[] listeningItems = new LsrwItem[16];
+			for(int j=0;j<4;j++){
+				for(int k=0;k<4;k++){
+					String name = "C"+(i+1)+"T"+(j+1)+"S"+(k+1);
+					LsrwItem lsrwItem = new LsrwItem();
+					
+					lsrwItem.setTitle("剑桥雅思"+(i+1)+"-测试"+(j+1)+"-"+t+"Section"+(k+1));
+					lsrwItem.setType(1);
+					lsrwItem.setQuestions(name+".Q.html");
+					lsrwItem.setAnswers(name+".A.html");
+					lsrwItem.setAudio(name+".mp3");
+					lsrwItem.setLyrics(name+".lrc");
+					listeningItems[j*4+k] = lsrwItem;
+				}
+			}
+			
+			generals[8-i] = listeningItems;
+		}
+		return generals;
+	}
 	private class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 		int[] logos = new int[] { R.drawable.wei, R.drawable.shu, R.drawable.wu, R.drawable.shu, R.drawable.wei,
@@ -89,50 +131,14 @@ public class PageFragmentLSRWTab extends Fragment {
 
 		private String[] generalsTypes = new String[9];
 
-		private LsrwItem[][] generals = new LsrwItem[9][];
+		private LsrwItem[][] generals;
 
-		ExpandableListAdapter() {
+		public ExpandableListAdapter() {
 			for (int i = 0; i <9; i++)
 				generalsTypes[i] = "剑桥雅思" + (9-i);
-
-			initData ();
+			generals = initData ();
 		}
-		void initData() {
-			String t = null;
-			switch (type){
-			case 1:
-				t = "听力";
-				break;
-			case 2:
-				t = "口语";
-				break;
-			case 3:
-				t = "阅读";
-				break;
-			case 4:
-				t = "写作";
-				break;
-			}
-			for(int i=0;i<9;i++){
-				LsrwItem[] listeningItems = new LsrwItem[16];
-				for(int j=0;j<4;j++){
-					for(int k=0;k<4;k++){
-						String name = "C"+(i+1)+"T"+(j+1)+"S"+(k+1);
-						LsrwItem lsrwItem = new LsrwItem();
-						
-						lsrwItem.setTitle("剑桥雅思"+(i+1)+"-测试"+(j+1)+"-"+t+"Section"+(k+1));
-						lsrwItem.setType(1);
-						lsrwItem.setQuestions(name+".Q.html");
-						lsrwItem.setAnswers(name+".A.html");
-						lsrwItem.setAudio(name+".mp3");
-						lsrwItem.setLyrics(name+".lrc");
-						listeningItems[j*4+k] = lsrwItem;
-					}
-				}
-				
-				generals[8-i] = listeningItems;
-			}
-		}
+		
 
 		// 子视图图思
 		/*
@@ -141,7 +147,7 @@ public class PageFragmentLSRWTab extends Fragment {
 		 * R.drawable.liubei, R.drawable.zhugeliang, R.drawable.huangyueying, R.drawable.zhaoyun }, { R.drawable.lvmeng,
 		 * R.drawable.luxun, R.drawable.sunquan, R.drawable.zhouyu, R.drawable.sunshangxiang } };
 		 */
-		TextView getTextView() {
+		private TextView getTextView() {
 			AbsListView.LayoutParams lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 64);
 			TextView textView = new TextView(PageFragmentLSRWTab.this.getActivity());
 			textView.setLayoutParams(lp);
@@ -165,14 +171,17 @@ public class PageFragmentLSRWTab extends Fragment {
 		}
 
 		public int getChildrenCount(int groupPosition) {
+			//Logger.i(TAG, "getChildrenCount "+groupPosition );
 			return generals[groupPosition].length;
 		}
 
 		public Object getChild(int groupPosition, int childPosition) {
+			//Logger.i(TAG, "getChild "+groupPosition +", "+ childPosition);
 			return generals[groupPosition][childPosition];
 		}
 
 		public long getChildId(int groupPosition, int childPosition) {
+			//Logger.i(TAG, "getChildId "+groupPosition +", "+ childPosition);
 			return childPosition;
 		}
 
@@ -203,6 +212,7 @@ public class PageFragmentLSRWTab extends Fragment {
 			ImageView generallogo = new ImageView(PageFragmentLSRWTab.this.getActivity());
 			// generallogo.setImageResource(generallogos[groupPosition][childPosition]);
 			ll.addView(generallogo);
+			
 			TextView textView = getTextView();
 			textView.setPadding(60, 0, 0, 0);
 			textView.setTextColor(getResources().getColor(R.color.sub_text_color));
@@ -215,4 +225,6 @@ public class PageFragmentLSRWTab extends Fragment {
 			return true;
 		}
 	}
+
+	
 }

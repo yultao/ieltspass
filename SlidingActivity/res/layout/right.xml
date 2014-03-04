@@ -15,7 +15,7 @@
             android:layout_height="50dp"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
-            android:text="调试信息"
+            android:text="@string/version"
             android:textColor="@color/black"
             android:textSize="15sp" />
 

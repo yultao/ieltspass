@@ -164,7 +164,7 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 
 	private void navigateUp() {
-		NavUtils.navigateUpTo(this, new Intent(this, SlidingActivity.class));
+		NavUtils.navigateUpTo(this, new Intent(this, LaunchActivity.class));
 	}
 
 	private void refreshButtonText() {

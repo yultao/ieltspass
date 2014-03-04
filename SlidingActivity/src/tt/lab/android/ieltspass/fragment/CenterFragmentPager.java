@@ -2,7 +2,7 @@
 package tt.lab.android.ieltspass.fragment;
 
 import tt.lab.android.ieltspass.R;
-import tt.lab.android.ieltspass.activity.SlidingActivity;
+import tt.lab.android.ieltspass.activity.LaunchActivity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -155,7 +155,7 @@ public class CenterFragmentPager extends CenterFragment {
 		button4.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				((SlidingActivity) getActivity()).showLeft();
+				((LaunchActivity) getActivity()).showLeft();
 			}
 		});
 

@@ -63,6 +63,7 @@ public class ListeningActivity extends FragmentActivity {
 	private String audio;
 	private String questions;
 	private String answers;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,13 +75,20 @@ public class ListeningActivity extends FragmentActivity {
 		audio = bundle.getString("audio");
 		questions = bundle.getString("questions");
 		answers = bundle.getString("answers");
-		
+
 		initPager();
 		initTitle();
+		initAudio();
 		initControls();
 		initPlayer();
 		initFragement();
 		start();
+	}
+
+	private void initAudio() {
+		// TODO Auto-generated method stub
+		String name = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + audio;
+		file = new File(name);
 	}
 
 	private void initPager() {
@@ -126,12 +134,12 @@ public class ListeningActivity extends FragmentActivity {
 		ListeningFragmentQuestions fragmentQuestions = new ListeningFragmentQuestions();
 		fragmentQuestions.setQuestions(questions);
 		pagerItemList.add(fragmentQuestions);
-		
+
 		ListeningFragmentLyrics fragmentLyrics = new ListeningFragmentLyrics();
 		Bundle args = new Bundle();
 		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 1);
 		fragmentLyrics.setArguments(args);
-		fragmentLyrics.setPlayer(player,seekBar, lyrics);
+		fragmentLyrics.setPlayer(player, seekBar, lyrics);
 		pagerItemList.add(fragmentLyrics);
 
 		ListeningFragmentAnswers fragmentAnswers = new ListeningFragmentAnswers();
@@ -140,62 +148,16 @@ public class ListeningActivity extends FragmentActivity {
 
 	}
 
-	private void navigateUp() {
-		release();
-		NavUtils.navigateUpTo(this, new Intent(this, SlidingActivity.class));
-	}
-
-	private void initPlayer() {
-		// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
-		// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
-		player = new MediaPlayer();
-		
-		/* 当MediaPlayer.OnCompletionLister会运行的Listener */
-		player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-			// @Override
-			/* 覆盖文件播出完毕事件 */
-			public void onCompletion(MediaPlayer arg0) {
-				seekBar.setProgress(0);
-				pause();
-			}
-		});
-
-		/* 当MediaPlayer.OnErrorListener会运行的Listener */
-		player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-			@Override
-			/* 覆盖错误处理事件 */
-			public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
-				pause();
-				return false;
-			}
-		});
-		String name = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/"+audio;
-		file = new File(name);
-		Logger.i(TAG, "initPlayer " + file.getAbsolutePath());
-		if (file.exists()) {
-			try {
-				player.reset();
-				player.setDataSource(file.getAbsolutePath());
-				player.prepare();
-				duration.setText(Utilities.formatTime(player.getDuration()));
-				seekBar.setMax(player.getDuration());
-			} catch (Exception e) {
-				Logger.i(TAG, "initPlayer: " + e.getMessage());
-				e.printStackTrace();
-			}
-		}
-	}
-
 	private void initControls() {
 		seekBar = (SeekBar) findViewById(R.id.seekBar1);
+		seekBar.setEnabled(file.exists());
 		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
 				// fromUser判断是用户改变的滑块的值
 				try {
-					//Logger.i(TAG, "onProgressChanged: fromUser: " +  progress +", "+fromUser);
+					// Logger.i(TAG, "onProgressChanged: fromUser: " + progress +", "+fromUser);
 					if (fromUser == true) {
 						player.seekTo(progress);
 					}
@@ -215,6 +177,7 @@ public class ListeningActivity extends FragmentActivity {
 		});
 
 		btnPlayStop = (Button) findViewById(R.id.button1);
+		btnPlayStop.setEnabled(file.exists());
 		btnPlayStop.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -230,8 +193,53 @@ public class ListeningActivity extends FragmentActivity {
 		duration = (TextView) findViewById(R.id.duration);
 	}
 
+	private void initPlayer() {
+		if (file.exists()) {
+			// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
+			// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+			player = new MediaPlayer();
+
+			/* 当MediaPlayer.OnCompletionLister会运行的Listener */
+			player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+				// @Override
+				/* 覆盖文件播出完毕事件 */
+				public void onCompletion(MediaPlayer arg0) {
+					seekBar.setProgress(0);
+					pause();
+				}
+			});
+
+			/* 当MediaPlayer.OnErrorListener会运行的Listener */
+			player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+				@Override
+				/* 覆盖错误处理事件 */
+				public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
+					pause();
+					return false;
+				}
+			});
+
+			try {
+				player.reset();
+				player.setDataSource(file.getAbsolutePath());
+				player.prepare();
+				duration.setText(Utilities.formatTime(player.getDuration()));
+				seekBar.setMax(player.getDuration());
+			} catch (Exception e) {
+				Logger.i(TAG, "initPlayer: " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
+
 	private void refreshButtonText() {
 		btnPlayStop.setBackground(getResources().getDrawable(player.isPlaying() ? R.drawable.pause : R.drawable.play));
+	}
+
+	private void navigateUp() {
+		release();
+		NavUtils.navigateUpTo(this, new Intent(this, LaunchActivity.class));
 	}
 
 	private Runnable updateProgressThread = new Runnable() {
@@ -240,7 +248,7 @@ public class ListeningActivity extends FragmentActivity {
 			try {
 				int cp = player.getCurrentPosition();
 				seekBar.setProgress(cp);
-				handler.postDelayed(updateProgressThread, 500);//No need to update UI so frequently, 500 is enough.
+				handler.postDelayed(updateProgressThread, 500);// No need to update UI so frequently, 500 is enough.
 			} catch (Exception e) {
 				Logger.i(TAG, "updateProgressThread: " + e.getMessage());
 			}
@@ -249,60 +257,62 @@ public class ListeningActivity extends FragmentActivity {
 	};
 
 	private void start() {
-		//Logger.i(TAG, "start I");
-		try {
-			// player.seekTo(seekBar.getProgress());
-			player.start();
-			handler.post(updateProgressThread);
+		if (player != null) {
+			// Logger.i(TAG, "start I");
+			try {
+				// player.seekTo(seekBar.getProgress());
+				player.start();
+				handler.post(updateProgressThread);
 
-			currentPosition.setText(Utilities.formatTime(player.getCurrentPosition()));
-			refreshButtonText();
+				currentPosition.setText(Utilities.formatTime(player.getCurrentPosition()));
+				refreshButtonText();
 
-		} catch (Exception e) {
-			Logger.i(TAG, "start: " + e.getMessage());
-			e.printStackTrace();
+			} catch (Exception e) {
+				Logger.i(TAG, "start: " + e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		//Logger.i(TAG, "start O");
+		// Logger.i(TAG, "start O");
 	}
 
 	private void pause() {
-		//Logger.i(TAG, "pause I ");
+		// Logger.i(TAG, "pause I ");
 		try {
-			/* 发生错误时也解除资源与MediaPlayer的赋值 */
-			player.pause();
-			// tv.setText("播放发生异常!");
-			handler.removeCallbacks(updateProgressThread);
-			refreshButtonText();
+			if (player != null) {
+				/* 发生错误时也解除资源与MediaPlayer的赋值 */
+				player.pause();
+				// tv.setText("播放发生异常!");
+				handler.removeCallbacks(updateProgressThread);
+				refreshButtonText();
+			}
+
 		} catch (Exception e) {
 			Logger.i(TAG, "pause: E: " + e.getMessage());
 			e.printStackTrace();
 		}
-		//Logger.i(TAG, "pause O");
+		// Logger.i(TAG, "pause O");
 	}
 
 	private void release() {
-		//Logger.i(TAG, "release I");
+		// Logger.i(TAG, "release I");
 		try {
+			if (player != null) {
+				// Logger.i(TAG, "release: 0: ");
+				refreshButtonText();
+				// Logger.i(TAG, "release: 1: ");
+				player.release();
+				// Logger.i(TAG, "release: 2: "+updateProgressThread);
 
-			//Logger.i(TAG, "release: 0: ");
-			refreshButtonText();
-			//Logger.i(TAG, "release: 1: ");
-			player.release();
-			//Logger.i(TAG, "release: 2: "+updateProgressThread);
-			
-
-			// tv.setText("播放发生异常!");
-			handler.removeCallbacks(updateProgressThread);
-			//Logger.i(TAG, "release: 3: ");
-			
+				// tv.setText("播放发生异常!");
+				handler.removeCallbacks(updateProgressThread);
+				// Logger.i(TAG, "release: 3: ");
+			}
 		} catch (Exception e) {
 			Logger.i(TAG, "release: E: " + e.getMessage());
 			e.printStackTrace();
 		}
-		//Logger.i(TAG, "release O");
+		// Logger.i(TAG, "release O");
 	}
-
-	
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -315,7 +325,7 @@ public class ListeningActivity extends FragmentActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.listening, menu);
+		//getMenuInflater().inflate(R.menu.listening, menu);
 		return true;
 	}
 
@@ -371,6 +381,7 @@ public class ListeningActivity extends FragmentActivity {
 		MediaPlayer player;
 		SeekBar seekBar;
 		private String lyrics;
+
 		public DummySectionFragment() {
 		}
 
@@ -392,8 +403,8 @@ public class ListeningActivity extends FragmentActivity {
 					Map<String, String> sentence = lyricsList.get(i);
 					String time = sentence.get("time");
 					String word = sentence.get("word");
-					
-					TextView textView = createTextView(time+": "+ word);
+
+					TextView textView = createTextView(time + ": " + word);
 					linearLayout1.addView(textView);
 
 					Map<String, Object> m = new HashMap<String, Object>();
@@ -425,9 +436,9 @@ public class ListeningActivity extends FragmentActivity {
 					Map<String, Object> map = lyricsTextViewMap.get(formatedTime);
 
 					if (map != null) {
-						
+
 						TextView textView = (TextView) map.get("text");
-						//Logger.i(TAG, "equals: " + (textView.equals(lastTextView)));
+						// Logger.i(TAG, "equals: " + (textView.equals(lastTextView)));
 						if (lastTextView == null || !lastTextView.equals(textView)) {
 							Logger.i(TAG, "in: ");
 							if (lastTextView != null) {
@@ -441,13 +452,13 @@ public class ListeningActivity extends FragmentActivity {
 							Logger.i(TAG, "index: " + index);
 
 							int real = index - 5;
-							if (real <=0) {
+							if (real <= 0) {
 								real = 0;
 							}
 							TextView toScroll = (TextView) lyricsTextViewList.get(real).get("text");
-							
+
 							scrollView1.requestChildFocus(toScroll, toScroll);
-							
+
 							real = index + 5;
 							if (real >= lyricsTextViewList.size()) {
 								real = lyricsTextViewList.size() - 1;
@@ -487,13 +498,14 @@ public class ListeningActivity extends FragmentActivity {
 		};
 
 		private TextView createTextView(String text) {
-			ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			
+			ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT);
+
 			TextView textView = new TextView(this.getActivity());
 			textView.setLayoutParams(lp);
 			textView.setTextSize(18);
 			textView.setText(text);
-			
+
 			return textView;
 		}
 	}

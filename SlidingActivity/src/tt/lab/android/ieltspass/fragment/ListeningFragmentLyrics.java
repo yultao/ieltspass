@@ -70,7 +70,7 @@ public class ListeningFragmentLyrics extends Fragment {
 				sentence.setTextView(textView);
 				linearLayout.addView(textView);
 			}
-			Logger.i(TAG, "lyrics: \n"+ lyrics);
+			//Logger.i(TAG, "lyrics: \n"+ lyrics);
 			handler.post(updateLyricsThread);
 		} catch (Exception e) {
 			Logger.i(TAG, "addView e: " + e.getMessage());

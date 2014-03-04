@@ -21,7 +21,7 @@ import android.view.Menu;
 import android.widget.Toast;
 import tt.lab.android.ieltspass.R;
 
-public class SlidingActivity extends FragmentActivity {
+public class LaunchActivity extends FragmentActivity {
 	private SlidingMenuRelativeLayout mSlidingMenuRelativeLayout;
 	private LeftFragment leftFragment;
 	private RightFragment rightFragment;
