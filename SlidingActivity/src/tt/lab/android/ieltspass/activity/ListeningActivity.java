@@ -104,7 +104,7 @@ public class ListeningActivity extends FragmentActivity {
 	private void initTitle() {
 		Button back = (Button) findViewById(R.id.menuButton);
 		// back.setBackground(Resources.getSystem().getDrawable(R.drawable.back));
-		back.setBackground(getResources().getDrawable(R.drawable.back));
+		back.setBackgroundDrawable(getResources().getDrawable(R.drawable.back));
 		back.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -234,7 +234,7 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void refreshButtonText() {
-		btnPlayStop.setBackground(getResources().getDrawable(player.isPlaying() ? R.drawable.pause : R.drawable.play));
+		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(player.isPlaying() ? R.drawable.pause : R.drawable.play));
 	}
 
 	private void navigateUp() {

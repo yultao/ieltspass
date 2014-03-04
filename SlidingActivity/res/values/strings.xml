@@ -14,5 +14,8 @@
     <string name="title_listening_section3">答案讲解</string>
     <string name="title_activity_daily">DailyActivity</string>
     <string name="title_activity_listening">ListeningActivity</string>
+    <string name="title_activity_speaking">SpeakingActivity</string>
+    <string name="title_activity_writing">WritingActivity</string>
+    <string name="title_activity_reading">ReadingActivity</string>
 
 </resources>
