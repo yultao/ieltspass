@@ -15,9 +15,12 @@ import tt.lab.android.ieltspass.data.Utilities;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentAnswers;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentLyrics;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentQuestions;
+import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -40,18 +43,8 @@ import android.widget.TextView;
 
 public class ListeningActivity extends FragmentActivity {
 	private static final String TAG = ListeningActivity.class.getName();
-	/**
-	 * The {@link android.support.v4.view.PagerAdapter} that will provide fragments for each of the sections. We use a
-	 * {@link android.support.v4.app.FragmentPagerAdapter} derivative, which will keep every loaded fragment in memory.
-	 * If this becomes too memory intensive, it may be best to switch to a
-	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-	 */
-	SectionsPagerAdapter mSectionsPagerAdapter;
-
-	/**
-	 * The {@link ViewPager} that will host the section contents.
-	 */
-	ViewPager mViewPager;
+	private SectionsPagerAdapter mSectionsPagerAdapter;
+	private ViewPager mViewPager;
 	private Button btnPlayStop;
 	private MediaPlayer player;
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
@@ -69,14 +62,7 @@ public class ListeningActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_listening);
-		Intent intent = this.getIntent();
-		Bundle bundle = intent.getExtras();
-		title = bundle.getString("title");
-		lyrics = bundle.getString("lyrics");
-		audio = bundle.getString("audio");
-		questions = bundle.getString("questions");
-		answers = bundle.getString("answers");
-
+		initParameters();
 		initPager();
 		initTitle();
 		initAudio();
@@ -84,20 +70,27 @@ public class ListeningActivity extends FragmentActivity {
 		initPlayer();
 		initFragement();
 		start();
+		
+		
+	}
+
+	private void initParameters() {
+		Intent intent = this.getIntent();
+		Bundle bundle = intent.getExtras();
+		title = bundle.getString("title");
+		lyrics = bundle.getString("lyrics");
+		audio = bundle.getString("audio");
+		questions = bundle.getString("questions");
+		answers = bundle.getString("answers");
 	}
 
 	private void initAudio() {
-		// TODO Auto-generated method stub
 		String name = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + audio;
 		file = new File(name);
 	}
 
 	private void initPager() {
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
@@ -107,7 +100,6 @@ public class ListeningActivity extends FragmentActivity {
 		// back.setBackground(Resources.getSystem().getDrawable(R.drawable.back));
 		back.setBackgroundDrawable(getResources().getDrawable(R.drawable.back));
 		back.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				navigateUp();
@@ -131,7 +123,6 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void initFragement() {
-
 		ListeningFragmentQuestions fragmentQuestions = new ListeningFragmentQuestions();
 		fragmentQuestions.setQuestions(questions);
 		pagerItemList.add(fragmentQuestions);
@@ -152,7 +143,6 @@ public class ListeningActivity extends FragmentActivity {
 	private void initControls() {
 		seekBar = (SeekBar) findViewById(R.id.seekBar1);
 		seekBar.setEnabled(file.exists());
-		
 		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -200,13 +190,24 @@ public class ListeningActivity extends FragmentActivity {
 			// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
 			// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 			player = new MediaPlayer();
+			
+			player.setOnPreparedListener(new OnPreparedListener() {
+				
+				@Override
+				public void onPrepared(MediaPlayer mp) {
+					Logger.i(TAG, "onPrepared");
+					//start();
+				}
+			});
+			
+			
 			player.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
 				
 				@Override
 				public void onBufferingUpdate(MediaPlayer mp, int percent) {
-					int a = seekBar.getMax()*percent;
+					int a = seekBar.getMax()*percent/100;
 					Logger.i(TAG, "onBufferingUpdate: "+percent+"% "+a);
-					seekBar.setSecondaryProgress(a);
+					//seekBar.setSecondaryProgress(a);
 					
 				}
 			});
@@ -235,15 +236,18 @@ public class ListeningActivity extends FragmentActivity {
 				Logger.i(TAG, "initPlayer "+1);
 				player.reset();
 				Logger.i(TAG, "initPlayer "+2);
-				player.setDataSource(file.getAbsolutePath());//http://taog.ueuo.com/003.mp3
+				player.setDataSource(file.getAbsolutePath());
+				//player.setDataSource("http://taog.ueuo.com/003.mp3");
 				Logger.i(TAG, "initPlayer "+3);
 				player.prepare();
+				
 				Logger.i(TAG, "initPlayer "+4);
 				duration.setText(Utilities.formatTime(player.getDuration()));
 				Logger.i(TAG, "initPlayer "+5);
 				seekBar.setMax(player.getDuration());
 				Logger.i(TAG, "initPlayer "+6);
-				seekBar.setSecondaryProgress(seekBar.getMax()/2);
+				
+				new DownloadAsyncTask(seekBar).execute();
 			} catch (Exception e) {
 				Logger.i(TAG, "initPlayer: " + e.getMessage());
 				e.printStackTrace();
@@ -273,12 +277,23 @@ public class ListeningActivity extends FragmentActivity {
 
 		}
 	};
+	private Runnable downloadThread = new Runnable() {
+		public void run() {
+			
+			try {
+				 
+			} catch (Exception e) {
+				Logger.i(TAG, "downloadThread: " + e.getMessage());
+			}
 
+		}
+	};
 	private void start() {
 		if (player != null) {
 			// Logger.i(TAG, "start I");
 			try {
 				// player.seekTo(seekBar.getProgress());
+				Logger.i(TAG, "start "+6);
 				player.start();
 				handler.post(updateProgressThread);
 
@@ -527,5 +542,42 @@ public class ListeningActivity extends FragmentActivity {
 			return textView;
 		}
 	}
+	public class DownloadAsyncTask extends AsyncTask<Integer, Integer, String> {
+		private SeekBar seekBar;
 
+		public DownloadAsyncTask(SeekBar seekBar) {
+			this.seekBar = seekBar;
+		}
+
+		@Override
+		protected String doInBackground(Integer... arg0) {
+			
+			for (int i=0;i<100;i++){
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				publishProgress(i);
+			}
+			return "DONE.";
+		}
+
+		@Override
+		protected void onPreExecute() {
+			Logger.i(TAG, "onPreExecute");
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			Logger.i(TAG, "onPostExecute: " + result);
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+			int value = values[0];
+			//Logger.i(TAG, "onProgressUpdate: " + value);
+			seekBar.setSecondaryProgress((value*seekBar.getMax()/100));
+		}
+	}
 }

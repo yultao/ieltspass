@@ -148,7 +148,7 @@ public class SlidingMenuRelativeLayout extends RelativeLayout {
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
 		
 		final int action = ev.getAction();
-		Log.i("onTouchEvent()", "onInterceptTouchEvent action: "+action);
+		//Log.i("onTouchEvent()", "onInterceptTouchEvent action: "+action);
 		final float x = ev.getX();
 		final float y = ev.getY();
 		switch (action) {
@@ -207,14 +207,14 @@ public class SlidingMenuRelativeLayout extends RelativeLayout {
 
 		}
 		
-		Log.i("onTouchEvent()", "onInterceptTouchEvent mIsBeingDragged: "+mIsBeingDragged);
+		//Log.i("onTouchEvent()", "onInterceptTouchEvent mIsBeingDragged: "+mIsBeingDragged);
 		return mIsBeingDragged;
 	}
 
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
-		Log.i("onTouchEvent()", "canSlideLeft:"+canSlideLeft+", canSlideRight: "+canSlideRight+", mIsBeingDragged: "+mIsBeingDragged+", action: "+ev.getAction());
+		//Log.i("onTouchEvent()", "canSlideLeft:"+canSlideLeft+", canSlideRight: "+canSlideRight+", mIsBeingDragged: "+mIsBeingDragged+", action: "+ev.getAction());
 		if (mVelocityTracker == null) {
 			mVelocityTracker = VelocityTracker.obtain();
 		}
@@ -243,7 +243,7 @@ public class SlidingMenuRelativeLayout extends RelativeLayout {
 
 			break;
 		case MotionEvent.ACTION_MOVE:
-			Log.i("onTouchEvent()", "mIsBeingDragged: "+mIsBeingDragged);
+			//Log.i("onTouchEvent()", "mIsBeingDragged: "+mIsBeingDragged);
 			mIsBeingDragged = true;
 			if (mIsBeingDragged) {//It's a bug!
 				final float deltaX = mLastMotionX - x;//deltax <0: 向右滑动
