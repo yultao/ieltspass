@@ -17,6 +17,7 @@ import tt.lab.android.ieltspass.fragment.ListeningFragmentLyrics;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentQuestions;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -151,6 +152,7 @@ public class ListeningActivity extends FragmentActivity {
 	private void initControls() {
 		seekBar = (SeekBar) findViewById(R.id.seekBar1);
 		seekBar.setEnabled(file.exists());
+		
 		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -198,7 +200,16 @@ public class ListeningActivity extends FragmentActivity {
 			// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
 			// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 			player = new MediaPlayer();
-
+			player.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
+				
+				@Override
+				public void onBufferingUpdate(MediaPlayer mp, int percent) {
+					int a = seekBar.getMax()*percent;
+					Logger.i(TAG, "onBufferingUpdate: "+percent+"% "+a);
+					seekBar.setSecondaryProgress(a);
+					
+				}
+			});
 			/* 当MediaPlayer.OnCompletionLister会运行的Listener */
 			player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
@@ -221,11 +232,18 @@ public class ListeningActivity extends FragmentActivity {
 			});
 
 			try {
+				Logger.i(TAG, "initPlayer "+1);
 				player.reset();
-				player.setDataSource(file.getAbsolutePath());
+				Logger.i(TAG, "initPlayer "+2);
+				player.setDataSource(file.getAbsolutePath());//http://taog.ueuo.com/003.mp3
+				Logger.i(TAG, "initPlayer "+3);
 				player.prepare();
+				Logger.i(TAG, "initPlayer "+4);
 				duration.setText(Utilities.formatTime(player.getDuration()));
+				Logger.i(TAG, "initPlayer "+5);
 				seekBar.setMax(player.getDuration());
+				Logger.i(TAG, "initPlayer "+6);
+				seekBar.setSecondaryProgress(seekBar.getMax()/2);
 			} catch (Exception e) {
 				Logger.i(TAG, "initPlayer: " + e.getMessage());
 				e.printStackTrace();
