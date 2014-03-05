@@ -114,10 +114,10 @@ public class PageFragmentLSRWTab extends Fragment {
 		LsrwItem[][] generals = new LsrwItem[9][];
 		
 		String t = tt[type-1];
-		for (int i = 0; i < 9; i++) {
-			LsrwItem[] listeningItems = new LsrwItem[16];
-			for (int j = 0; j < 4; j++) {
-				for (int k = 0; k < 4; k++) {
+		for (int i = 0; i < 9; i++) {//cambridge
+			LsrwItem[] listeningItems = new LsrwItem[4];
+			for (int j = 0; j < 4; j++) {//test
+				for (int k = 0; k < 1; k++) {//section
 					String name = "C" + (i + 1) + "T" + (j + 1) + "S" + (k + 1);
 					LsrwItem lsrwItem = new LsrwItem();
 					lsrwItem.setTitle("剑桥雅思" + (i + 1) + "-测试" + (j + 1) + "-" + t + "Section" + (k + 1));
@@ -126,7 +126,7 @@ public class PageFragmentLSRWTab extends Fragment {
 					lsrwItem.setAnswers(name + ".A.html");
 					lsrwItem.setAudio(name + ".mp3");
 					lsrwItem.setLyrics(name + ".lrc");
-					listeningItems[j * 4 + k] = lsrwItem;
+					listeningItems[j * 1 + k] = lsrwItem;
 				}
 			}
 			generals[8 - i] = listeningItems;
@@ -203,7 +203,7 @@ public class PageFragmentLSRWTab extends Fragment {
 			LinearLayout ll = new LinearLayout(PageFragmentLSRWTab.this.getActivity());
 			ll.setOrientation(0);
 			ImageView logo = new ImageView(PageFragmentLSRWTab.this.getActivity());
-			logo.setImageResource(logos[groupPosition]);
+			//logo.setImageResource(logos[groupPosition]);
 			logo.setPadding(60, 0, 0, 0);
 			ll.addView(logo);
 			TextView textView = getTextView();

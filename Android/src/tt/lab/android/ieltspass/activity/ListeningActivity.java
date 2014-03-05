@@ -133,9 +133,9 @@ public class ListeningActivity extends FragmentActivity {
 		pagerItemList.add(fragmentQuestions);
 
 		ListeningFragmentLyrics fragmentLyrics = new ListeningFragmentLyrics();
-//		Bundle args = new Bundle();
-//		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 1);
-//		fragmentLyrics.setArguments(args);
+		// Bundle args = new Bundle();
+		// args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 1);
+		// fragmentLyrics.setArguments(args);
 		fragmentLyrics.setPlayer(player, seekBar, lyrics);
 		pagerItemList.add(fragmentLyrics);
 
@@ -148,8 +148,8 @@ public class ListeningActivity extends FragmentActivity {
 	private void enablePlayStopButton(boolean enabled) {
 		btnPlayStop.setEnabled(enabled);
 		int a = 0;
-		if(enabled){
-			if(player.isPlaying()){
+		if (enabled) {
+			if (player.isPlaying()) {
 				a = R.drawable.pause_enabled;
 			} else {
 				a = R.drawable.play_enabled;
@@ -157,7 +157,7 @@ public class ListeningActivity extends FragmentActivity {
 		} else {
 			a = R.drawable.play;
 		}
-		
+
 		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(a));
 	}
 
@@ -170,8 +170,9 @@ public class ListeningActivity extends FragmentActivity {
 
 				// fromUser判断是用户改变的滑块的值
 				try {
-					// Logger.i(TAG, "onProgressChanged: fromUser: " + progress +", "+fromUser);
+					// 
 					if (fromUser == true) {
+						Logger.i(TAG, "onProgressChanged: fromUser: " + progress +", "+fromUser);
 						player.seekTo(progress);
 					}
 					currentPosition.setText(Utilities.formatTime(progress));
@@ -208,81 +209,86 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void initPlayer() {
-		if (file.exists()) {
-			// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
-			// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
-			player = new MediaPlayer();
-			player.setOnPreparedListener(new OnPreparedListener() {
-				@Override
-				public void onPrepared(MediaPlayer mp) {
-					Logger.i(TAG, "onPrepared");
-					start();
-					enablePlayStopButton(true);
-					seekBar.setEnabled(true);
-					percentage.setText("Prepared");
-					//Logger.i(TAG, "onPrepared " + 4 + ", " + player.getDuration());
-					duration.setText(Utilities.formatTime(player.getDuration()));
-					Logger.i(TAG, "onPrepared " + 5 + ", " +  player.getDuration()+" = "+Utilities.formatTime(player.getDuration()));
-					seekBar.setMax(player.getDuration());
-					
-				}
-			});
+		boolean fromLocal=file.exists();
+		String url = fromLocal ? file.getAbsolutePath() : "http://taog.ueuo.com/" + audio;
+		Logger.i(TAG, "initPlayer fromLocal? "+fromLocal);
+		if(!fromLocal){
+			Logger.i(TAG, "initPlayer downloading "+url);
+			new DownloadAsyncTask(seekBar, url).execute();
+			Logger.i(TAG, "initPlayer downloading immediately "+url);
+		}
+		// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
+		// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+		player = new MediaPlayer();
+		player.setOnPreparedListener(new OnPreparedListener() {
+			@Override
+			public void onPrepared(MediaPlayer mp) {
+				Logger.i(TAG, "onPrepared");
+				//只有在prepare好之后才能进行下一步操作，否则把与声音有关的操作全部disabled
+				start();
+				enablePlayStopButton(true);
+				seekBar.setEnabled(true);
+				percentage.setText("");
+				// Logger.i(TAG, "onPrepared " + 4 + ", " + player.getDuration());
+				duration.setText(Utilities.formatTime(player.getDuration()));
+				Logger.i(
+						TAG,
+						"onPrepared  getDuration " + player.getDuration() + " = "
+								+ Utilities.formatTime(player.getDuration()));
+				seekBar.setMax(player.getDuration());
 
-			player.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
-				int i = 0;
-
-				@Override
-				public void onBufferingUpdate(MediaPlayer mp, int percent) {
-					int a = seekBar.getMax() * percent / 100;
-					//Logger.i(TAG, "onBufferingUpdate: " + percent + "% " + a + ", " + seekBar.getMax());
-					
-					if (percent == 100) {
-						percentage.setText("");
-					} else {
-						percentage.setText("Loading " + percent + "% ");
-					}
-
-					seekBar.setSecondaryProgress(a);
-					// player.addTimedTextSource(fd, mimeType);
-
-				}
-			});
-			/* 当MediaPlayer.OnCompletionLister会运行的Listener */
-			player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-				// @Override
-				public void onCompletion(MediaPlayer arg0) {
-					seekBar.setProgress(0);
-					pause();
-				}
-			});
-
-			/* 当MediaPlayer.OnErrorListener会运行的Listener */
-			player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-				@Override
-				public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
-					Logger.i(TAG, "onError " + arg1+", "+arg2);
-					release();
-					return false;
-				}
-			});
-
-			try {
-				String strurl  = "http://taog.ueuo.com/C9T1S2.mp3";
-				player.reset();
-				Logger.i(TAG, "initPlayer " + 2+", "+strurl);
-				player.setDataSource(file.getAbsolutePath());
-				//player.setDataSource(strurl);
-				Logger.i(TAG, "initPlayer " + 3);
-				player.prepareAsync();
-				Logger.i(TAG, "initPlayer " + 4);
-				percentage.setText("Preparing");
-				Logger.i(TAG, "initPlayer " + 5);
-				new DownloadAsyncTask(seekBar,strurl).execute();
-			} catch (Exception e) {
-				Logger.i(TAG, "initPlayer: E " + e.getMessage());
-				e.printStackTrace();
 			}
+		});
+
+		player.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
+			@Override
+			public void onBufferingUpdate(MediaPlayer mp, int percent) {
+				int progress = seekBar.getMax() * percent / 100;
+				//Logger.i(TAG, "onBufferingUpdate: " + percent + "% " + progress + ", " + seekBar.getMax());
+
+				if (percent == 100) {
+					percentage.setText("");
+				} else {
+					percentage.setText("Loading " + percent + "% ");
+				}
+
+				seekBar.setSecondaryProgress(progress);
+				// player.addTimedTextSource(fd, mimeType);
+
+			}
+		});
+		/* 当MediaPlayer.OnCompletionLister会运行的Listener */
+		player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+			// @Override
+			public void onCompletion(MediaPlayer arg0) {
+				seekBar.setProgress(0);
+				pause();
+			}
+		});
+
+		player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+			@Override
+			public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
+				Logger.i(TAG, "onError " + arg1 + ", " + arg2);
+				release();
+				return false;
+			}
+		});
+
+		try {
+			player.reset();
+			Logger.i(TAG, "initPlayer " + 2 + ", " + url);
+			player.setDataSource(url);
+			Logger.i(TAG, "initPlayer " + 3);
+			player.prepareAsync();
+			Logger.i(TAG, "initPlayer " + 4);
+			percentage.setText("Preparing");
+			Logger.i(TAG, "initPlayer " + 5);
+			
+		} catch (Exception e) {
+			Logger.i(TAG, "initPlayer: E " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -442,42 +448,42 @@ public class ListeningActivity extends FragmentActivity {
 		@Override
 		protected String doInBackground(Integer... arg0) {
 			try {
-				Logger.i(TAG, "doInBackground "+arg0);
+				Logger.i(TAG, "doInBackground " + arg0);
 				URL url = new URL(strurl);
-				String name = strurl.substring(strurl.lastIndexOf("/")+1);
-				Logger.i(TAG, "doInBackground name "+name);
+				String name = strurl.substring(strurl.lastIndexOf("/") + 1);
+				Logger.i(TAG, "doInBackground name " + name);
 				URLConnection openConnection = url.openConnection();
 
 				InputStream is = openConnection.getInputStream();
 				int available = is.available();
-				//Logger.i(TAG, "doInBackground "+21+", "+available);
-				String filename=Constants.SD_PATH+"/"+Constants.AUDIO_PATH+"/"+name;
-				Logger.i(TAG, "doInBackground filename "+filename);
-				String tmpfilename = filename+".d";
-				Logger.i(TAG, "doInBackground tmpfilename "+tmpfilename);
+				// Logger.i(TAG, "doInBackground "+21+", "+available);
+				String filename = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + name;
+				Logger.i(TAG, "doInBackground filename " + filename);
+				String tmpfilename = filename + ".d";
+				Logger.i(TAG, "doInBackground tmpfilename " + tmpfilename);
 				File tmp = new File(tmpfilename);
 				OutputStream os = new FileOutputStream(tmp);
 				byte[] buffer = new byte[1024];
 				int len;
 				while ((len = is.read(buffer)) != -1) {
-					//Logger.i(TAG, "doInBackground "+3+", "+len);
+					// Logger.i(TAG, "doInBackground "+3+", "+len);
 					os.write(buffer, 0, len);
 				}
 				File file = new File(filename);
 				boolean renameTo = tmp.renameTo(file);
-				Logger.i(TAG, "doInBackground renameTo "+renameTo);
+				Logger.i(TAG, "doInBackground renameTo " + renameTo);
 				is.close();
 				os.close();
-//				for (int i = 0; i < 100; i++) {
-//					try {
-//						Thread.sleep(1000);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//					publishProgress(i);
-//				}
+				// for (int i = 0; i < 100; i++) {
+				// try {
+				// Thread.sleep(1000);
+				// } catch (InterruptedException e) {
+				// e.printStackTrace();
+				// }
+				// publishProgress(i);
+				// }
 			} catch (Exception e) {
-				Logger.i(TAG, "doInBackground E: "+e.getMessage());
+				Logger.i(TAG, "doInBackground E: " + e.getMessage());
 				e.printStackTrace();
 			}
 			return "DONE.";
@@ -497,7 +503,7 @@ public class ListeningActivity extends FragmentActivity {
 		protected void onProgressUpdate(Integer... values) {
 			int value = values[0];
 			// Logger.i(TAG, "onProgressUpdate: " + value);
-			//seekBar.setSecondaryProgress((value * seekBar.getMax() / 100));
+			// seekBar.setSecondaryProgress((value * seekBar.getMax() / 100));
 		}
 	}
 }
