@@ -1,0 +1,25 @@
+2014-03-04 07:54:02: tt.lab.android.ieltspass.fragment.PageFragmentVocabulary	sort: 2 ms.
+2014-03-04 07:55:57: tt.lab.android.ieltspass.fragment.PageFragmentLSRW	switchTab getChildCount: 2131361829, 0
+2014-03-04 07:56:09: tt.lab.android.ieltspass.fragment.PageFragmentLSRWTab	onGroupExpand: 3
+2014-03-04 07:56:18: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 1
+2014-03-04 07:56:18: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 2
+2014-03-04 07:56:19: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 3
+2014-03-04 07:56:19: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 4
+2014-03-04 07:56:20: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 5
+2014-03-04 07:56:20: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 6
+2014-03-04 07:56:20: tt.lab.android.ieltspass.activity.ListeningActivity	onPreExecute
+2014-03-04 07:56:20: tt.lab.android.ieltspass.activity.ListeningActivity	start 6
+2014-03-04 07:56:20: tt.lab.android.ieltspass.activity.ListeningActivity	onPrepared
+2014-03-04 07:58:03: tt.lab.android.ieltspass.activity.ListeningActivity	onPostExecute: DONE.
+2014-03-04 07:59:03: tt.lab.android.ieltspass.fragment.PageFragmentVocabulary	sort: 14 ms.
+2014-03-04 07:59:19: tt.lab.android.ieltspass.fragment.PageFragmentLSRW	switchTab getChildCount: 2131361829, 0
+2014-03-04 07:59:25: tt.lab.android.ieltspass.fragment.PageFragmentLSRWTab	onGroupExpand: 3
+2014-03-04 07:59:32: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 1
+2014-03-04 07:59:32: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 2
+2014-03-04 07:59:33: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 3
+2014-03-04 07:59:33: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 4
+2014-03-04 07:59:33: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 5
+2014-03-04 07:59:33: tt.lab.android.ieltspass.activity.ListeningActivity	initPlayer 6
+2014-03-04 07:59:33: tt.lab.android.ieltspass.activity.ListeningActivity	onPreExecute
+2014-03-04 07:59:33: tt.lab.android.ieltspass.activity.ListeningActivity	onPrepared
+2014-03-04 07:59:33: tt.lab.android.ieltspass.activity.ListeningActivity	start 6

@@ -60,7 +60,7 @@ public class DailyActivity extends Activity {
 		webSettings.setJavaScriptEnabled(true);
 		webSettings.setBuiltInZoomControls(false);
 		webSettings.setSupportZoom(false);
-		webSettings.setAllowUniversalAccessFromFileURLs(true);
+		//webSettings.setAllowUniversalAccessFromFileURLs(true);
 		webView.setHapticFeedbackEnabled(false);
 		webView.addJavascriptInterface(new Object() {
 			public void callFromJS_getAvailMemory() {

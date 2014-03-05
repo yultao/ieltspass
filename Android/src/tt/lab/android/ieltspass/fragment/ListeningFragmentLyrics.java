@@ -63,8 +63,10 @@ public class ListeningFragmentLyrics extends Fragment {
 						LyricsTextView textView = (LyricsTextView)v;
 						
 						Sentence sentence = textView.getSentence();
-						seekBar.setProgress(sentence.getStart());
-						player.seekTo(sentence.getStart());
+						if(seekBar.isEnabled()){
+							seekBar.setProgress(sentence.getStart());
+							player.seekTo(sentence.getStart());
+						}
 					}
 				});
 				sentence.setTextView(textView);

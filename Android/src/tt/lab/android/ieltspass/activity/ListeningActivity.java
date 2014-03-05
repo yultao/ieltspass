@@ -1,6 +1,13 @@
 package tt.lab.android.ieltspass.activity;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +57,7 @@ public class ListeningActivity extends FragmentActivity {
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private Handler handler = new Handler();
 	private SeekBar seekBar;
-	private TextView currentPosition, duration;
+	private TextView currentPosition, percentage, duration;
 	private File file;
 	private String title;
 	private String lyrics;
@@ -69,9 +76,7 @@ public class ListeningActivity extends FragmentActivity {
 		initControls();
 		initPlayer();
 		initFragement();
-		start();
-		
-		
+
 	}
 
 	private void initParameters() {
@@ -128,9 +133,9 @@ public class ListeningActivity extends FragmentActivity {
 		pagerItemList.add(fragmentQuestions);
 
 		ListeningFragmentLyrics fragmentLyrics = new ListeningFragmentLyrics();
-		Bundle args = new Bundle();
-		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 1);
-		fragmentLyrics.setArguments(args);
+//		Bundle args = new Bundle();
+//		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 1);
+//		fragmentLyrics.setArguments(args);
 		fragmentLyrics.setPlayer(player, seekBar, lyrics);
 		pagerItemList.add(fragmentLyrics);
 
@@ -140,9 +145,15 @@ public class ListeningActivity extends FragmentActivity {
 
 	}
 
+	private void enablePlayStopButton(boolean enabled) {
+		btnPlayStop.setEnabled(enabled);
+		int a = enabled ? R.drawable.play_enabled : R.drawable.play;
+		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(a));
+	}
+
 	private void initControls() {
 		seekBar = (SeekBar) findViewById(R.id.seekBar1);
-		seekBar.setEnabled(file.exists());
+		seekBar.setEnabled(false);
 		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -169,7 +180,7 @@ public class ListeningActivity extends FragmentActivity {
 		});
 
 		btnPlayStop = (Button) findViewById(R.id.button1);
-		btnPlayStop.setEnabled(file.exists());
+		enablePlayStopButton(false);
 		btnPlayStop.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -182,6 +193,7 @@ public class ListeningActivity extends FragmentActivity {
 		});
 
 		currentPosition = (TextView) findViewById(R.id.currentPosition);
+		percentage = (TextView) findViewById(R.id.percentage);
 		duration = (TextView) findViewById(R.id.duration);
 	}
 
@@ -190,32 +202,45 @@ public class ListeningActivity extends FragmentActivity {
 			// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
 			// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 			player = new MediaPlayer();
-			
 			player.setOnPreparedListener(new OnPreparedListener() {
-				
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					Logger.i(TAG, "onPrepared");
-					//start();
+					start();
+					enablePlayStopButton(true);
+					seekBar.setEnabled(true);
+					percentage.setText("Prepared");
+					//Logger.i(TAG, "onPrepared " + 4 + ", " + player.getDuration());
+					duration.setText(Utilities.formatTime(player.getDuration()));
+					Logger.i(TAG, "onPrepared " + 5 + ", " +  player.getDuration()+" = "+Utilities.formatTime(player.getDuration()));
+					seekBar.setMax(player.getDuration());
+					
 				}
 			});
-			
-			
+
 			player.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
-				
+				int i = 0;
+
 				@Override
 				public void onBufferingUpdate(MediaPlayer mp, int percent) {
-					int a = seekBar.getMax()*percent/100;
-					Logger.i(TAG, "onBufferingUpdate: "+percent+"% "+a);
-					//seekBar.setSecondaryProgress(a);
+					int a = seekBar.getMax() * percent / 100;
+					//Logger.i(TAG, "onBufferingUpdate: " + percent + "% " + a + ", " + seekBar.getMax());
 					
+					if (percent == 100) {
+						percentage.setText("");
+					} else {
+						percentage.setText("Loading " + percent + "% ");
+					}
+
+					seekBar.setSecondaryProgress(a);
+					// player.addTimedTextSource(fd, mimeType);
+
 				}
 			});
 			/* 当MediaPlayer.OnCompletionLister会运行的Listener */
 			player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
 				// @Override
-				/* 覆盖文件播出完毕事件 */
 				public void onCompletion(MediaPlayer arg0) {
 					seekBar.setProgress(0);
 					pause();
@@ -225,38 +250,35 @@ public class ListeningActivity extends FragmentActivity {
 			/* 当MediaPlayer.OnErrorListener会运行的Listener */
 			player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 				@Override
-				/* 覆盖错误处理事件 */
 				public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
-					pause();
+					Logger.i(TAG, "onError " + arg1+", "+arg2);
+					release();
 					return false;
 				}
 			});
 
 			try {
-				Logger.i(TAG, "initPlayer "+1);
+				String strurl  = "http://taog.ueuo.com/C9T1S2.mp3";
 				player.reset();
-				Logger.i(TAG, "initPlayer "+2);
+				Logger.i(TAG, "initPlayer " + 2+", "+strurl);
 				player.setDataSource(file.getAbsolutePath());
-				//player.setDataSource("http://taog.ueuo.com/003.mp3");
-				Logger.i(TAG, "initPlayer "+3);
-				player.prepare();
-				
-				Logger.i(TAG, "initPlayer "+4);
-				duration.setText(Utilities.formatTime(player.getDuration()));
-				Logger.i(TAG, "initPlayer "+5);
-				seekBar.setMax(player.getDuration());
-				Logger.i(TAG, "initPlayer "+6);
-				
-				new DownloadAsyncTask(seekBar).execute();
+				//player.setDataSource(strurl);
+				Logger.i(TAG, "initPlayer " + 3);
+				player.prepareAsync();
+				Logger.i(TAG, "initPlayer " + 4);
+				percentage.setText("Preparing");
+				Logger.i(TAG, "initPlayer " + 5);
+				new DownloadAsyncTask(seekBar,strurl).execute();
 			} catch (Exception e) {
-				Logger.i(TAG, "initPlayer: " + e.getMessage());
+				Logger.i(TAG, "initPlayer: E " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
 	}
 
 	private void refreshButtonText() {
-		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(player.isPlaying() ? R.drawable.pause : R.drawable.play));
+		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(
+				player.isPlaying() ? R.drawable.pause_enabled : R.drawable.play_enabled));
 	}
 
 	private void navigateUp() {
@@ -279,21 +301,22 @@ public class ListeningActivity extends FragmentActivity {
 	};
 	private Runnable downloadThread = new Runnable() {
 		public void run() {
-			
+
 			try {
-				 
+
 			} catch (Exception e) {
 				Logger.i(TAG, "downloadThread: " + e.getMessage());
 			}
 
 		}
 	};
+
 	private void start() {
 		if (player != null) {
 			// Logger.i(TAG, "start I");
 			try {
 				// player.seekTo(seekBar.getProgress());
-				Logger.i(TAG, "start "+6);
+				Logger.i(TAG, "start " + 6);
 				player.start();
 				handler.post(updateProgressThread);
 
@@ -358,7 +381,7 @@ public class ListeningActivity extends FragmentActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		//getMenuInflater().inflate(R.menu.listening, menu);
+		// getMenuInflater().inflate(R.menu.listening, menu);
 		return true;
 	}
 
@@ -379,7 +402,6 @@ public class ListeningActivity extends FragmentActivity {
 
 		@Override
 		public int getCount() {
-			// Show 3 total pages.
 			return pagerItemList.size();
 		}
 
@@ -398,167 +420,55 @@ public class ListeningActivity extends FragmentActivity {
 		}
 	}
 
-	/**
-	 * A dummy fragment representing a section of the app, but that simply displays dummy text.
-	 */
-	public static class DummySectionFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this fragment.
-		 */
-		public static final String ARG_SECTION_NUMBER = "section_number";
-		ScrollView scrollView1;
-		Map<String, Map<String, Object>> lyricsTextViewMap = new HashMap<String, Map<String, Object>>();
-		List<Map<String, Object>> lyricsTextViewList = new ArrayList<Map<String, Object>>();
-		Handler handler = new Handler();
-		TextView lastTextView = null;
-		MediaPlayer player;
-		SeekBar seekBar;
-		private String lyrics;
-
-		public DummySectionFragment() {
-		}
-
-		public void setPlayer(MediaPlayer player, SeekBar seekBar, String lyrics) {
-			this.player = player;
-			this.seekBar = seekBar;
-			this.lyrics = lyrics;
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_listening_lyrics, container, false);
-
-			scrollView1 = (ScrollView) rootView.findViewById(R.id.scrollView1);
-			LinearLayout linearLayout1 = (LinearLayout) rootView.findViewById(R.id.linearLayout);
-			try {
-				List<Map<String, String>> lyricsList = Database.parseLyrics(lyrics);
-				for (int i = 0; i < lyricsList.size(); i++) {
-					Map<String, String> sentence = lyricsList.get(i);
-					String time = sentence.get("time");
-					String word = sentence.get("word");
-
-					TextView textView = createTextView(time + ": " + word);
-					linearLayout1.addView(textView);
-
-					Map<String, Object> m = new HashMap<String, Object>();
-					m.put("time", time);
-					m.put("text", textView);
-					lyricsTextViewList.add(m);
-
-					Map<String, Object> mm = new HashMap<String, Object>();
-					mm.put("index", i);
-					mm.put("text", textView);
-					lyricsTextViewMap.put(time, mm);
-				}
-				handler.post(updateLyricsThread);
-			} catch (Exception e) {
-				Logger.i(TAG, "addView e: " + e.getMessage());
-			}
-			return rootView;
-		}
-
-		private Runnable updateLyricsThread = new Runnable() {
-			public void run() {
-				try {
-
-					// Algorithm 1
-					int cp = player.getCurrentPosition();
-					cp = seekBar.getProgress();
-					String formatedTime = Utilities.formatTime(cp);
-
-					Map<String, Object> map = lyricsTextViewMap.get(formatedTime);
-
-					if (map != null) {
-
-						TextView textView = (TextView) map.get("text");
-						// Logger.i(TAG, "equals: " + (textView.equals(lastTextView)));
-						if (lastTextView == null || !lastTextView.equals(textView)) {
-							Logger.i(TAG, "in: ");
-							if (lastTextView != null) {
-
-								lastTextView.setTextColor(getResources().getColor(R.color.sub_text_color));
-							}
-							textView.setTextColor(getResources().getColor(R.color.red));
-							lastTextView = textView;
-
-							int index = (Integer) map.get("index");
-							Logger.i(TAG, "index: " + index);
-
-							int real = index - 5;
-							if (real <= 0) {
-								real = 0;
-							}
-							TextView toScroll = (TextView) lyricsTextViewList.get(real).get("text");
-
-							scrollView1.requestChildFocus(toScroll, toScroll);
-
-							real = index + 5;
-							if (real >= lyricsTextViewList.size()) {
-								real = lyricsTextViewList.size() - 1;
-							}
-							toScroll = (TextView) lyricsTextViewList.get(real).get("text");
-
-							scrollView1.requestChildFocus(toScroll, toScroll);
-						}
-					}
-
-					// Algorithm 2
-					/*
-					 * if (currentIndex < lyricsTextViewList.size()) { Map<String, Object> map =
-					 * lyricsTextViewList.get(currentIndex); String time = (String)map.get("time");
-					 * 
-					 * int timeInt = formatTimeInt(time); int cp = player.getCurrentPosition(); if(cp>=timeInt){
-					 * 
-					 * TextView textView = (TextView)map.get("text"); if (lastTextView != null) {
-					 * lastTextView.setTextColor(getResources().getColor(R.color.sub_text_color)); } lastTextView =
-					 * textView;
-					 * 
-					 * int real = currentIndex + 5; if (real >= lyricsTextViewList.size()) { real =
-					 * lyricsTextViewList.size() - 1; } TextView toScroll =
-					 * (TextView)lyricsTextViewList.get(real).get("text");
-					 * textView.setTextColor(getResources().getColor(R.color.red));
-					 * 
-					 * 
-					 * scrollView1.requestChildFocus(textView,textView); currentIndex++; } }
-					 */
-					handler.postDelayed(updateLyricsThread, 10);
-				} catch (Exception e) {
-					Logger.i(TAG, "updateLyricsThread e: " + e.getMessage());
-				}
-
-			}
-
-		};
-
-		private TextView createTextView(String text) {
-			ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-					ViewGroup.LayoutParams.WRAP_CONTENT);
-
-			TextView textView = new TextView(this.getActivity());
-			textView.setLayoutParams(lp);
-			textView.setTextSize(18);
-			textView.setText(text);
-
-			return textView;
-		}
-	}
 	public class DownloadAsyncTask extends AsyncTask<Integer, Integer, String> {
 		private SeekBar seekBar;
+		private String strurl;
 
-		public DownloadAsyncTask(SeekBar seekBar) {
+		public DownloadAsyncTask(SeekBar seekBar, String strurl) {
 			this.seekBar = seekBar;
+			this.strurl = strurl;
 		}
 
 		@Override
 		protected String doInBackground(Integer... arg0) {
-			
-			for (int i=0;i<100;i++){
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+			try {
+				Logger.i(TAG, "doInBackground "+arg0);
+				URL url = new URL(strurl);
+				String name = strurl.substring(strurl.lastIndexOf("/")+1);
+				Logger.i(TAG, "doInBackground name "+name);
+				URLConnection openConnection = url.openConnection();
+
+				InputStream is = openConnection.getInputStream();
+				int available = is.available();
+				//Logger.i(TAG, "doInBackground "+21+", "+available);
+				String filename=Constants.SD_PATH+"/"+Constants.AUDIO_PATH+"/"+name;
+				Logger.i(TAG, "doInBackground filename "+filename);
+				String tmpfilename = filename+".d";
+				Logger.i(TAG, "doInBackground tmpfilename "+tmpfilename);
+				File tmp = new File(tmpfilename);
+				OutputStream os = new FileOutputStream(tmp);
+				byte[] buffer = new byte[1024];
+				int len;
+				while ((len = is.read(buffer)) != -1) {
+					//Logger.i(TAG, "doInBackground "+3+", "+len);
+					os.write(buffer, 0, len);
 				}
-				publishProgress(i);
+				File file = new File(filename);
+				boolean renameTo = tmp.renameTo(file);
+				Logger.i(TAG, "doInBackground renameTo "+renameTo);
+				is.close();
+				os.close();
+//				for (int i = 0; i < 100; i++) {
+//					try {
+//						Thread.sleep(1000);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//					publishProgress(i);
+//				}
+			} catch (Exception e) {
+				Logger.i(TAG, "doInBackground E: "+e.getMessage());
+				e.printStackTrace();
 			}
 			return "DONE.";
 		}
@@ -576,8 +486,8 @@ public class ListeningActivity extends FragmentActivity {
 		@Override
 		protected void onProgressUpdate(Integer... values) {
 			int value = values[0];
-			//Logger.i(TAG, "onProgressUpdate: " + value);
-			seekBar.setSecondaryProgress((value*seekBar.getMax()/100));
+			// Logger.i(TAG, "onProgressUpdate: " + value);
+			//seekBar.setSecondaryProgress((value * seekBar.getMax() / 100));
 		}
 	}
 }

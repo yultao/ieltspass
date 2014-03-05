@@ -42,7 +42,14 @@
                 android:layout_marginLeft="14dp"
                 android:text="00:00"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+			<TextView
+                android:id="@+id/percentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="14dp"
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceSmall" />
             <TextView
                 android:id="@+id/duration"
                 android:layout_width="wrap_content"
