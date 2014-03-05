@@ -147,7 +147,17 @@ public class ListeningActivity extends FragmentActivity {
 
 	private void enablePlayStopButton(boolean enabled) {
 		btnPlayStop.setEnabled(enabled);
-		int a = enabled ? R.drawable.play_enabled : R.drawable.play;
+		int a = 0;
+		if(enabled){
+			if(player.isPlaying()){
+				a = R.drawable.pause_enabled;
+			} else {
+				a = R.drawable.play_enabled;
+			}
+		} else {
+			a = R.drawable.play;
+		}
+		
 		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(a));
 	}
 
