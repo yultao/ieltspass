@@ -193,7 +193,7 @@ public class PageFragmentLSRW2 extends Fragment {
 					listeningItems[j * 4 + k] = lsrwItem;
 				}
 			}
-			generals[8 - i] = listeningItems;
+			generals[i] = listeningItems;
 		}
 		return generals;
 	}
