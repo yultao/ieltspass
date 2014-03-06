@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,6 +55,8 @@ public class ListeningActivity extends FragmentActivity {
 	private ViewPager mViewPager;
 	private Button btnPlayStop;
 	private MediaPlayer player;
+	private boolean playerPrepared, seekBarSeeking, downloading;
+	private int downloadingPercent;
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private Handler handler = new Handler();
 	private SeekBar seekBar;
@@ -173,6 +176,7 @@ public class ListeningActivity extends FragmentActivity {
 					// 
 					if (fromUser == true) {
 						Logger.i(TAG, "onProgressChanged: fromUser: " + progress +", "+fromUser);
+						seekBarSeeking = true;
 						player.seekTo(progress);
 					}
 					currentPosition.setText(Utilities.formatTime(progress));
@@ -224,6 +228,7 @@ public class ListeningActivity extends FragmentActivity {
 			@Override
 			public void onPrepared(MediaPlayer mp) {
 				Logger.i(TAG, "onPrepared");
+				playerPrepared = true;
 				//只有在prepare好之后才能进行下一步操作，否则把与声音有关的操作全部disabled
 				start();
 				enablePlayStopButton(true);
@@ -241,6 +246,8 @@ public class ListeningActivity extends FragmentActivity {
 		});
 
 		player.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
+			
+
 			@Override
 			public void onBufferingUpdate(MediaPlayer mp, int percent) {
 				int progress = seekBar.getMax() * percent / 100;
@@ -249,12 +256,29 @@ public class ListeningActivity extends FragmentActivity {
 				if (percent == 100) {
 					percentage.setText("");
 				} else {
-					percentage.setText("Loading " + percent + "% ");
+					String tt = "L " + percent + "%";
+					if(seekBarSeeking){
+						tt += ", S "+(seekBar.getProgress()*100/seekBar.getMax())+"%";
+					}
+					if(downloading) {
+						tt += ", D ";
+					}
+					percentage.setText(tt);
+					
 				}
 
 				seekBar.setSecondaryProgress(progress);
 				// player.addTimedTextSource(fd, mimeType);
 
+			}
+		});
+		
+		player.setOnSeekCompleteListener(new OnSeekCompleteListener() {
+			
+			@Override
+			public void onSeekComplete(MediaPlayer mp) {
+				seekBarSeeking = false;
+				percentage.setText("");
 			}
 		});
 		/* 当MediaPlayer.OnCompletionLister会运行的Listener */
@@ -271,6 +295,7 @@ public class ListeningActivity extends FragmentActivity {
 			@Override
 			public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
 				Logger.i(TAG, "onError " + arg1 + ", " + arg2);
+				percentage.setText("Error");
 				release();
 				return false;
 			}
@@ -279,6 +304,7 @@ public class ListeningActivity extends FragmentActivity {
 		try {
 			player.reset();
 			Logger.i(TAG, "initPlayer " + 2 + ", " + url);
+			percentage.setText("Setting "+audio);
 			player.setDataSource(url);
 			Logger.i(TAG, "initPlayer " + 3);
 			player.prepareAsync();
@@ -293,8 +319,21 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void refreshButtonText() {
-		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(
-				player.isPlaying() ? R.drawable.pause_enabled : R.drawable.play_enabled));
+		int a = 0;
+		if(btnPlayStop.isEnabled()){
+			if(player.isPlaying()){
+				a = R.drawable.pause_enabled;
+			} else {
+				a = R.drawable.play_enabled;
+			}
+		} else {
+			if(player.isPlaying()){
+				a = R.drawable.pause;
+			} else {
+				a = R.drawable.play;
+			}
+		}
+		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(a));
 	}
 
 	private void navigateUp() {
@@ -332,13 +371,15 @@ public class ListeningActivity extends FragmentActivity {
 			// Logger.i(TAG, "start I");
 			try {
 				// player.seekTo(seekBar.getProgress());
-				Logger.i(TAG, "start " + 6);
+				Logger.i(TAG, "start 1");
 				player.start();
+				Logger.i(TAG, "start 2");
 				handler.post(updateProgressThread);
-
+				Logger.i(TAG, "start 3");
 				currentPosition.setText(Utilities.formatTime(player.getCurrentPosition()));
+				Logger.i(TAG, "start 4");
 				refreshButtonText();
-
+				Logger.i(TAG, "start 5");
 			} catch (Exception e) {
 				Logger.i(TAG, "start: " + e.getMessage());
 				e.printStackTrace();
@@ -458,14 +499,16 @@ public class ListeningActivity extends FragmentActivity {
 				int available = is.available();
 				// Logger.i(TAG, "doInBackground "+21+", "+available);
 				String filename = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + name;
-				Logger.i(TAG, "doInBackground filename " + filename);
+				Logger.i(TAG, "doInBackground filename " + filename+", "+available);
 				String tmpfilename = filename + ".d";
 				Logger.i(TAG, "doInBackground tmpfilename " + tmpfilename);
 				File tmp = new File(tmpfilename);
 				OutputStream os = new FileOutputStream(tmp);
 				byte[] buffer = new byte[1024];
 				int len;
+				int read = 0;
 				while ((len = is.read(buffer)) != -1) {
+					read +=len;
 					// Logger.i(TAG, "doInBackground "+3+", "+len);
 					os.write(buffer, 0, len);
 				}
@@ -474,14 +517,6 @@ public class ListeningActivity extends FragmentActivity {
 				Logger.i(TAG, "doInBackground renameTo " + renameTo);
 				is.close();
 				os.close();
-				// for (int i = 0; i < 100; i++) {
-				// try {
-				// Thread.sleep(1000);
-				// } catch (InterruptedException e) {
-				// e.printStackTrace();
-				// }
-				// publishProgress(i);
-				// }
 			} catch (Exception e) {
 				Logger.i(TAG, "doInBackground E: " + e.getMessage());
 				e.printStackTrace();
@@ -491,11 +526,13 @@ public class ListeningActivity extends FragmentActivity {
 
 		@Override
 		protected void onPreExecute() {
+			downloading = true;
 			Logger.i(TAG, "onPreExecute");
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
+			downloading = false;
 			Logger.i(TAG, "onPostExecute: " + result);
 		}
 
