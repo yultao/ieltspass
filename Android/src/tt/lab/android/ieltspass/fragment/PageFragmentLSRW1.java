@@ -49,59 +49,69 @@ public class PageFragmentLSRW1 extends Fragment {
 			private String[] generalsTypes = new String[] { "听", "说", "读", "写" };
 			private LsrwItem[][] generals = new LsrwItem[4][];
 			{
-				LsrwItem[] listeningItems = new LsrwItem[6];
-				int i=0;
-				LsrwItem lsrwItem = new LsrwItem();
-				lsrwItem.setTitle("剑桥雅思6测试1听力-Section1");
-				lsrwItem.setType(1);
-				lsrwItem.setQuestions("C1T1S1.Q.html");
-				lsrwItem.setAnswers("C6T1S1.A.html");
-				lsrwItem.setAudio("C6T1S1.mp3");
-				lsrwItem.setLyrics("C6T1S1.lrc");
-				listeningItems[i++]=lsrwItem;
-				
-				lsrwItem = new LsrwItem();
-				lsrwItem.setTitle("剑桥雅思6测试1听力-Section2");
-				lsrwItem.setType(1);
-				lsrwItem.setQuestions("C6T1S2.Q.html");
-				lsrwItem.setAnswers("C6T1S2.A.html");
-				lsrwItem.setAudio("C6T1S2.mp3");
-				lsrwItem.setLyrics("C6T1S2.lrc");
-				listeningItems[i++]=lsrwItem;
-				
-				lsrwItem = new LsrwItem();
-				lsrwItem.setTitle("剑桥雅思6测试1听力-Section3");
-				lsrwItem.setType(1);
-				lsrwItem.setQuestions("C6T1S3.Q.html");
-				lsrwItem.setAnswers("C6T1S3.A.html");
-				lsrwItem.setAudio("C6T1S3.mp3");
-				lsrwItem.setLyrics("C6T1S3.lrc");
-				listeningItems[i++]=lsrwItem;
-				
-				
-				lsrwItem = new LsrwItem();
-				lsrwItem.setTitle("剑桥雅思6测试1听力-Section4");
-				lsrwItem.setType(1);
-				lsrwItem.setQuestions("C6T1S4.Q.html");
-				lsrwItem.setAnswers("C6T1S4.A.html");
-				lsrwItem.setAudio("C6T1S4.mp3");
-				lsrwItem.setLyrics("C6T1S4.lrc");
-				listeningItems[i++]=lsrwItem;
-
-				lsrwItem = new LsrwItem();
-				lsrwItem.setTitle("王菲 - 棋子");
-				lsrwItem.setType(1);
-				lsrwItem.setAudio("qizi.mp3");
-				lsrwItem.setLyrics("qizi.lrc");
-				listeningItems[i++]=lsrwItem;
-				
-				
-				lsrwItem = new LsrwItem();
-				lsrwItem.setTitle("王铮亮 - 时间都去哪儿了");
-				lsrwItem.setType(1);
-				lsrwItem.setAudio("Time.mp3");
-				lsrwItem.setLyrics("Time.lrc");
-				listeningItems[i++]=lsrwItem;
+				LsrwItem[] listeningItems = new LsrwItem[36];
+				for(int i=0;i<listeningItems.length;i++){
+					LsrwItem lsrwItem = new LsrwItem();
+					lsrwItem.setTitle("剑桥雅思6测试1听力-Section"+i);
+					lsrwItem.setType(1);
+					lsrwItem.setQuestions("C1T1S1.Q.html");
+					lsrwItem.setAnswers("C6T1S1.A.html");
+					lsrwItem.setAudio("C6T1S1.mp3");
+					lsrwItem.setLyrics("C6T1S1.lrc");
+					listeningItems[i]=lsrwItem;
+				}
+//				int i=0;
+//				LsrwItem lsrwItem = new LsrwItem();
+//				lsrwItem.setTitle("剑桥雅思6测试1听力-Section1");
+//				lsrwItem.setType(1);
+//				lsrwItem.setQuestions("C1T1S1.Q.html");
+//				lsrwItem.setAnswers("C6T1S1.A.html");
+//				lsrwItem.setAudio("C6T1S1.mp3");
+//				lsrwItem.setLyrics("C6T1S1.lrc");
+//				listeningItems[i++]=lsrwItem;
+//				
+//				lsrwItem = new LsrwItem();
+//				lsrwItem.setTitle("剑桥雅思6测试1听力-Section2");
+//				lsrwItem.setType(1);
+//				lsrwItem.setQuestions("C6T1S2.Q.html");
+//				lsrwItem.setAnswers("C6T1S2.A.html");
+//				lsrwItem.setAudio("C6T1S2.mp3");
+//				lsrwItem.setLyrics("C6T1S2.lrc");
+//				listeningItems[i++]=lsrwItem;
+//				
+//				lsrwItem = new LsrwItem();
+//				lsrwItem.setTitle("剑桥雅思6测试1听力-Section3");
+//				lsrwItem.setType(1);
+//				lsrwItem.setQuestions("C6T1S3.Q.html");
+//				lsrwItem.setAnswers("C6T1S3.A.html");
+//				lsrwItem.setAudio("C6T1S3.mp3");
+//				lsrwItem.setLyrics("C6T1S3.lrc");
+//				listeningItems[i++]=lsrwItem;
+//				
+//				
+//				lsrwItem = new LsrwItem();
+//				lsrwItem.setTitle("剑桥雅思6测试1听力-Section4");
+//				lsrwItem.setType(1);
+//				lsrwItem.setQuestions("C6T1S4.Q.html");
+//				lsrwItem.setAnswers("C6T1S4.A.html");
+//				lsrwItem.setAudio("C6T1S4.mp3");
+//				lsrwItem.setLyrics("C6T1S4.lrc");
+//				listeningItems[i++]=lsrwItem;
+//
+//				lsrwItem = new LsrwItem();
+//				lsrwItem.setTitle("王菲 - 棋子");
+//				lsrwItem.setType(1);
+//				lsrwItem.setAudio("qizi.mp3");
+//				lsrwItem.setLyrics("qizi.lrc");
+//				listeningItems[i++]=lsrwItem;
+//				
+//				
+//				lsrwItem = new LsrwItem();
+//				lsrwItem.setTitle("王铮亮 - 时间都去哪儿了");
+//				lsrwItem.setType(1);
+//				lsrwItem.setAudio("Time.mp3");
+//				lsrwItem.setLyrics("Time.lrc");
+//				listeningItems[i++]=lsrwItem;
 				
 				generals[0]=listeningItems;
 				generals[1]=listeningItems;

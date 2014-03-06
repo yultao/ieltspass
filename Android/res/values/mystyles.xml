@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- 总 style  直接引用  这个   由  tab style  和    Indicator style 组成 -->
     <style name="StyledAllIndicators" parent="AppTheme">
@@ -10,6 +10,7 @@
 
     <!-- tab的 style -->
     <style name="CustomTabPageIndicator" >
+        <item name="android:background">@color/bg_color</item>
         <item name="android:textSize">18sp</item>
 		<item name="android:gravity">center</item>
 		<item name="android:paddingTop">4dp</item>
@@ -23,6 +24,7 @@
     <!-- 下标的指示器的颜色 -->
     <style name="CustomUnderlinePageIndicator">
         <item name="selectedColor">#EB5548</item>
+        <item name="android:background">@color/bg_color</item>
     </style>
 
 </resources>
