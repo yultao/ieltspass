@@ -5,12 +5,12 @@
     android:background="@color/bg_color_deep" >
 
     <RelativeLayout
-        android:layout_width="100dp"
+        android:layout_width="0dp"
         android:layout_height="fill_parent"
         android:gravity="right" >
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/version"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:gravity="center_vertical"
@@ -24,7 +24,7 @@
             android:layout_width="fill_parent"
             android:layout_height="2px"
             layout="@layout/line"
-            android:layout_below="@+id/title" >
+            android:layout_below="@+id/version" >
         </include>
 
         <ListView

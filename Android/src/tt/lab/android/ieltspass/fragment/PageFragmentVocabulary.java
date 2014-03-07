@@ -50,7 +50,7 @@ public class PageFragmentVocabulary extends Fragment {
 	private boolean filterSpinnerInited;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Logger.i(TAG, "onCreateView");
+		//Logger.i(TAG, "onCreateView");
 		context = this.getActivity();
 		view = inflater.inflate(R.layout.fragment_vocabulary, null);
 
@@ -125,6 +125,8 @@ public class PageFragmentVocabulary extends Fragment {
 			}
 
 		});
+		searchView.setIconifiedByDefault(false);
+		searchView.setFocusable(false);
 	}
 
 	private void initSortSpinner() {
@@ -218,6 +220,7 @@ public class PageFragmentVocabulary extends Fragment {
 		listView.setAdapter(simpleAdapter);
 		
 		searchView.setQueryHint("共"+currentData.size()+"条");
+		
 	}
 
 	private void filter() {

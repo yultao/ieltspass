@@ -67,7 +67,7 @@ public class CenterFragmentIndicator extends CenterFragment {
 
 		PageFragmentDaily pageDaily = new PageFragmentDaily();
 		PageFragmentVocabulary pageVocabulary = new PageFragmentVocabulary();
-		PageFragmentLSRW2 pageLSRW = new PageFragmentLSRW2();
+		PageFragmentLSRW pageLSRW = new PageFragmentLSRW();
 		//PageFragmentLSRW pageLSRW1 = new PageFragmentLSRW();
 		//pagerItemList.add(pageLSRW1);
 		pagerItemList.add(pageDaily);
