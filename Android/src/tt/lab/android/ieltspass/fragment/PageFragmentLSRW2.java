@@ -172,7 +172,7 @@ public class PageFragmentLSRW2 extends Fragment {
 			buttons[i].setBackgroundColor(getResources().getColor(R.color.bg_color));
 			buttons[i].setTextColor(getResources().getColor(R.color.black));
 		}
-		buttons[index].setBackgroundColor(getResources().getColor(R.color.red));
+		buttons[index].setBackgroundColor(getResources().getColor(R.color.blue_light));
 		buttons[index].setTextColor(getResources().getColor(R.color.white));
 		
 		tabSelected = index;
