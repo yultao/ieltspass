@@ -1,5 +1,6 @@
 package tt.lab.android.ieltspass.data;
 
+
 import java.util.List;
 
 /**
@@ -14,12 +15,16 @@ public class Word {
     String AE_phonetic_symbol;
     String BE_sound;
     String AE_sound;
-    String Cn_explanation;
-    String En_explanation;
-    String word_vacabulary;
-    String pic;
-    String category;
+    String word_vocabulary;
+    String logo;
+    int is_listening=0;
+    int is_speaking=0;
+    int is_reading=0;
+    int is_writing=0;
     List<Example> exampleList=null;
+    List<Pic> picList=null;
+    List<MemoryMethod> mmList=null;
+    List<Explanation> explanationList=null;
 
     public List<Example> getExampleList() {
         return exampleList;
@@ -29,12 +34,12 @@ public class Word {
         this.exampleList = exampleList;
     }
 
-    public String getWord_vacabulary() {
-        return word_vacabulary;
+    public String getWord_vocabulary() {
+        return word_vocabulary;
     }
 
-    public void setWord_vacabulary(String word_vacabulary) {
-        this.word_vacabulary = word_vacabulary;
+    public void setWord_vocabulary(String word_vocabulary) {
+        this.word_vocabulary = word_vocabulary;
     }
 
     public String getBE_phonetic_symbol() {
@@ -69,35 +74,68 @@ public class Word {
         this.AE_sound = AE_sound;
     }
 
-    public String getCn_explanation() {
-        return Cn_explanation;
+    public int getIs_listening() {
+        return is_listening;
     }
 
-    public void setCn_explanation(String cn_explanation) {
-        Cn_explanation = cn_explanation;
+    public void setIs_listening(int is_listening) {
+        this.is_listening = is_listening;
     }
 
-    public String getEn_explanation() {
-        return En_explanation;
+    public int getIs_speaking() {
+        return is_speaking;
     }
 
-    public void setEn_explanation(String en_explanation) {
-        En_explanation = en_explanation;
+    public void setIs_speaking(int is_speaking) {
+        this.is_speaking = is_speaking;
     }
 
-    public String getPic() {
-        return pic;
+    public int getIs_reading() {
+        return is_reading;
     }
 
-    public void setPic(String pic) {
-        this.pic = pic;
+    public void setIs_reading(int is_reading) {
+        this.is_reading = is_reading;
     }
 
-    public String getCategory() {
-        return category;
+    public int getIs_writing() {
+        return is_writing;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setIs_writing(int is_writing) {
+        this.is_writing = is_writing;
+    }
+
+    public List<Pic> getPicList() {
+        return picList;
+    }
+
+    public void setPicList(List<Pic> picList) {
+        this.picList = picList;
+    }
+
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
+    public List<MemoryMethod> getMmList() {
+        return mmList;
+    }
+
+    public void setMmList(List<MemoryMethod> mmList) {
+        this.mmList = mmList;
+    }
+
+    public List<Explanation> getExplanationList() {
+        return explanationList;
+    }
+
+    public void setExplanationList(List<Explanation> explanationList) {
+        this.explanationList = explanationList;
     }
 }
