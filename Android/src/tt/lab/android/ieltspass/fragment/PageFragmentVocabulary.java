@@ -327,9 +327,9 @@ public class PageFragmentVocabulary extends Fragment {
 		List<Word> wordList = wordsDao.getWordList();
 		for (Word word: wordList) {
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("title", word.getWord_vacabulary());
+			map.put("title", word.getWord_vocabulary());
 			map.put("phon", word.getBE_phonetic_symbol());
-			map.put("info", word.getCn_explanation());
+			map.put("info", word.getExplanationList().get(0).getContent());
 			map.put("category", word.getCategory());
 			
 			if ("1.很生".equals(word.getCategory())) {

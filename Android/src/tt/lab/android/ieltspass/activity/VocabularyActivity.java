@@ -86,7 +86,7 @@ public class VocabularyActivity extends FragmentActivity {
 			btnPlayStop = (Button) findViewById(R.id.btnPlay);
 			
 			
-			textViewTitle.setText(word.getWord_vacabulary());
+			textViewTitle.setText(word.getWord_vocabulary());
 			textViewPhoetic.setText(word.getBE_phonetic_symbol());
 			textViewDate.setText(word.getCategory());
 			btnPlayStop.setOnClickListener(new OnClickListener() {
@@ -147,7 +147,7 @@ public class VocabularyActivity extends FragmentActivity {
 				intent.setType("image/*");// intent.setType("text/plain");
 				intent.putExtra(Intent.EXTRA_SUBJECT, "好友推荐");
 				intent.putExtra(Intent.EXTRA_TEXT, "雅思通(IELTS PASS)分享：" + word.toString()
-						+ " 详见：http://www.ieltspass.com/" + word.getWord_vacabulary());
+						+ " 详见：http://www.ieltspass.com/" + word.getWord_vocabulary());
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(Intent.createChooser(intent, "分享"));
 			}

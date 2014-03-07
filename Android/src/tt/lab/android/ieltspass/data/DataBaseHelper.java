@@ -35,7 +35,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     //数据库SQL语句 添加一个表
-    private static final String NAME_TABLE_CREATE = "create table words(BE_phonetic_symbol text,AE_phonetic_symbol text,BE_sound text,AE_sound text,Cn_explanation text,En_explanation text,pic text,word_vacabulary text); ";
+    private static final String NAME_TABLE_CREATE = "create table words(BE_phonetic_symbol text,AE_phonetic_symbol text,BE_sound text,AE_sound text,Cn_explanation text,En_explanation text,pic text,word_vocabulary text); ";
 
     DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

@@ -25,6 +25,7 @@ public class Word {
     List<Pic> picList=null;
     List<MemoryMethod> mmList=null;
     List<Explanation> explanationList=null;
+    String category;
 
     public List<Example> getExampleList() {
         return exampleList;
@@ -137,5 +138,13 @@ public class Word {
 
     public void setExplanationList(List<Explanation> explanationList) {
         this.explanationList = explanationList;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }
