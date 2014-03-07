@@ -11,6 +11,7 @@ import tt.lab.android.ieltspass.activity.SpeakingActivity;
 import tt.lab.android.ieltspass.activity.WritingActivity;
 import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.LsrwItem;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -35,75 +37,151 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class PageFragmentLSRW2 extends Fragment {
+	private static int tabSelected;
+	private static int[][] itemSelected = new int[4][9];
 	private String TAG = PageFragmentLSRW2.class.getName();
 	private Button button1, button2, button3, button4;
 	private Button[] buttons = new Button[4];
 	private View view;
-	private int type=1;
-	private static String[] tt = {"听力","口语","阅读","写作"};
+	private int type = 1;
+	private static String[] tt = { "听力", "口语", "阅读", "写作" };
 	private ExpandableListView expandableListView;
 	private ExpandableListAdapter adapter;
-	
-	public PageFragmentLSRW2() {
-
-	}
 
 	public void setType(int type) {
 		this.type = type;
 	}
 
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		Logger.i(TAG, "onAttach");
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		Logger.i(TAG, "onCreate");
+	}
+
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		Logger.i(TAG, "onDestroy");
+	}
+
+	@Override
+	public void onDetach() {
+		// TODO Auto-generated method stub
+		super.onDetach();
+		Logger.i(TAG, "onDetach");
+	}
+
+	@Override
+	public void onHiddenChanged(boolean hidden) {
+		// TODO Auto-generated method stub
+		super.onHiddenChanged(hidden);
+		Logger.i(TAG, "onHiddenChanged " + hidden);
+	}
+
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		Logger.i(TAG, "onPause");
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		Logger.i(TAG, "onResume");
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		Logger.i(TAG, "onStart");
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		Logger.i(TAG, "onStop");
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		Logger.i(TAG, "onViewCreated");
+	}
+
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		view = inflater.inflate(R.layout.fragment_lsrw_a, null);
-		button1 = (Button) view.findViewById(R.id.button1);
-		button2 = (Button) view.findViewById(R.id.button2);
-		button3 = (Button) view.findViewById(R.id.button3);
-		button4 = (Button) view.findViewById(R.id.button4);
-		buttons[0]=button1;
-		buttons[1]=button2;
-		buttons[2]=button3;
-		buttons[3]=button4;
-		refreshButtonColor(0);
+		Logger.i(TAG, "onCreateView " + view);
 		
-		buttons[0].setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				refreshExpandableList(1);
-				refreshButtonColor(0);
-			}
-		});
-		buttons[1].setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				refreshExpandableList(2);
-				refreshButtonColor(1);
-			}
-		});
-		buttons[2].setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				refreshExpandableList(3);
-				refreshButtonColor(2);
-			}
-		});
-		buttons[3].setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				refreshExpandableList(4);
-				refreshButtonColor(3);
-			}
-		});
+
+			view = inflater.inflate(R.layout.fragment_lsrw_a, null);
+			button1 = (Button) view.findViewById(R.id.button1);
+			button2 = (Button) view.findViewById(R.id.button2);
+			button3 = (Button) view.findViewById(R.id.button3);
+			button4 = (Button) view.findViewById(R.id.button4);
+			buttons[0] = button1;
+			buttons[1] = button2;
+			buttons[2] = button3;
+			buttons[3] = button4;
+			
+			refreshButtonColor(tabSelected);
+			buttons[0].setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					refreshExpandableList(1);
+					refreshButtonColor(0);
+				}
+			});
+			buttons[1].setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					refreshExpandableList(2);
+					refreshButtonColor(1);
+				}
+			});
+			buttons[2].setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					refreshExpandableList(3);
+					refreshButtonColor(2);
+				}
+			});
+			buttons[3].setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					refreshExpandableList(4);
+					refreshButtonColor(3);
+				}
+			});
+
+			initExpandableList();
 		
-		initExpandableList();
 		return view;
 	}
 
 	private void refreshButtonColor(int index) {
-		for(int i=0;i<buttons.length;i++){
+		for (int i = 0; i < buttons.length; i++) {
 			buttons[i].setBackgroundColor(getResources().getColor(R.color.bg_color));
 			buttons[i].setTextColor(getResources().getColor(R.color.black));
 		}
 		buttons[index].setBackgroundColor(getResources().getColor(R.color.red));
 		buttons[index].setTextColor(getResources().getColor(R.color.white));
+		
+		tabSelected = index;
+		for(int i=0;i<itemSelected[tabSelected].length;i++){
+			if(itemSelected[tabSelected][i]!=0)
+				expandableListView.expandGroup(i);
+		}
+		
+		
 	}
 
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -111,12 +189,21 @@ public class PageFragmentLSRW2 extends Fragment {
 	}
 
 	private void initExpandableList() {
+		Logger.i(TAG, "expandableListView: " + expandableListView);
 		expandableListView = (ExpandableListView) view.findViewById(R.id.expandableListView1);
 		resetList();
 		expandableListView.setOnGroupExpandListener(new OnGroupExpandListener() {
 			@Override
 			public void onGroupExpand(int groupPosition) {
+				itemSelected[tabSelected][groupPosition]=1;
 				Logger.i(TAG, "onGroupExpand: " + groupPosition);
+			}
+		});
+		expandableListView.setOnGroupCollapseListener(new OnGroupCollapseListener() {
+			
+			@Override
+			public void onGroupCollapse(int groupPosition) {
+				itemSelected[tabSelected][groupPosition]=0;
 			}
 		});
 		// 设置item点击的监听器
@@ -177,14 +264,14 @@ public class PageFragmentLSRW2 extends Fragment {
 
 	private LsrwItem[][] initData() {
 		LsrwItem[][] generals = new LsrwItem[9][];
-		String t = tt[type-1];
-		for (int i = 0; i < 9; i++) {//cambridge
+		String t = tt[type - 1];
+		for (int i = 0; i < 9; i++) {// cambridge
 			LsrwItem[] listeningItems = new LsrwItem[16];
-			for (int j = 0; j < 4; j++) {//test
-				for (int k = 0; k < 4; k++) {//section
+			for (int j = 0; j < 4; j++) {// test
+				for (int k = 0; k < 4; k++) {// section
 					String name = "C" + (i + 1) + "T" + (j + 1) + "S" + (k + 1);
 					LsrwItem lsrwItem = new LsrwItem();
-					lsrwItem.setTitle("剑桥雅思" + (i + 1) + "-测试" + (j + 1) + "-" + t + "Section" + (k + 1));
+					lsrwItem.setTitle("剑桥雅思" + (i + 1) + "-"+t + (j + 1) + "-" +"Section" + (k + 1));
 					lsrwItem.setType(type);
 					lsrwItem.setQuestions(name + ".Q.html");
 					lsrwItem.setAnswers(name + ".A.html");
@@ -209,7 +296,7 @@ public class PageFragmentLSRW2 extends Fragment {
 
 		public ExpandableListAdapter() {
 			for (int i = 0; i < 9; i++)
-				generalsTypes[i] = "剑桥雅思" + (9 - i);
+				generalsTypes[i] = "剑桥雅思" + (i+1);
 			generals = initData();
 		}
 

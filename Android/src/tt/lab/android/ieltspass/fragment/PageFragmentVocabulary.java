@@ -32,7 +32,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 
 public class PageFragmentVocabulary extends Fragment {
-
+	private static final String TAG = PageFragmentVocabulary.class.getName();
 	private List<Map<String, Object>> currentData;
 	private List<Map<String, Object>> listData0 = new ArrayList<Map<String, Object>>(),
 			listData1 = new ArrayList<Map<String, Object>>(), listData2 = new ArrayList<Map<String, Object>>(),
@@ -50,6 +50,7 @@ public class PageFragmentVocabulary extends Fragment {
 	private boolean filterSpinnerInited;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		Logger.i(TAG, "onCreateView");
 		context = this.getActivity();
 		view = inflater.inflate(R.layout.fragment_vocabulary, null);
 

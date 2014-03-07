@@ -8,6 +8,7 @@ import java.util.Map;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.activity.DailyActivity;
 import tt.lab.android.ieltspass.activity.VocabularyActivity;
+import tt.lab.android.ieltspass.data.Logger;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,9 +22,11 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class PageFragmentDaily extends Fragment {
+	private static final String TAG = PageFragmentDaily.class.getName();
 	private ListView listView;
 	private View view;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		Logger.i(TAG, "onCreateView");
 		view = inflater.inflate(R.layout.fragment_daily, null);
 		initList();
 		return view;
