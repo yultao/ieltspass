@@ -21,7 +21,14 @@ public class Word {
     int is_speaking=0;
     int is_reading=0;
     int is_writing=0;
-    List<Example> exampleList=null;
+    
+    private String part_of_speech;
+    private String explanation;
+    private String tinyPic;
+    
+    
+
+	List<Example> exampleList=null;
     List<Pic> picList=null;
     List<MemoryMethod> mmList=null;
     List<Explanation> explanationList=null;
@@ -147,4 +154,29 @@ public class Word {
     public void setCategory(String category) {
         this.category = category;
     }
+    
+    public String getPart_of_speech() {
+		return part_of_speech;
+	}
+
+	public void setPart_of_speech(String part_of_speech) {
+		this.part_of_speech = part_of_speech;
+	}
+
+
+	public String getTinyPic() {
+		return tinyPic;
+	}
+
+	public void setTinyPic(String tinyPic) {
+		this.tinyPic = tinyPic;
+	}
+
+	public String getExplanation() {
+		return explanation;
+	}
+
+	public void setExplanation(String explanation) {
+		this.explanation = explanation;
+	}
 }

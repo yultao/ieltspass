@@ -201,4 +201,25 @@ public class Database {
 		return words;
 	}
 
+	
+	public static String getSql(String sqlFile) {
+		Logger.i(TAG, "getSql sqlFile "+ sqlFile);
+		StringBuilder sb = new StringBuilder();
+		try {
+			InputStream is = Constants.assetManager.open("sql/"+sqlFile+".sql");
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+			String s = null;
+			while ((s = bufferedReader.readLine()) != null) {
+				sb.append("\n "+s );
+			}
+			is.close();
+			bufferedReader.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.i(Database.class.getName(), "getSql E: " + e.getMessage());
+		}
+		String sql  =sb.toString();
+		Logger.i(TAG, "getSql sql "+ sql);
+		return sql;
+	}
 }

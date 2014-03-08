@@ -16,6 +16,7 @@ import java.util.List;
  */
 public class WordsDao {
     Context context = null;
+	private String TAG = WordsDao.class.getName();
 
     public WordsDao(Context context) {
         this.context = context;
@@ -134,8 +135,113 @@ public class WordsDao {
         cursor.close();
         return explanationList;
     }
-
+    
     public List<Word> getWordList() {
+    	long t1= System.currentTimeMillis();
+    	List<Word> wordList = new ArrayList<Word>();
+    	SQLiteDatabase db = null;
+    	Cursor cursor = null;
+    	try{
+    		
+    		String sql = Database.getSql("getWordList");
+	        db = DataBaseHelper.getInstance(context).getWordsDB();
+	        cursor = db.rawQuery(sql, null);
+	        Logger.i(TAG, "cursor "+cursor);
+	        while (cursor.moveToNext()) {
+	        	int i = 0;
+	            String word_vocabulary = cursor.getString(i++);
+	            String BE_phonetic_symbol = cursor.getString(i++);
+	            String BE_sound = cursor.getString(i++);
+	            String is_listening = cursor.getString(i++);
+	            String is_speaking = cursor.getString(i++);
+	            String is_reading = cursor.getString(i++);
+	            String is_writing = cursor.getString(i++);
+	            String part_of_speech = cursor.getString(i++);
+	            String explanation = cursor.getString(i++);
+	            String tinyPic = cursor.getString(i++);
+	            Word word = new Word();
+	            word.setWord_vocabulary(word_vocabulary);
+	            word.setBE_phonetic_symbol(BE_phonetic_symbol);
+	            word.setBE_sound(BE_sound);
+	            word.setIs_listening(Integer.parseInt(is_listening));
+	            word.setIs_speaking(Integer.parseInt(is_speaking));
+	            word.setIs_reading(Integer.parseInt(is_reading));
+	            word.setIs_writing(Integer.parseInt(is_writing));
+	            word.setTinyPic(tinyPic);
+	            word.setExplanation(explanation);
+	            word.setPart_of_speech(part_of_speech);
+	            
+	            wordList.add(word);
+	            
+	        }
+    	} catch (Exception e){
+    		Logger.i(TAG , "getWordList, E: "+ e.getMessage());
+    		e.printStackTrace();
+    	} finally {
+    		if(cursor!=null)
+    			cursor.close();
+    		if(db!=null)
+    			db.close();
+    	}
+    	long t2= System.currentTimeMillis();
+    	Logger.i(TAG, "Retrived words: "+wordList.size()+", time elapsed: "+(t2-t1)+ " ms.");
+        return wordList;
+    }
+    public List<Word> getWordList1() {
+    	List<Word> wordList = new ArrayList<Word>();
+    	SQLiteDatabase db = null;
+    	Cursor cursor = null;
+    	try{
+    		
+    	
+    	
+    	String sql = "select"
+    			+" w.word_vocabulary, w.BE_phonetic_symbol,"
+    			+" w.is_listening, w.is_speaking, w.is_reading, w.is_writing, "
+    			+" e.content, p.tinyPic"
+    			+" from words w, explanations e, pics p "
+    			+" where e.word_vocabulary = w.word_vocabulary"
+    			+" and p.word_vocabulary = w.word_vocabulary";
+    
+        
+	        db = DataBaseHelper.getInstance(context).getWordsDB();
+	        cursor = db.rawQuery(sql, null);
+	        while (cursor.moveToNext()) {
+	        	int i = 0;
+	            String word_vocabulary = cursor.getString(i++);
+	            String BE_phonetic_symbol = cursor.getString(i++);
+	            String BE_sound = cursor.getString(i++);
+	            String is_listening = cursor.getString(i++);
+	            String is_speaking = cursor.getString(i++);
+	            String is_reading = cursor.getString(i++);
+	            String is_writing = cursor.getString(i++);
+	            String content = cursor.getString(i++);
+	            String tinyPic = cursor.getString(i++);
+	            Word word = new Word();
+	            word.setWord_vocabulary(word_vocabulary);
+	            word.setBE_phonetic_symbol(BE_phonetic_symbol);
+	            word.setBE_sound(BE_sound);
+	            word.setIs_listening(Integer.parseInt(is_listening));
+	            word.setIs_speaking(Integer.parseInt(is_speaking));
+	            word.setIs_reading(Integer.parseInt(is_reading));
+	            word.setIs_writing(Integer.parseInt(is_writing));
+	            
+	            wordList.add(word);
+	            
+	        }
+    	} catch (Exception e){
+    		Logger.i(TAG , "getWordList, E: "+ e.getMessage());
+    		e.printStackTrace();
+    	} finally {
+    		if(cursor!=null)
+    			cursor.close();
+    		if(db!=null)
+    			db.close();
+    	}
+        return wordList;
+    }
+    
+    public List<Word> getWordList2() {
         //this variable should be set as parameter
         int count = 50;
 

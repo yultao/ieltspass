@@ -121,14 +121,14 @@ public class PageFragmentLSRW extends Fragment {
 	}
 
 	private void initExpandableList() {
-		Logger.i(TAG, "expandableListView: " + expandableListView);
+		//Logger.i(TAG, "expandableListView: " + expandableListView);
 		expandableListView = (ExpandableListView) view.findViewById(R.id.expandableListView1);
 		resetList();
 		expandableListView.setOnGroupExpandListener(new OnGroupExpandListener() {
 			@Override
 			public void onGroupExpand(int groupPosition) {
 				itemSelected[tabSelected][groupPosition] = 1;
-				Logger.i(TAG, "onGroupExpand: " + groupPosition);
+				//Logger.i(TAG, "onGroupExpand: " + groupPosition);
 			}
 		});
 		expandableListView.setOnGroupCollapseListener(new OnGroupCollapseListener() {

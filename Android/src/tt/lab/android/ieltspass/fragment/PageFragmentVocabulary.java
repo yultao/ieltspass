@@ -1,5 +1,12 @@
 package tt.lab.android.ieltspass.fragment;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,13 +16,19 @@ import java.util.Map;
 
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.activity.VocabularyActivity;
+import tt.lab.android.ieltspass.data.Constants;
 import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.Word;
 import tt.lab.android.ieltspass.data.WordsDao;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,8 +37,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.SeekBar;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.SimpleAdapter;
@@ -38,7 +53,7 @@ public class PageFragmentVocabulary extends Fragment {
 			listData1 = new ArrayList<Map<String, Object>>(), listData2 = new ArrayList<Map<String, Object>>(),
 			listData3 = new ArrayList<Map<String, Object>>(), listData4 = new ArrayList<Map<String, Object>>(),
 			listData5 = new ArrayList<Map<String, Object>>();
-
+	
 	private View view;
 	private Context context;
 	private ListView listView;
@@ -215,7 +230,7 @@ public class PageFragmentVocabulary extends Fragment {
 	 * @param data
 	 */
 	private void resetData() {
-		simpleAdapter = new SimpleAdapter(context, currentData, R.layout.fragment_vocabulary_vlist, new String[] { "title",
+		simpleAdapter = new MySimpleAdapter(context, currentData, R.layout.fragment_vocabulary_vlist, new String[] { "title",
 				"phon", "info", "img" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
 		listView.setAdapter(simpleAdapter);
 		
@@ -329,7 +344,7 @@ public class PageFragmentVocabulary extends Fragment {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("title", word.getWord_vocabulary());
 			map.put("phon", word.getBE_phonetic_symbol());
-			map.put("info", word.getExplanationList().get(0).getContent());
+			map.put("info", word.getExplanation());
 			map.put("category", word.getCategory());
 			
 			if ("1.很生".equals(word.getCategory())) {
@@ -348,7 +363,11 @@ public class PageFragmentVocabulary extends Fragment {
 				map.put("img", String.valueOf(R.drawable.category_5));
 				listData5.add(map);
 			} else {
-				map.put("img", String.valueOf(R.drawable.category_0));
+				if(word.getTinyPic()==null||word.getTinyPic().trim().equals("")){
+					map.put("img", String.valueOf(R.drawable.head_default));
+				} else {
+					map.put("img", word.getTinyPic());
+				}
 			}
 			listData0.add(map);
 		}
@@ -409,5 +428,62 @@ public class PageFragmentVocabulary extends Fragment {
 		Logger.i(this.getClass().getName(), "initData: "+(t2-t1)+" ms.");
 		*/
 	}
+	private class MySimpleAdapter extends SimpleAdapter{
 
+		public MySimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from,
+				int[] to) {
+			super(context, data, resource, from, to);
+		}
+		public void setViewImage(ImageView v, String value) {
+			if(value!=null && value.toLowerCase().startsWith("http")){
+				new DownloadAsyncTask(v, value).execute();
+			} else {
+				super.setViewImage(v, value);
+			}
+	    }
+		
+	}
+	private Handler handler = new Handler();
+	
+	private class DownloadAsyncTask extends AsyncTask<Integer, Integer, String> {
+		private String url;
+		private ImageView imageView;
+		private Bitmap bitmap;
+		public DownloadAsyncTask(ImageView imageView, String url){
+			this.url = url;
+			this.imageView = imageView;
+		}
+
+		@Override
+		protected String doInBackground(Integer... arg0) {
+			try {
+				URL picUrl = new URL(url);
+				bitmap = BitmapFactory.decodeStream(picUrl.openStream()); 
+				
+				
+			} catch (Exception e) {
+				Logger.i(TAG, "setViewImage E: "+e);
+				e.printStackTrace();
+			}
+			return "DONE.";
+		}
+
+		@Override
+		protected void onPreExecute() {
+			
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			if(bitmap!=null)
+				imageView.setImageBitmap(bitmap);
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+			int value = values[0];
+			// Logger.i(TAG, "onProgressUpdate: " + value);
+			// seekBar.setSecondaryProgress((value * seekBar.getMax() / 100));
+		}
+	}
 }

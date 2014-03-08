@@ -477,7 +477,7 @@ public class ListeningActivity extends FragmentActivity {
 		}
 	}
 
-	public class DownloadAsyncTask extends AsyncTask<Integer, Integer, String> {
+	private class DownloadAsyncTask extends AsyncTask<Integer, Integer, String> {
 		private SeekBar seekBar;
 		private String strurl;
 
