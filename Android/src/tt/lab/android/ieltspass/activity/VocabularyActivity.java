@@ -130,7 +130,7 @@ public class VocabularyActivity extends FragmentActivity {
 	private void initTitle() {
 		Button back = (Button) findViewById(R.id.menuButton);
 		// back.setBackground(Resources.getSystem().getDrawable(R.drawable.back));
-		back.setBackgroundDrawable(getResources().getDrawable(R.drawable.back));
+		back.setBackgroundDrawable(getResources().getDrawable(R.drawable.backbutton));
 		back.setOnClickListener(new OnClickListener() {
 
 			@Override

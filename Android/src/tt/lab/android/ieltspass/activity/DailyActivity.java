@@ -111,6 +111,7 @@ public class DailyActivity extends Activity {
 		
 		
 		Button back = (Button) findViewById(R.id.menuButton);
+		back.setBackgroundDrawable(getResources().getDrawable(R.drawable.backbutton));
 		back.setOnClickListener(new OnClickListener() {
 
 			@Override

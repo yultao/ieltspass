@@ -3,44 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".DailyActivity" >
-	<RelativeLayout
-        android:id="@+id/mytitle"
+	<include
+        android:id="@+id/title"
         android:layout_width="fill_parent"
-        android:layout_height="40dp"
-        android:background="@color/red" >
-
-        <Button
-            android:id="@+id/menuButton"
-            android:background="@drawable/back"
-            android:layout_width="40dp"
-		    android:layout_height="40dp"
-		    android:padding="0dp"
-		    android:text=""
-            android:textColor="@color/bg_color" />
-
-        <Button
-            android:id="@+id/shareButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/share" />
-
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/menuButton"
-            android:layout_alignBottom="@+id/menuButton"
-            android:layout_toRightOf="@+id/menuButton"
-            android:text="IELTS PASS"
-            android:textColor="@color/bg_color"
-            android:textSize="18dp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        layout="@layout/title" >
+    </include>
   	<WebView
         android:id="@+id/webview"
-        android:layout_below="@+id/mytitle"
+        android:layout_below="@+id/title"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" 
         android:scrollbars="none"/>
