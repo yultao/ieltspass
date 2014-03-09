@@ -77,7 +77,7 @@ public class LaunchActivity extends FragmentActivity {
 	private void exit() {
 		if (!isExit) {
 			isExit = true;
-			Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
 			// 利用handler延迟发送更改状态信息
 			mHandler.sendEmptyMessageDelayed(0, 2000);
 		} else {

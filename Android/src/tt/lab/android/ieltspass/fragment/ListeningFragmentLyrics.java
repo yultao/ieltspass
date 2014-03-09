@@ -32,7 +32,7 @@ public class ListeningFragmentLyrics extends Fragment {
 	private SeekBar seekBar;
 	private String lyricsFileName;
 	private Lyrics lyrics;
-
+	private boolean userClicked;
 	public void setPlayer(MediaPlayer player, SeekBar seekBar, String lyricsFileName) {
 		this.player = player;
 		this.seekBar = seekBar;
@@ -61,11 +61,11 @@ public class ListeningFragmentLyrics extends Fragment {
 					@Override
 					public void onClick(View v) {
 						LyricsTextView textView = (LyricsTextView)v;
-						
 						Sentence sentence = textView.getSentence();
-						if(seekBar.isEnabled()){
+						if(seekBar.isEnabled()){//player is OK
 							seekBar.setProgress(sentence.getStart());
 							player.seekTo(sentence.getStart());
+							userClicked = true;
 						}
 					}
 				});
@@ -101,18 +101,22 @@ public class ListeningFragmentLyrics extends Fragment {
 			if (sentence != null) {
 				TextView textView = (TextView) sentence.getTextView();
 				// Logger.i(TAG, "equals: " + (textView.equals(lastTextView)));
-				if (lastTextView == null || !lastTextView.equals(textView)) {
+				if (lastTextView == null || !lastTextView.equals(textView)) {//第一条，或有新的一条
 					if (lastTextView != null) {
 						lastTextView.setTextColor(getResources().getColor(R.color.sub_text_color));
 					}
 					textView.setTextColor(getResources().getColor(R.color.red));
 					lastTextView = textView;
 					
-					TextView toScroll = (TextView) lyrics.getScrollTopSentence(sentence).getTextView();
-					scrollView.requestChildFocus(toScroll, toScroll);
-
-					toScroll = (TextView) lyrics.getScrollBottomSentence(sentence).getTextView();
-					scrollView.requestChildFocus(toScroll, toScroll);
+					if(!userClicked){//如果这条是用户自己点的，就不滚动。
+						TextView toScroll = (TextView) lyrics.getScrollTopSentence(sentence).getTextView();
+						scrollView.requestChildFocus(toScroll, toScroll);
+	
+						toScroll = (TextView) lyrics.getScrollBottomSentence(sentence).getTextView();
+						scrollView.requestChildFocus(toScroll, toScroll);
+					} else{
+						userClicked = false;
+					}
 				}
 			}
 		}
@@ -147,7 +151,8 @@ public class ListeningFragmentLyrics extends Fragment {
 		textView.setLayoutParams(lp);
 		textView.setTextSize(18);
 		textView.setText(text);
-		
+		textView.setBackgroundDrawable(getResources().getDrawable(R.drawable.lyrics_background));
+
 		return textView;
 	}
 }

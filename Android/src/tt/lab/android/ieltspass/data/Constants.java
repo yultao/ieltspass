@@ -19,4 +19,7 @@ public class Constants {
 	public static final String LOG_PATH=ROOT_PATH+"/LOG";
 	public static  AssetManager assetManager;
 	
+	public static class Preference{
+		public static boolean onlyUseWifi = false;
+	}
 }

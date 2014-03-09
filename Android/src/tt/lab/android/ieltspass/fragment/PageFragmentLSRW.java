@@ -102,11 +102,11 @@ public class PageFragmentLSRW extends Fragment {
 
 	private void refreshButtonColor(int index) {
 		for (int i = 0; i < buttons.length; i++) {
-			buttons[i].setBackgroundColor(getResources().getColor(R.color.bg_color));
+			buttons[i].setBackgroundDrawable(getResources().getDrawable(R.drawable.tabbutton_background));
 			buttons[i].setTextColor(getResources().getColor(R.color.black));
 		}
-		buttons[index].setBackgroundColor(getResources().getColor(R.color.blue_light));
-		buttons[index].setTextColor(getResources().getColor(R.color.white));
+		buttons[index].setBackgroundDrawable(getResources().getDrawable(R.drawable.tabbutton_background_selected));
+		buttons[index].setTextColor(getResources().getColor(R.color.red));
 
 		tabSelected = index;
 		for (int i = 0; i < itemSelected[tabSelected].length; i++) {
@@ -219,8 +219,8 @@ public class PageFragmentLSRW extends Fragment {
 
 	private class ExpandableListAdapter extends BaseExpandableListAdapter {
 
-		int[] logos = new int[] { R.drawable.wei, R.drawable.shu, R.drawable.wu, R.drawable.shu, R.drawable.wei,
-				R.drawable.shu, R.drawable.wu, R.drawable.shu, R.drawable.wei };
+		int[] logos = new int[] { R.drawable.c1, R.drawable.c2, R.drawable.c3, R.drawable.c4, R.drawable.c5,
+				R.drawable.c6, R.drawable.c7, R.drawable.c8, R.drawable.c9 };
 
 		private String[] generalsTypes = new String[9];
 
@@ -286,6 +286,7 @@ public class PageFragmentLSRW extends Fragment {
 			LinearLayout ll = new LinearLayout(PageFragmentLSRW.this.getActivity());
 			ll.setOrientation(0);
 			ImageView logo = new ImageView(PageFragmentLSRW.this.getActivity());
+			logo.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 75));
 			logo.setImageResource(logos[groupPosition]);
 			logo.setPadding(60, 0, 0, 0);
 			ll.addView(logo);

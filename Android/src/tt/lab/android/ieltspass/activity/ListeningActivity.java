@@ -48,6 +48,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ListeningActivity extends FragmentActivity {
 	private static final String TAG = ListeningActivity.class.getName();
@@ -55,8 +56,7 @@ public class ListeningActivity extends FragmentActivity {
 	private ViewPager mViewPager;
 	private Button btnPlayStop;
 	private MediaPlayer player;
-	private boolean playerPrepared, seekBarSeeking, downloading;
-	private int downloadingPercent;
+	private boolean seekBarSeeking, downloading;
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private Handler handler = new Handler();
 	private SeekBar seekBar;
@@ -151,7 +151,7 @@ public class ListeningActivity extends FragmentActivity {
 	private void enablePlayStopButton(boolean enabled) {
 		btnPlayStop.setEnabled(enabled);
 		int a = 0;
-		if (enabled) {
+		if (enabled) {// if enabled, the player must not be null
 			if (player.isPlaying()) {
 				a = R.drawable.pause_enabled;
 			} else {
@@ -173,9 +173,9 @@ public class ListeningActivity extends FragmentActivity {
 
 				// fromUser判断是用户改变的滑块的值
 				try {
-					// 
+					//
 					if (fromUser == true) {
-						Logger.i(TAG, "onProgressChanged: fromUser: " + progress +", "+fromUser);
+						Logger.i(TAG, "onProgressChanged: fromUser: " + progress + ", " + fromUser);
 						seekBarSeeking = true;
 						player.seekTo(progress);
 					}
@@ -213,121 +213,147 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void initPlayer() {
-		boolean fromLocal=file.exists();
+		boolean fromLocal = file.exists();
 		String url = fromLocal ? file.getAbsolutePath() : "http://taog.ueuo.com/" + audio;
-		Logger.i(TAG, "initPlayer fromLocal? "+fromLocal);
-		if(!fromLocal){
-			Logger.i(TAG, "initPlayer downloading "+url);
+		Logger.i(TAG, "initPlayer fromLocal? " + fromLocal);
+
+		if (checkNetwork(fromLocal)) {
 			new DownloadAsyncTask(seekBar, url).execute();
-			Logger.i(TAG, "initPlayer downloading immediately "+url);
-		}
-		// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
-		// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
-		player = new MediaPlayer();
-		player.setOnPreparedListener(new OnPreparedListener() {
-			@Override
-			public void onPrepared(MediaPlayer mp) {
-				Logger.i(TAG, "onPrepared");
-				playerPrepared = true;
-				//只有在prepare好之后才能进行下一步操作，否则把与声音有关的操作全部disabled
-				start();
-				enablePlayStopButton(true);
-				seekBar.setEnabled(true);
-				percentage.setText("");
-				// Logger.i(TAG, "onPrepared " + 4 + ", " + player.getDuration());
-				duration.setText(Utilities.formatTime(player.getDuration()));
-				Logger.i(
-						TAG,
-						"onPrepared  getDuration " + player.getDuration() + " = "
-								+ Utilities.formatTime(player.getDuration()));
-				seekBar.setMax(player.getDuration());
-
-			}
-		});
-
-		player.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
-			
-
-			@Override
-			public void onBufferingUpdate(MediaPlayer mp, int percent) {
-				int progress = seekBar.getMax() * percent / 100;
-				//Logger.i(TAG, "onBufferingUpdate: " + percent + "% " + progress + ", " + seekBar.getMax());
-
-				if (percent == 100) {
+			// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
+			// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+			player = new MediaPlayer();
+			player.setOnPreparedListener(new OnPreparedListener() {
+				@Override
+				public void onPrepared(MediaPlayer mp) {
+					Logger.i(TAG, "onPrepared");
+					// 只有在prepare好之后才能进行下一步操作，否则把与声音有关的操作全部disabled
+					start();
+					enablePlayStopButton(true);
+					seekBar.setEnabled(true);
 					percentage.setText("");
-				} else {
-					String tt = "L " + percent + "%";
-					if(seekBarSeeking){
-						tt += ", S "+(seekBar.getProgress()*100/seekBar.getMax())+"%";
-					}
-					if(downloading) {
-						tt += ", D ";
-					}
-					percentage.setText(tt);
-					
+					// Logger.i(TAG, "onPrepared " + 4 + ", " + player.getDuration());
+					duration.setText(Utilities.formatTime(player.getDuration()));
+					Logger.i(
+							TAG,
+							"onPrepared  getDuration " + player.getDuration() + " = "
+									+ Utilities.formatTime(player.getDuration()));
+					seekBar.setMax(player.getDuration());
+
 				}
+			});
 
-				seekBar.setSecondaryProgress(progress);
-				// player.addTimedTextSource(fd, mimeType);
+			player.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
 
+				@Override
+				public void onBufferingUpdate(MediaPlayer mp, int percent) {
+					int progress = seekBar.getMax() * percent / 100;
+					// Logger.i(TAG, "onBufferingUpdate: " + percent + "% " + progress + ", " + seekBar.getMax());
+
+					if (percent == 100) {
+						percentage.setText("");
+					} else {
+						String tt = "L " + percent + "%";
+						if (seekBarSeeking) {
+							tt += ", S " + (seekBar.getProgress() * 100 / seekBar.getMax()) + "%";
+						}
+						if (downloading) {
+							tt += ", D ";
+						}
+						percentage.setText(tt);
+
+					}
+
+					seekBar.setSecondaryProgress(progress);
+					// player.addTimedTextSource(fd, mimeType);
+
+				}
+			});
+
+			player.setOnSeekCompleteListener(new OnSeekCompleteListener() {
+
+				@Override
+				public void onSeekComplete(MediaPlayer mp) {
+					seekBarSeeking = false;
+					percentage.setText("");
+				}
+			});
+			/* 当MediaPlayer.OnCompletionLister会运行的Listener */
+			player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+				// @Override
+				public void onCompletion(MediaPlayer arg0) {
+					seekBar.setProgress(0);
+					pause();
+				}
+			});
+
+			player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+				@Override
+				public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
+					Logger.i(TAG, "onError " + arg1 + ", " + arg2);
+					percentage.setText("Error");
+					release();
+					return false;
+				}
+			});
+
+			try {
+				player.reset();
+				//Logger.i(TAG, "initPlayer " + 2 + ", " + url);
+				percentage.setText("Setting");
+				player.setDataSource(url);
+				//Logger.i(TAG, "initPlayer " + 3);
+				percentage.setText("Preparing.");
+				player.prepareAsync();
+				//Logger.i(TAG, "initPlayer " + 4);
+				percentage.setText("Preparing..");
+				//Logger.i(TAG, "initPlayer " + 5);
+
+			} catch (Exception e) {
+				Logger.i(TAG, "initPlayer: E " + e.getMessage());
+				e.printStackTrace();
 			}
-		});
-		
-		player.setOnSeekCompleteListener(new OnSeekCompleteListener() {
-			
-			@Override
-			public void onSeekComplete(MediaPlayer mp) {
-				seekBarSeeking = false;
-				percentage.setText("");
-			}
-		});
-		/* 当MediaPlayer.OnCompletionLister会运行的Listener */
-		player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
-			// @Override
-			public void onCompletion(MediaPlayer arg0) {
-				seekBar.setProgress(0);
-				pause();
-			}
-		});
-
-		player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-			@Override
-			public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
-				Logger.i(TAG, "onError " + arg1 + ", " + arg2);
-				percentage.setText("Error");
-				release();
-				return false;
-			}
-		});
-
-		try {
-			player.reset();
-			Logger.i(TAG, "initPlayer " + 2 + ", " + url);
-			percentage.setText("Setting "+audio);
-			player.setDataSource(url);
-			Logger.i(TAG, "initPlayer " + 3);
-			player.prepareAsync();
-			Logger.i(TAG, "initPlayer " + 4);
-			percentage.setText("Preparing");
-			Logger.i(TAG, "initPlayer " + 5);
-			
-		} catch (Exception e) {
-			Logger.i(TAG, "initPlayer: E " + e.getMessage());
-			e.printStackTrace();
 		}
+	}
+
+	private boolean checkNetwork(boolean fromLocal) {
+		boolean initPlayer = false;
+		if (fromLocal) {// 如果本地文件存在，直接用
+			//Toast.makeText(this, "使用本地缓存", Toast.LENGTH_SHORT).show();
+			initPlayer = true;
+		} else if (Utilities.isWifiConnected(this)) {
+			//Toast.makeText(this, "有WIFI", Toast.LENGTH_SHORT).show();
+
+			initPlayer = true;
+		} else if (Utilities.isNetworkConnected(this)) {
+			//Toast.makeText(this, "有非WIFI", Toast.LENGTH_SHORT).show();
+			if (!Constants.Preference.onlyUseWifi) {
+				initPlayer = true;
+			} else {
+				Toast.makeText(this, "仅有手机网络，不允许", Toast.LENGTH_SHORT).show();
+			}
+		} else {
+			Toast.makeText(this, "无网络，本地也无缓存", Toast.LENGTH_SHORT).show();
+		}
+		//Logger.i(TAG, "initPlayer wifi? " + Utilities.isWifiConnected(this));
+		//Logger.i(TAG, "initPlayer mobile? " + Utilities.isMobileConnected(this));
+		//Logger.i(TAG, "initPlayer network? " + Utilities.isNetworkConnected(this));
+		//Logger.i(TAG, "initPlayer type? " + Utilities.getConnectedType(this));
+
+		return initPlayer;
 	}
 
 	private void refreshButtonText() {
 		int a = 0;
-		if(btnPlayStop.isEnabled()){
-			if(player.isPlaying()){
-				a = R.drawable.pause_enabled;
+		if (btnPlayStop.isEnabled()) {
+			if (player.isPlaying()) {
+				a = R.drawable.pausebutton;
 			} else {
-				a = R.drawable.play_enabled;
+				a = R.drawable.playbutton;
 			}
 		} else {
-			if(player.isPlaying()){
+			if (player.isPlaying()) {
 				a = R.drawable.pause;
 			} else {
 				a = R.drawable.play;
@@ -499,7 +525,7 @@ public class ListeningActivity extends FragmentActivity {
 				int available = is.available();
 				// Logger.i(TAG, "doInBackground "+21+", "+available);
 				String filename = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + name;
-				Logger.i(TAG, "doInBackground filename " + filename+", "+available);
+				Logger.i(TAG, "doInBackground filename " + filename + ", " + available);
 				String tmpfilename = filename + ".d";
 				Logger.i(TAG, "doInBackground tmpfilename " + tmpfilename);
 				File tmp = new File(tmpfilename);
@@ -508,7 +534,7 @@ public class ListeningActivity extends FragmentActivity {
 				int len;
 				int read = 0;
 				while ((len = is.read(buffer)) != -1) {
-					read +=len;
+					read += len;
 					// Logger.i(TAG, "doInBackground "+3+", "+len);
 					os.write(buffer, 0, len);
 				}

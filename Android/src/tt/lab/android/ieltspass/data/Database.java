@@ -29,7 +29,7 @@ public class Database {
 		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			internal = true;
 		} else {
-			dataFileName = initVocabulary();
+			//dataFileName = initVocabulary();
 			//initData(Constants.AUDIO_PATH, Constants.AUDIO_NAME);
 			//initData(Constants.AUDIO_PATH, Constants.LRC_NAME);
 			
