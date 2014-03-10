@@ -150,18 +150,7 @@ public class ListeningActivity extends FragmentActivity {
 
 	private void enablePlayStopButton(boolean enabled) {
 		btnPlayStop.setEnabled(enabled);
-		int a = 0;
-		if (enabled) {// if enabled, the player must not be null
-			if (player.isPlaying()) {
-				a = R.drawable.pause_enabled;
-			} else {
-				a = R.drawable.play_enabled;
-			}
-		} else {
-			a = R.drawable.play;
-		}
-
-		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(a));
+		refreshButtonText();
 	}
 
 	private void initControls() {
@@ -350,7 +339,7 @@ public class ListeningActivity extends FragmentActivity {
 				a = R.drawable.playbutton;
 			}
 		} else {
-			if (player.isPlaying()) {
+			if (player!=null && player.isPlaying()) {
 				a = R.drawable.pause;
 			} else {
 				a = R.drawable.play;
