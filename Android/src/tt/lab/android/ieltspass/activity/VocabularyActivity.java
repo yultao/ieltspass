@@ -176,7 +176,7 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 
 	private void startPlaying() {
-		String name = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/test.mp3";
+		String name = Constants.LISTENING_AUDIO_PATH + "/test.mp3";
 		// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
 		// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 		player = new MediaPlayer();

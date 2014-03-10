@@ -1,6 +1,7 @@
 package tt.lab.android.ieltspass.activity;
 
 import tt.lab.android.ieltspass.data.Constants;
+import tt.lab.android.ieltspass.data.Utilities;
 import tt.lab.android.ieltspass.fragment.CenterFragment;
 import tt.lab.android.ieltspass.fragment.CenterFragmentIndicator;
 import tt.lab.android.ieltspass.fragment.CenterFragmentPager;
@@ -9,7 +10,9 @@ import tt.lab.android.ieltspass.fragment.LeftFragment;
 import tt.lab.android.ieltspass.fragment.RightFragment;
 import tt.lab.android.ieltspass.fragment.CenterFragment.PageChangeListener;
 import tt.lab.android.ieltspass.view.SlidingMenuRelativeLayout;
+import android.content.Context;
 import android.content.res.AssetManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,7 +36,8 @@ public class LaunchActivity extends FragmentActivity {
 		super.onCreate(arg0);
 		setContentView(R.layout.main);
 		Constants.assetManager = getAssets();
-		
+		Utilities.ensurePath(Constants.VOCABULARY_IMAGE_PATH);
+		Utilities.connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 			init();
 			initListener();
 	}

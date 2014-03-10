@@ -19,8 +19,8 @@
         <ImageView
             android:id="@+id/img"
             android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_margin ="5px"  />
+            android:layout_height="fill_parent" 
+            android:contentDescription="TODO"/>
     </LinearLayout>
 
     <LinearLayout

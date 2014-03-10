@@ -41,7 +41,8 @@ public class ListeningFragmentQuestions extends Fragment {
 //		    break ;  
 //		}  
 //		webSettings.setDefaultZoom(zoomDensity); 
-		webSettings.setLayoutAlgorithm(LayoutAlgorithm.NORMAL); 		webView.loadUrl("file:///android_asset/cambridge/listening/"+questions );//
+		webSettings.setLayoutAlgorithm(LayoutAlgorithm.NORMAL); 		//webView.loadUrl("file:///android_asset/cambridge/listening/"+questions );//
+		webView.loadUrl("file://"+Constants.LISTENING_QUESTION_PATH+"/"+questions );
 //		ImageView imageView = (ImageView)rootView.findViewById(R.id.imageView1);
 //		
 //		String myJpgPath = Constants.SD_PATH+"/"+Constants.AUDIO_PATH+"/C6T1S2.Q.png";//"file:///android_asset/cambridge/listening/C6T1S2.Q.png";

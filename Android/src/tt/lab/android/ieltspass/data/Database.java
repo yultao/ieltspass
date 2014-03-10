@@ -95,7 +95,7 @@ public class Database {
 	public static List<Map<String,String>> parseLyrics(String lyricsName) {
 		List<Map<String,String>> lyricsList = new ArrayList<Map<String,String>>();
 		try {
-			InputStream is = new FileInputStream(Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + lyricsName);
+			InputStream is = new FileInputStream(Constants.LISTENING_AUDIO_PATH + "/" + lyricsName);
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 			String s = null;
 			while ((s = bufferedReader.readLine()) != null) {
@@ -161,7 +161,7 @@ public class Database {
 
 	private static String initVocabulary() {
 		String dataFileName;
-		String dataPath = Constants.SD_PATH + "/" + Constants.DATA_PATH;
+		String dataPath = Constants.DATA_PATH;
 		Logger.i(TAG, "dataPath: " + dataPath);
 		File dir = new File(dataPath);
 
@@ -222,4 +222,5 @@ public class Database {
 		Logger.i(TAG, "getSql sql "+ sql);
 		return sql;
 	}
+	
 }

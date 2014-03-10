@@ -16,7 +16,7 @@ public class Logger {
 	private static File logfile;
 	static {
 		
-		String targetDir = Constants.SD_PATH + "/" + Constants.LOG_PATH;
+		String targetDir = Constants.LOG_PATH;
 		File dir = new File(targetDir);
 		if (!dir.exists()) {
 			dir.mkdirs();

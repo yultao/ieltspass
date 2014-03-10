@@ -1,7 +1,9 @@
 package tt.lab.android.ieltspass.fragment;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
@@ -19,6 +21,7 @@ import tt.lab.android.ieltspass.activity.VocabularyActivity;
 import tt.lab.android.ieltspass.data.Constants;
 import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.Logger;
+import tt.lab.android.ieltspass.data.Utilities;
 import tt.lab.android.ieltspass.data.Word;
 import tt.lab.android.ieltspass.data.WordsDao;
 import android.content.Context;
@@ -364,9 +367,10 @@ public class PageFragmentVocabulary extends Fragment {
 				listData5.add(map);
 			} else {
 				if(word.getTinyPic()==null||word.getTinyPic().trim().equals("")){
-					map.put("img", String.valueOf(R.drawable.head_default));
+					map.put("img", String.valueOf(R.drawable.no_pic));
 				} else {
-					map.put("img", word.getTinyPic());
+					
+					map.put("img", Utilities.getTinyPic(word.getTinyPic()));
 				}
 			}
 			listData0.add(map);
@@ -374,6 +378,8 @@ public class PageFragmentVocabulary extends Fragment {
 		currentData = listData0;
 		
 	}
+	
+	
 	private void initData2() {
 		/*
 		long t1 = System.currentTimeMillis();
@@ -435,35 +441,90 @@ public class PageFragmentVocabulary extends Fragment {
 			super(context, data, resource, from, to);
 		}
 		public void setViewImage(ImageView v, String value) {
+			//Logger.i(TAG, "setViewImage: "+v.getId()+", "+value);
+			//从网络下载
 			if(value!=null && value.toLowerCase().startsWith("http")){
-				new DownloadAsyncTask(v, value).execute();
+				if (Utilities.isWifiConnected() 
+						|| (Utilities.isNetworkConnected() && !Constants.Preference.onlyUseWifi)) {
+					new DownloadImageAsyncTask(v, value).execute();
+				}
+			} else if(value.startsWith("/")){
+				//super.setViewImage(v, value);
+				//new DisplayImageAsyncTask(v, value).execute();
+				Bitmap bitmap = BitmapFactory.decodeFile(value);
+				v.setImageBitmap(bitmap);
 			} else {
 				super.setViewImage(v, value);
 			}
 	    }
 		
 	}
-	private Handler handler = new Handler();
 	
-	private class DownloadAsyncTask extends AsyncTask<Integer, Integer, String> {
-		private String url;
+	private class DownloadImageAsyncTask extends AsyncTask<Integer, Integer, String> {
+		private String strurl;
 		private ImageView imageView;
 		private Bitmap bitmap;
-		public DownloadAsyncTask(ImageView imageView, String url){
-			this.url = url;
+		public DownloadImageAsyncTask(ImageView imageView, String url){
+			this.strurl = url;
 			this.imageView = imageView;
 		}
 
+		/**
+		 * 先缓存到本地
+		 */
 		@Override
 		protected String doInBackground(Integer... arg0) {
+			InputStream is = null;
+			OutputStream os = null;
 			try {
-				URL picUrl = new URL(url);
-				bitmap = BitmapFactory.decodeStream(picUrl.openStream()); 
+				URL url = new URL(strurl);
+				URLConnection openConnection = url.openConnection();
+				is = openConnection.getInputStream();
 				
+				String name = strurl.substring(strurl.lastIndexOf("/") + 1);
+				
+				String filename = Constants.VOCABULARY_IMAGE_PATH + "/" + name;
+				String tmpfilename = filename + ".d";
+				File tmp = new File(tmpfilename);
+				os = new FileOutputStream(tmp);
+				byte[] buffer = new byte[1024];
+				int len;
+				int read = 0;
+				while ((len = is.read(buffer)) != -1) {
+					read += len;
+					os.write(buffer, 0, len);
+				}
+				if(read>1024){//>1k
+					File file = new File(filename);
+					boolean renameTo = tmp.renameTo(file);
+					bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
+					//Logger.i(TAG, "doInBackground renameTo " + renameTo);
+				} else {
+					boolean delete = tmp.delete();
+					//Logger.i(TAG, "doInBackground delete " + delete);
+				}
+				//bitmap = BitmapFactory.decodeStream(openConnection.getInputStream());
 				
 			} catch (Exception e) {
-				Logger.i(TAG, "setViewImage E: "+e);
+				Logger.i(TAG, "doInBackground E: " + e.getMessage());
 				e.printStackTrace();
+			} finally {
+				if(is!=null){
+					try {
+						is.close();
+					} catch (IOException e) {
+						Logger.i(TAG, "doInBackground is close " + e);
+						e.printStackTrace();
+					}
+				}
+				if(os!=null){
+					try {
+						os.close();
+					} catch (IOException e) {
+						Logger.i(TAG, "doInBackground os close " + e);
+						e.printStackTrace();
+					}
+				}
 			}
 			return "DONE.";
 		}
@@ -481,9 +542,8 @@ public class PageFragmentVocabulary extends Fragment {
 
 		@Override
 		protected void onProgressUpdate(Integer... values) {
-			int value = values[0];
-			// Logger.i(TAG, "onProgressUpdate: " + value);
-			// seekBar.setSecondaryProgress((value * seekBar.getMax() / 100));
 		}
 	}
+	
+	
 }

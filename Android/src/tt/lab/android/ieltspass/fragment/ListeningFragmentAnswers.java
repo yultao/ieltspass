@@ -1,6 +1,7 @@
 package tt.lab.android.ieltspass.fragment;
 
 import tt.lab.android.ieltspass.R;
+import tt.lab.android.ieltspass.data.Constants;
 import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.Utilities;
 import tt.lab.android.ieltspass.model.lyrics.Lyrics;
@@ -28,8 +29,8 @@ public class ListeningFragmentAnswers extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_listening_answers, container, false);
-		//webView = (WebView) rootView.findViewById(R.id.webview);
-		//webView.loadUrl("file:///android_asset/cambridge/listening/"+answers);
+		webView = (WebView) rootView.findViewById(R.id.webview);
+		webView.loadUrl("file://"+Constants.LISTENING_ANSWER_PATH+"/"+answers);
 		return rootView;
 	}
 

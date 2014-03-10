@@ -14,6 +14,7 @@ import tt.lab.android.ieltspass.model.lyrics.Lyrics;
 import tt.lab.android.ieltspass.model.lyrics.Sentence;
 
 public class Utilities {
+	public static ConnectivityManager connectivityManager;
 	private static final String TAG = Utilities.class.getName();
 
 	public static void main(String args[]) {
@@ -106,7 +107,7 @@ public class Utilities {
 	public static Lyrics parseLyrics(String lyricsName) {
 		Lyrics lyrics = new Lyrics();
 		try {
-			String path = Constants.SD_PATH + "/" + Constants.AUDIO_PATH + "/" + lyricsName;
+			String path = Constants.LISTENING_AUDIO_PATH + "/" + lyricsName;
 			File f = new File(path);
 			if (f.exists()) {
 				InputStream is = new FileInputStream(f);
@@ -228,43 +229,68 @@ public class Utilities {
 		return s;
 	}
 
-	public static boolean isWifiConnected(Context context) {
-		ConnectivityManager mConnectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo mWiFiNetworkInfo = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+	public static boolean isWifiConnected() {
+		
+		NetworkInfo mWiFiNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 		if (mWiFiNetworkInfo != null) {
 			return mWiFiNetworkInfo.isAvailable();
 		}
 		return false;
 	}
 
-	public static boolean isNetworkConnected(Context context) {
-		ConnectivityManager mConnectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+	public static boolean isNetworkConnected() {
+		NetworkInfo mNetworkInfo = connectivityManager.getActiveNetworkInfo();
 		if (mNetworkInfo != null) {
 			return mNetworkInfo.isAvailable();
 		}
 		return false;
 	}
 
-	public static boolean isMobileConnected(Context context) {
-		ConnectivityManager mConnectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo mMobileNetworkInfo = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+	public static boolean isMobileConnected() {
+		NetworkInfo mMobileNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 		if (mMobileNetworkInfo != null) {
 			return mMobileNetworkInfo.isAvailable();
 		}
 		return false;
 	}
 
-	public static int getConnectedType(Context context) {
-		ConnectivityManager mConnectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+	public static int getConnectedType() {
+		NetworkInfo mNetworkInfo = connectivityManager.getActiveNetworkInfo();
 		if (mNetworkInfo != null && mNetworkInfo.isAvailable()) {
 			return mNetworkInfo.getType();
 		}
 		return -1;
+	}
+	
+
+	/**
+	 * TODO 
+	 * @param picurl
+	 * @return
+	 */
+	public static String getTinyPic(String picurl){
+		long t1 = System.currentTimeMillis();
+		String url = null;
+		boolean local = false;
+		if(picurl!=null){
+			String filename = picurl.substring(picurl.lastIndexOf("/")+1);
+			File file = new File(Constants.VOCABULARY_IMAGE_PATH+"/"+filename);
+			local = file.exists();
+			if(local){
+				url = file.getAbsolutePath();
+			} else {
+				url = picurl;
+			}
+		}
+		long t2 = System.currentTimeMillis();
+		//Logger.i(TAG, "url "+url+", time elapsed: "+(t2-t1)+" ms.");
+		return url;
+	}
+	
+	public static void ensurePath(String path) {
+		File dir = new File(path);
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
 	}
 }
