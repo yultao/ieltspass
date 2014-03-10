@@ -15,6 +15,7 @@ import tt.lab.android.ieltspass.data.Constants;
 import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.Logger;
 import tt.lab.android.ieltspass.data.Word;
+import tt.lab.android.ieltspass.data.WordsDao;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
@@ -62,6 +63,7 @@ public class VocabularyActivity extends FragmentActivity {
 	private Button btnPlayStop;
 	private boolean playing;
 	private MediaPlayer player;
+	private WordsDao wordsDao;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,8 @@ public class VocabularyActivity extends FragmentActivity {
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
+		wordsDao = new WordsDao(this.getApplicationContext());
+		
 		initTitle();
 		try {
 			TextView textViewTitle = (TextView) findViewById(R.id.textViewTitle);
@@ -157,10 +161,11 @@ public class VocabularyActivity extends FragmentActivity {
 		Intent intent = this.getIntent();
 		Bundle bundle = intent.getExtras();
 		String string = bundle.getString("title");
-		Map<String, Word> wordMap = Database.getWords();
-		word = wordMap.get(string);
+		//Map<String, Word> wordMap = Database.getWords();
+		//word = wordMap.get(string);
+		word = wordsDao.getSingleWordInfo(string);
 
-		title.setText(string.toUpperCase());
+		title.setText(string);
 	}
 
 	private void navigateUp() {

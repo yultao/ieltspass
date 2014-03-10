@@ -37,6 +37,7 @@ public class WordsDao {
             String is_reading = cursor.getString(6);
             String is_writing = cursor.getString(7);
 
+            word.setWord_vocabulary(word_vocabulary);
             word.setBE_phonetic_symbol(BE_phonetic_symbol);
             word.setAE_phonetic_symbol(AE_phonetic_symbol);
             word.setBE_sound(BE_sound);
@@ -180,8 +181,8 @@ public class WordsDao {
     	} finally {
     		if(cursor!=null)
     			cursor.close();
-    		if(db!=null)
-    			db.close();
+    		/*if(db!=null)
+    			db.close();*/
     	}
     	long t2= System.currentTimeMillis();
     	Logger.i(TAG, "Retrived words: "+wordList.size()+", time elapsed: "+(t2-t1)+ " ms.");
@@ -235,8 +236,8 @@ public class WordsDao {
     	} finally {
     		if(cursor!=null)
     			cursor.close();
-    		if(db!=null)
-    			db.close();
+    		/*if(db!=null)
+    			db.close();*/
     	}
         return wordList;
     }
