@@ -306,13 +306,15 @@ public class ListeningActivity extends FragmentActivity {
 
 	private boolean checkNetwork(boolean fromLocal) {
 		boolean initPlayer = false;
+		boolean wifi = Utilities.isWifiConnected();
+		boolean mobile = Utilities.isMobileConnected();
 		if (fromLocal) {// 如果本地文件存在，直接用
 			//Toast.makeText(this, "使用本地缓存", Toast.LENGTH_SHORT).show();
 			initPlayer = true;
-		} else if (Utilities.isWifiConnected()) {
+		} else if (wifi) {
 			//Toast.makeText(this, "有WIFI", Toast.LENGTH_SHORT).show();
 			initPlayer = true;
-		} else if (Utilities.isNetworkConnected()) {
+		} else if (mobile) {
 			//Toast.makeText(this, "有非WIFI", Toast.LENGTH_SHORT).show();
 			if (!Constants.Preference.onlyUseWifi) {
 				initPlayer = true;
@@ -322,8 +324,8 @@ public class ListeningActivity extends FragmentActivity {
 		} else {
 			Toast.makeText(this, "无网络，本地也无缓存", Toast.LENGTH_SHORT).show();
 		}
-		Logger.i(TAG, " wifi? " + Utilities.isWifiConnected()
-				+" mobile? "+ Utilities.isMobileConnected()
+		Logger.i(TAG, " wifi? " + wifi
+				+" mobile? "+ mobile
 				+" network? " + Utilities.isNetworkConnected()
 				+" type? " + Utilities.getConnectedType());
 
@@ -383,15 +385,10 @@ public class ListeningActivity extends FragmentActivity {
 			// Logger.i(TAG, "start I");
 			try {
 				// player.seekTo(seekBar.getProgress());
-				Logger.i(TAG, "start 1");
 				player.start();
-				Logger.i(TAG, "start 2");
 				handler.post(updateProgressThread);
-				Logger.i(TAG, "start 3");
 				currentPosition.setText(Utilities.formatTime(player.getCurrentPosition()));
-				Logger.i(TAG, "start 4");
 				refreshButtonText();
-				Logger.i(TAG, "start 5");
 			} catch (Exception e) {
 				Logger.i(TAG, "start: " + e.getMessage());
 				e.printStackTrace();

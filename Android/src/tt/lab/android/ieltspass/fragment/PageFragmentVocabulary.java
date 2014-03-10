@@ -445,8 +445,10 @@ public class PageFragmentVocabulary extends Fragment {
 			//从网络下载
 			if(value!=null && value.toLowerCase().startsWith("http")){
 				if (Utilities.isWifiConnected() 
-						|| (Utilities.isNetworkConnected() && !Constants.Preference.onlyUseWifi)) {
+						|| (Utilities.isMobileConnected() && !Constants.Preference.onlyUseWifi)) {
 					new DownloadImageAsyncTask(v, value).execute();
+				} else {
+					super.setViewImage(v, String.valueOf(R.drawable.no_net));
 				}
 			} else if(value.startsWith("/")){
 				//super.setViewImage(v, value);
@@ -454,7 +456,7 @@ public class PageFragmentVocabulary extends Fragment {
 				Bitmap bitmap = BitmapFactory.decodeFile(value);
 				v.setImageBitmap(bitmap);
 			} else {
-				super.setViewImage(v, value);
+				super.setViewImage(v, value);//会变小
 			}
 	    }
 		

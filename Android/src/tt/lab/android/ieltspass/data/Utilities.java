@@ -229,35 +229,35 @@ public class Utilities {
 		return s;
 	}
 
-	public static boolean isWifiConnected() {
-		
-		NetworkInfo mWiFiNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		if (mWiFiNetworkInfo != null) {
-			return mWiFiNetworkInfo.isAvailable();
+	public static boolean isNetworkConnected() {
+		NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+		if (networkInfo != null) {
+			return networkInfo.isConnected();
 		}
 		return false;
 	}
 
-	public static boolean isNetworkConnected() {
-		NetworkInfo mNetworkInfo = connectivityManager.getActiveNetworkInfo();
-		if (mNetworkInfo != null) {
-			return mNetworkInfo.isAvailable();
+	public static boolean isWifiConnected() {
+		
+		NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		if (networkInfo != null) {
+			return networkInfo.isConnected();
 		}
 		return false;
 	}
 
 	public static boolean isMobileConnected() {
-		NetworkInfo mMobileNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-		if (mMobileNetworkInfo != null) {
-			return mMobileNetworkInfo.isAvailable();
+		NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+		if (networkInfo != null) {
+			return networkInfo.isConnected();
 		}
 		return false;
 	}
 
 	public static int getConnectedType() {
-		NetworkInfo mNetworkInfo = connectivityManager.getActiveNetworkInfo();
-		if (mNetworkInfo != null && mNetworkInfo.isAvailable()) {
-			return mNetworkInfo.getType();
+		NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+		if (networkInfo != null && networkInfo.isConnected()) {
+			return networkInfo.getType();
 		}
 		return -1;
 	}
