@@ -201,7 +201,7 @@ public class PageFragmentLSRW extends Fragment {
 			LsrwItem[] listeningItems = new LsrwItem[16];
 			for (int j = 0; j < 4; j++) {// test
 				for (int k = 0; k < 4; k++) {// section
-					String name = "C" + (i + 1) + "T" + (j + 1) + "S" + (k + 1);
+					String name = (i + 1) + "-" + (j + 1) + "-" + (k + 1);
 					LsrwItem lsrwItem = new LsrwItem();
 					lsrwItem.setTitle("剑桥雅思" + (i + 1) + "-" + t + (j + 1) + "-" + "Section" + (k + 1));
 					lsrwItem.setType(type);
