@@ -1,5 +1,6 @@
 package tt.lab.android.ieltspass.data;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -136,8 +137,13 @@ public class WordsDao {
         return explanationList;
     }
     
-    public List<Word> getWordList() {
+    public List<Word> getWordList(int count, int offset) {
+    	ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    	ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+    	activityManager.getMemoryInfo(memoryInfo);
+    	long m1 =memoryInfo.availMem;
     	long t1= System.currentTimeMillis();
+    	
     	List<Word> wordList = new ArrayList<Word>();
     	SQLiteDatabase db = null;
     	Cursor cursor = null;
@@ -145,7 +151,8 @@ public class WordsDao {
     		
     		String sql = Database.getSql("getWordList");
 	        db = DataBaseHelper.getInstance(context).getWordsDB();
-	        cursor = db.rawQuery(sql, null);
+	        cursor = db.rawQuery(sql, new String[]{String.valueOf(count), String.valueOf(offset)});
+	        
 	        Logger.i(TAG, "cursor "+cursor);
 	        while (cursor.moveToNext()) {
 	        	int i = 0;
@@ -177,14 +184,12 @@ public class WordsDao {
     	} catch (Exception e){
     		Logger.i(TAG , "getWordList, E: "+ e.getMessage());
     		e.printStackTrace();
-    	} finally {
-    		if(cursor!=null)
-    			cursor.close();
-    		if(db!=null)
-    			db.close();
     	}
     	long t2= System.currentTimeMillis();
-    	Logger.i(TAG, "Retrived words: "+wordList.size()+", time elapsed: "+(t2-t1)+ " ms.");
+    	activityManager.getMemoryInfo(memoryInfo);
+    	long m2 =memoryInfo.availMem;
+
+    	Logger.i(TAG, "limit: "+count+ ", offset: "+offset+", words retrived: "+wordList.size()+", time elapsed: "+(t2-t1)+ " ms, memory consumed: "+(m1-m2)/1024+"k.");
         return wordList;
     }
     public List<Word> getWordList1() {

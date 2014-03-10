@@ -37,8 +37,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -48,6 +50,8 @@ import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class PageFragmentVocabulary extends Fragment {
 	private static final String TAG = PageFragmentVocabulary.class.getName();
@@ -56,19 +60,21 @@ public class PageFragmentVocabulary extends Fragment {
 			listData1 = new ArrayList<Map<String, Object>>(), listData2 = new ArrayList<Map<String, Object>>(),
 			listData3 = new ArrayList<Map<String, Object>>(), listData4 = new ArrayList<Map<String, Object>>(),
 			listData5 = new ArrayList<Map<String, Object>>();
-	
+
 	private View view;
 	private Context context;
 	private ListView listView;
+	private TextView loadingView;
 	private SimpleAdapter simpleAdapter;
 
 	private Spinner sortSpinner;
 	private SearchView searchView;
 
 	private boolean filterSpinnerInited;
-	
+	private int currentPage = 0, pageSize = 30, maxPage=8;
+
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		//Logger.i(TAG, "onCreateView");
+		// Logger.i(TAG, "onCreateView");
 		context = this.getActivity();
 		view = inflater.inflate(R.layout.fragment_vocabulary, null);
 
@@ -99,14 +105,48 @@ public class PageFragmentVocabulary extends Fragment {
 		return view;
 	}
 
+	private boolean toend = false;
+	private boolean loading;
 	private void initListView() {
 		listView = (ListView) view.findViewById(R.id.listView1);
 		
+		//loadingView = new TextView(this.context);
+		//loadingView.setText("Loading...");
+		//listView.addFooterView(loadingView);
+		loadingView = (TextView) view.findViewById(R.id.loadingView);
+		loadingView.setHeight(0);
+		listView.setOnScrollListener(new OnScrollListener() {
+
+			
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+				if (totalItemCount != 0) {
+					toend = (firstVisibleItem + visibleItemCount == totalItemCount);
+					if (toend && !loading && currentPage<maxPage) {
+						currentPage++;
+						
+						loadingView.setHeight(40);
+						loadingView.setText("Loading "+((currentPage)*pageSize+1)+"-"+((currentPage+1)*pageSize));
+						
+						//Toast.makeText(PageFragmentVocabulary.this.getActivity(), "第 " + currentPage + " 页  ",Toast.LENGTH_LONG).show();
+						
+						loading = true;
+						new UpdateDataAsyncTask().execute();
+					}
+				}
+			}
+		});
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Log.i("onItemClick", "position: " + position + ", id: " + id);
+				//Log.i("onItemClick", "position: " + position + ", id: " + id);
 				Map<String, Object> item = (Map<String, Object>) simpleAdapter.getItem(position);
 				Intent intent = new Intent();
 				intent.setClass(getActivity(), VocabularyActivity.class);
@@ -116,10 +156,56 @@ public class PageFragmentVocabulary extends Fragment {
 			}
 		});
 	}
+	private class UpdateDataAsyncTask extends AsyncTask<Integer, Integer, String> {
+		private List<Map<String, Object>> updateData;
+		@Override
+		protected String doInBackground(Integer... arg0) {
+			updateData = updateData();
+			try{
+				Thread.sleep(50);
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+			return "DONE.";
+		}
 
+		@Override
+		protected void onPreExecute() {
+
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			try{
+				currentData.addAll(updateData);
+				
+		
+				loading = false;
+				simpleAdapter.notifyDataSetChanged();
+				searchView.setQueryHint("共" + currentData.size() + "条");
+				loadingView.setHeight(0);
+
+//				if (listView.getFooterViewsCount() == 1) {
+//					Logger.i(TAG, "onPostExecute 4");
+//					listView.removeFooterView(loadingView);
+//					Logger.i(TAG, "onPostExecute 5");
+//				}
+				Logger.i(TAG, "onPostExecute 6");
+				
+			} catch (Exception e){
+				Logger.i(TAG, "onPostExecute E: "+e);
+			}
+			
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+			
+		}
+	}
 	private void initSearchView() {
 		searchView = (SearchView) view.findViewById(R.id.searchView1);
-		
+
 		searchView.setOnQueryTextListener(new OnQueryTextListener() {
 
 			@Override
@@ -207,8 +293,8 @@ public class PageFragmentVocabulary extends Fragment {
 					break;
 
 				}
-				
-				//第一次加载无需重新排序、过滤
+
+				// 第一次加载无需重新排序、过滤
 				if (filterSpinnerInited) {
 					resetData();
 					sort();
@@ -233,12 +319,12 @@ public class PageFragmentVocabulary extends Fragment {
 	 * @param data
 	 */
 	private void resetData() {
-		simpleAdapter = new MySimpleAdapter(context, currentData, R.layout.fragment_vocabulary_vlist, new String[] { "title",
-				"phon", "info", "img" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
+		simpleAdapter = new MySimpleAdapter(context, currentData, R.layout.fragment_vocabulary_vlist, new String[] {
+				"title", "phon", "info", "img" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
 		listView.setAdapter(simpleAdapter);
-		
-		searchView.setQueryHint("共"+currentData.size()+"条");
-		
+
+		searchView.setQueryHint("共" + currentData.size() + "条");
+
 	}
 
 	private void filter() {
@@ -334,22 +420,24 @@ public class PageFragmentVocabulary extends Fragment {
 			Log.e("sort", "e: " + e.getMessage());
 		}
 		long t2 = System.currentTimeMillis();
-		Logger.i(this.getClass().getName(), "sort: "+(t2-t1)+" ms.");
+		Logger.i(this.getClass().getName(), "sort: " + (t2 - t1) + " ms.");
 	}
 
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 	}
+
 	private void initData() {
-		WordsDao wordsDao = new WordsDao(context); 
-		List<Word> wordList = wordsDao.getWordList();
-		for (Word word: wordList) {
+		Logger.i(TAG, "initData I");
+		WordsDao wordsDao = new WordsDao(context);
+		List<Word> wordList = wordsDao.getWordList(pageSize, currentPage * pageSize);
+		for (Word word : wordList) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("title", word.getWord_vocabulary());
 			map.put("phon", word.getBE_phonetic_symbol());
 			map.put("info", word.getExplanation());
 			map.put("category", word.getCategory());
-			
+
 			if ("1.很生".equals(word.getCategory())) {
 				map.put("img", String.valueOf(R.drawable.category_1));
 				listData1.add(map);
@@ -366,107 +454,79 @@ public class PageFragmentVocabulary extends Fragment {
 				map.put("img", String.valueOf(R.drawable.category_5));
 				listData5.add(map);
 			} else {
-				if(word.getTinyPic()==null||word.getTinyPic().trim().equals("")){
+				if (word.getTinyPic() == null || word.getTinyPic().trim().equals("")) {
 					map.put("img", String.valueOf(R.drawable.no_pic));
 				} else {
-					
+
 					map.put("img", Utilities.getTinyPic(word.getTinyPic()));
 				}
 			}
 			listData0.add(map);
 		}
 		currentData = listData0;
-		
+		Logger.i(TAG, "initData O");
 	}
-	
-	
-	private void initData2() {
-		/*
-		long t1 = System.currentTimeMillis();
-		Map<String, Word> wordMap = Database.getWords();
-		
-		if (wordMap.size() == 0) {
-			for (int i = 0; i < 100; i++) {
-				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("title", "ABC title " + i);
-				map.put("info", "ABC info " + i);
-				map.put("phon", "ABC phon " + i);
-				if (i % 2 == 0) {
-					map.put("img", String.valueOf(R.drawable.wei));
-				} else if (i % 3 == 0) {
-					map.put("img", String.valueOf(R.drawable.shu));
-				} else {
-					map.put("img", String.valueOf(R.drawable.wu));
-				}
-				listData0.add(map);
-			}
-		} else {
-			for (String key : wordMap.keySet()) {
-				Word word = wordMap.get(key);
-				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("title", word.getTitle());
-				map.put("phon", word.getPhoneticSymbol());
-				map.put("info", word.getExplanation());
-				map.put("category", word.getCategory());
-				map.put("date", word.getDate());
-				if ("1.很生".equals(word.getCategory())) {
-					map.put("img", String.valueOf(R.drawable.category_1));
-					listData1.add(map);
-				} else if ("2.较生".equals(word.getCategory())) {
-					map.put("img", String.valueOf(R.drawable.category_2));
-					listData2.add(map);
-				} else if ("3.一般".equals(word.getCategory())) {
-					map.put("img", String.valueOf(R.drawable.category_3));
-					listData3.add(map);
-				} else if ("4.较熟".equals(word.getCategory())) {
-					map.put("img", String.valueOf(R.drawable.category_4));
-					listData4.add(map);
-				} else if ("5.很熟".equals(word.getCategory())) {
-					map.put("img", String.valueOf(R.drawable.category_5));
-					listData5.add(map);
-				}
-				listData0.add(map);
-			}
-		}
+	private List<Map<String, Object>>  updateData() {
+		Logger.i(TAG, "updateData I");
+		ArrayList<Map<String, Object>> cd = new ArrayList<Map<String, Object>>();
+		WordsDao wordsDao = new WordsDao(context);
+		List<Word> wordList = wordsDao.getWordList(pageSize, currentPage * pageSize);
+		Logger.i(TAG, "updateData wordList "+wordList.size());
+		for (Word word : wordList) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("title", word.getWord_vocabulary());
+			map.put("phon", word.getBE_phonetic_symbol());
+			map.put("info", word.getExplanation());
+			map.put("category", word.getCategory());
 
-		currentData = listData0;
-		long t2 = System.currentTimeMillis();
-		Logger.i(this.getClass().getName(), "initData: "+(t2-t1)+" ms.");
-		*/
+			if (word.getTinyPic() == null || word.getTinyPic().trim().equals("")) {
+				map.put("img", String.valueOf(R.drawable.no_pic));
+			} else {
+
+				map.put("img", Utilities.getTinyPic(word.getTinyPic()));
+			}
+			cd.add(map);
+		}
+		Logger.i(TAG, "updateData O "+currentData.size() );
+		
+		return cd;
 	}
-	private class MySimpleAdapter extends SimpleAdapter{
+	private class MySimpleAdapter extends SimpleAdapter {
 
 		public MySimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from,
 				int[] to) {
 			super(context, data, resource, from, to);
 		}
+
 		public void setViewImage(ImageView v, String value) {
-			//Logger.i(TAG, "setViewImage: "+v.getId()+", "+value);
-			//从网络下载
-			if(value!=null && value.toLowerCase().startsWith("http")){
-				if (Utilities.isWifiConnected() 
-						|| (Utilities.isMobileConnected() && !Constants.Preference.onlyUseWifi)) {
+			// Logger.i(TAG, "setViewImage: "+v.getId()+", "+value);
+			// 从网络下载
+			if (value != null && value.toLowerCase().startsWith("http")) {
+				if (Utilities.isWifiConnected() || (Utilities.isMobileConnected() && !Constants.Preference.onlyUseWifi)) {
 					new DownloadImageAsyncTask(v, value).execute();
 				} else {
 					super.setViewImage(v, String.valueOf(R.drawable.no_net));
 				}
-			} else if(value.startsWith("/")){
-				//super.setViewImage(v, value);
-				//new DisplayImageAsyncTask(v, value).execute();
+			} else if (value.startsWith("/")) {
+				// super.setViewImage(v, value);
+				// new DisplayImageAsyncTask(v, value).execute();
 				Bitmap bitmap = BitmapFactory.decodeFile(value);
 				v.setImageBitmap(bitmap);
 			} else {
-				super.setViewImage(v, value);//会变小
+				super.setViewImage(v, value);// 会变小
 			}
-	    }
-		
+		}
+
 	}
+
 	
+
 	private class DownloadImageAsyncTask extends AsyncTask<Integer, Integer, String> {
 		private String strurl;
 		private ImageView imageView;
 		private Bitmap bitmap;
-		public DownloadImageAsyncTask(ImageView imageView, String url){
+
+		public DownloadImageAsyncTask(ImageView imageView, String url) {
 			this.strurl = url;
 			this.imageView = imageView;
 		}
@@ -482,9 +542,9 @@ public class PageFragmentVocabulary extends Fragment {
 				URL url = new URL(strurl);
 				URLConnection openConnection = url.openConnection();
 				is = openConnection.getInputStream();
-				
+
 				String name = strurl.substring(strurl.lastIndexOf("/") + 1);
-				
+
 				String filename = Constants.VOCABULARY_IMAGE_PATH + "/" + name;
 				String tmpfilename = filename + ".d";
 				File tmp = new File(tmpfilename);
@@ -496,22 +556,22 @@ public class PageFragmentVocabulary extends Fragment {
 					read += len;
 					os.write(buffer, 0, len);
 				}
-				if(read>1024){//>1k
+				if (read > 1024) {// >1k
 					File file = new File(filename);
 					boolean renameTo = tmp.renameTo(file);
 					bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
-					//Logger.i(TAG, "doInBackground renameTo " + renameTo);
+					// Logger.i(TAG, "doInBackground renameTo " + renameTo);
 				} else {
 					boolean delete = tmp.delete();
-					//Logger.i(TAG, "doInBackground delete " + delete);
+					// Logger.i(TAG, "doInBackground delete " + delete);
 				}
-				//bitmap = BitmapFactory.decodeStream(openConnection.getInputStream());
-				
+				// bitmap = BitmapFactory.decodeStream(openConnection.getInputStream());
+
 			} catch (Exception e) {
 				Logger.i(TAG, "doInBackground E: " + e.getMessage());
 				e.printStackTrace();
 			} finally {
-				if(is!=null){
+				if (is != null) {
 					try {
 						is.close();
 					} catch (IOException e) {
@@ -519,7 +579,7 @@ public class PageFragmentVocabulary extends Fragment {
 						e.printStackTrace();
 					}
 				}
-				if(os!=null){
+				if (os != null) {
 					try {
 						os.close();
 					} catch (IOException e) {
@@ -533,12 +593,12 @@ public class PageFragmentVocabulary extends Fragment {
 
 		@Override
 		protected void onPreExecute() {
-			
+
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
-			if(bitmap!=null)
+			if (bitmap != null)
 				imageView.setImageBitmap(bitmap);
 		}
 
@@ -546,6 +606,5 @@ public class PageFragmentVocabulary extends Fragment {
 		protected void onProgressUpdate(Integer... values) {
 		}
 	}
-	
-	
+
 }

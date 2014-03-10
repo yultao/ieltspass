@@ -206,7 +206,7 @@ public class Database {
 		Logger.i(TAG, "getSql sqlFile "+ sqlFile);
 		StringBuilder sb = new StringBuilder();
 		try {
-			InputStream is = Constants.assetManager.open("sqlsql/"+sqlFile+".sql");
+			InputStream is = Constants.assetManager.open("sqls/"+sqlFile+".sql");
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 			String s = null;
 			while ((s = bufferedReader.readLine()) != null) {

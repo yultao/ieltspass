@@ -26,7 +26,13 @@
         android:layout_above="@+id/controls"
         android:fastScrollEnabled="true">
     </ListView>
-
+	<TextView
+        android:id="@+id/loadingView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Loading..."
+        android:layout_above="@+id/controls"
+        />
     <RelativeLayout
         android:id="@+id/controls"
         android:layout_width="match_parent"

@@ -4,7 +4,9 @@ from (
 	from words w, explanations e
 	where w.word_vocabulary = e.word_vocabulary
 	and e.category='basic' 
-	and e.seq = 1) b
+	and e.seq = 1)  b
 left outer join pics p
 on b.word_vocabulary = p.word_vocabulary
 and p.isPrimary = 1
+limit ?
+offset ?
