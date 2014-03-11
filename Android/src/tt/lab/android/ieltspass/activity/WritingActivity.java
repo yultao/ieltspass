@@ -93,7 +93,7 @@ public class WritingActivity extends FragmentActivity {
 		titleText.setText(title.toUpperCase());
 	}
 	private void navigateUp() {
-		NavUtils.navigateUpTo(this, new Intent(this, LaunchActivity.class));
+		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

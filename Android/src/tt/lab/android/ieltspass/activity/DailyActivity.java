@@ -1,11 +1,12 @@
 package tt.lab.android.ieltspass.activity;
 
 import java.util.Map;
+
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.R.layout;
 import tt.lab.android.ieltspass.R.menu;
 import tt.lab.android.ieltspass.data.Database;
-import tt.lab.android.ieltspass.data.Word;
+import tt.lab.android.ieltspass.model.Word;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -136,7 +137,7 @@ public class DailyActivity extends Activity {
 	}
 
 	private void navigateUp() {
-		NavUtils.navigateUpTo(this, new Intent(this, LaunchActivity.class));
+		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
 	}
 
 	@Override

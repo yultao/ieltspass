@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import tt.lab.android.ieltspass.Constants;
+import tt.lab.android.ieltspass.Logger;
+import tt.lab.android.ieltspass.model.Word;
 import android.content.res.AssetManager;
 import android.os.Environment;
 

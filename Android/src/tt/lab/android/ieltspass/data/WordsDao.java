@@ -8,6 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import tt.lab.android.ieltspass.Logger;
+import tt.lab.android.ieltspass.model.Example;
+import tt.lab.android.ieltspass.model.Explanation;
+import tt.lab.android.ieltspass.model.MemoryMethod;
+import tt.lab.android.ieltspass.model.Pic;
+import tt.lab.android.ieltspass.model.Word;
+
 /**
  * Created with IntelliJ IDEA.
  * User: hejind
@@ -137,6 +144,17 @@ public class WordsDao {
         return explanationList;
     }
     
+    public int getWordListCount() {
+    	int count = 0;
+    	SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
+    	Cursor cursor = db.rawQuery("select count(*) from words", null);
+        if (cursor.moveToNext()) {
+        	count = Integer.parseInt(cursor.getString(0));
+        }
+        cursor.close();
+        return count;
+    }
+    
     public List<Word> getWordList(int count, int offset) {
     	ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     	ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
@@ -145,12 +163,11 @@ public class WordsDao {
     	long t1= System.currentTimeMillis();
     	
     	List<Word> wordList = new ArrayList<Word>();
-    	SQLiteDatabase db = null;
     	Cursor cursor = null;
     	try{
     		
     		String sql = Database.getSql("getWordList");
-	        db = DataBaseHelper.getInstance(context).getWordsDB();
+    		SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
 	        cursor = db.rawQuery(sql, new String[]{String.valueOf(count), String.valueOf(offset)});
 	        
 	        Logger.i(TAG, "cursor "+cursor);
@@ -184,6 +201,9 @@ public class WordsDao {
     	} catch (Exception e){
     		Logger.i(TAG , "getWordList, E: "+ e.getMessage());
     		e.printStackTrace();
+    	} finally {
+    		if(cursor!=null)
+    			cursor.close();
     	}
     	long t2= System.currentTimeMillis();
     	activityManager.getMemoryInfo(memoryInfo);

@@ -1,5 +1,6 @@
 package tt.lab.android.ieltspass.activity;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import tt.lab.android.ieltspass.R;
@@ -7,6 +8,11 @@ import tt.lab.android.ieltspass.R.id;
 import tt.lab.android.ieltspass.R.layout;
 import tt.lab.android.ieltspass.R.menu;
 import tt.lab.android.ieltspass.R.string;
+import tt.lab.android.ieltspass.activity.ListeningActivity.SectionsPagerAdapter;
+import tt.lab.android.ieltspass.fragment.ListeningFragmentAnswers;
+import tt.lab.android.ieltspass.fragment.ListeningFragmentLyrics;
+import tt.lab.android.ieltspass.fragment.ListeningFragmentQuestions;
+import tt.lab.android.ieltspass.fragment.SpeakingFragmentRecordings;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,6 +40,7 @@ public class SpeakingActivity extends FragmentActivity {
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
 	SectionsPagerAdapter mSectionsPagerAdapter;
+	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private String title;
 	private String lyrics;
 	private String audio;
@@ -57,14 +64,14 @@ public class SpeakingActivity extends FragmentActivity {
 		answers = bundle.getString("answers");
 		
 		initTitle();
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+		initPager();
+		initFragement();
 
-		// Set up the ViewPager with the sections adapter.
+	}
+	private void initPager() {
+		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-
 	}
 	private void initTitle() {
 		Button back = (Button) findViewById(R.id.menuButton);
@@ -94,7 +101,22 @@ public class SpeakingActivity extends FragmentActivity {
 		titleText.setText(title.toUpperCase());
 	}
 	private void navigateUp() {
-		NavUtils.navigateUpTo(this, new Intent(this, LaunchActivity.class));
+		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
+	}
+	
+	private void initFragement() {
+		ListeningFragmentQuestions fragmentQuestions = new ListeningFragmentQuestions();
+		fragmentQuestions.setQuestions(questions);
+		pagerItemList.add(fragmentQuestions);
+
+
+		ListeningFragmentAnswers fragmentAnswers = new ListeningFragmentAnswers();
+		fragmentAnswers.setAnswers(answers);
+		pagerItemList.add(fragmentAnswers);
+
+		SpeakingFragmentRecordings fragmentRecordings = new SpeakingFragmentRecordings();
+		pagerItemList.add(fragmentRecordings);
+
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -114,32 +136,26 @@ public class SpeakingActivity extends FragmentActivity {
 
 		@Override
 		public Fragment getItem(int position) {
-			// getItem is called to instantiate the fragment for the given page.
-			// Return a DummySectionFragment (defined as a static inner class
-			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
-			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-			fragment.setArguments(args);
+			Fragment fragment = pagerItemList.get(position);
 			return fragment;
 		}
 
 		@Override
 		public int getCount() {
-			// Show 3 total pages.
-			return 3;
+			return pagerItemList.size();
 		}
+
 
 		@Override
 		public CharSequence getPageTitle(int position) {
 			Locale l = Locale.getDefault();
 			switch (position) {
 			case 0:
-				return getString(R.string.title_section1).toUpperCase(l);
+				return "题目".toUpperCase(l);
 			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
+				return "讲稿".toUpperCase(l);
 			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
+				return "录音".toUpperCase(l);
 			}
 			return null;
 		}
