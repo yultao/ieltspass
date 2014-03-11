@@ -145,18 +145,24 @@ public class WordsDao {
         return explanationList;
     }
     
-    public int getWordListCount() {
+    public int getWordListCount(String query) {
+    	Logger.i(TAG, "\n");
+    	long t1= System.currentTimeMillis();
     	int count = 0;
+		String sql = Database.getSql("getWordListCount");
     	SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
-    	Cursor cursor = db.rawQuery("select count(*) from words", null);
+    	Cursor cursor = db.rawQuery(sql, new String[]{query+"%"});
         if (cursor.moveToNext()) {
         	count = Integer.parseInt(cursor.getString(0));
         }
         cursor.close();
+        long t2= System.currentTimeMillis();
+    	Logger.i(TAG, "query: "+query+", count: "+count+", time elapsed: "+(t2-t1)+ " ms.");
+        
         return count;
     }
     
-    public List<Word> getWordList(int count, int offset) {
+    public List<Word> getWordList(String query, String orderBy, String order, int count, int offset) {
     	ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     	ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
     	activityManager.getMemoryInfo(memoryInfo);
@@ -168,10 +174,14 @@ public class WordsDao {
     	try{
     		
     		String sql = Database.getSql("getWordList");
+    		sql = String.format(sql, orderBy, order);
+    		Logger.i(TAG, sql);
     		SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
-	        cursor = db.rawQuery(sql, new String[]{String.valueOf(count), String.valueOf(offset)});
+	        cursor = db.rawQuery(sql, new String[]{
+	        		query+"%", 
+	        		String.valueOf(count), String.valueOf(offset)});
 	        
-	        Logger.i(TAG, "cursor "+cursor);
+	        
 	        while (cursor.moveToNext()) {
 	        	int i = 0;
 	            String word_vocabulary = cursor.getString(i++);
@@ -210,7 +220,7 @@ public class WordsDao {
     	activityManager.getMemoryInfo(memoryInfo);
     	long m2 =memoryInfo.availMem;
 
-    	Logger.i(TAG, "limit: "+count+ ", offset: "+offset+", words retrived: "+wordList.size()+", time elapsed: "+(t2-t1)+ " ms, memory consumed: "+(m1-m2)/1024+"k.");
+    	Logger.i(TAG, "query: "+query+", orderby: "+orderBy+", order: "+order+", limit: "+count+ ", offset: "+offset+", words retrived: "+wordList.size()+", time elapsed: "+(t2-t1)+ " ms, memory consumed: "+(m1-m2)/1024+"k.");
         return wordList;
     }
     public List<Word> getWordList1() {

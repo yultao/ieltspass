@@ -33,13 +33,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -47,8 +46,6 @@ import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class CenterFragmentVocabulary extends Fragment {
 	private static final String TAG = CenterFragmentVocabulary.class.getName();
@@ -67,13 +64,15 @@ public class CenterFragmentVocabulary extends Fragment {
 	private SearchView searchView;
 
 	private boolean filterSpinnerInited;
+	
+	private String orderby="b.word_vocabulary", order = "asc";
 	private int currentPage = 0, pageSize = 30, maxPage;
-
+	private WordsDao wordsDao;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Logger.i(TAG, "onCreateView");
 		context = this.getActivity();
 		view = inflater.inflate(R.layout.fragment_vocabulary, null);
-
+		wordsDao = new WordsDao(context);
 		/*
 		 * simpleAdapter.registerDataSetObserver(new DataSetObserver() { public void onChanged() {
 		 * Log.i("registerDataSetObserver", "onChanged");
@@ -86,7 +85,7 @@ public class CenterFragmentVocabulary extends Fragment {
 
 		// List View
 		initListView();
-
+		initListFootView();
 		// Search View
 		initSearchView();
 
@@ -101,19 +100,19 @@ public class CenterFragmentVocabulary extends Fragment {
 		return view;
 	}
 
+	private void initListFootView() {
+		footerView = new ProgressBar(context);
+
+		Logger.i(TAG, "initListFootView "+footerView);
+	}
+
 	private boolean toend = false;
 	private boolean loading;
-	private int wordListCount;
+	private int totalCount;
 	private ProgressBar footerView;
 	private void initListView() {
 		listView = (ListView) view.findViewById(R.id.listView1);
-		//loadingLayout = new LinearLayout(context);
-		ProgressBar progressBar = new ProgressBar(context);
-		//loadingLayout.addView(progressBar);
-		//final TextView loadingText = new TextView(context);
-		//loadingLayout.addView(loadingText);
 		
-		listView.addFooterView(progressBar);
 		listView.setOnScrollListener(new OnScrollListener() {
 
 			@Override
@@ -125,13 +124,13 @@ public class CenterFragmentVocabulary extends Fragment {
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 				if (totalItemCount != 0) {
 					toend = (firstVisibleItem + visibleItemCount == totalItemCount);
-					if (toend && !loading && currentPage < maxPage) {
+					if (toend && !loading && currentPage < maxPage-1) {
 						currentPage++;
 						//loadingText.setText("Loading "+((currentPage)*pageSize+1)+"-"+((currentPage+1)*pageSize)+"...");
 
 
 						//Toast.makeText(context, "第 " + currentPage +" 页  "+totalItemCount,Toast.LENGTH_LONG).show();
-
+						Logger.i(TAG, "Loading "+((currentPage)*pageSize+1)+"-"+((currentPage+1)*pageSize)+"...");
 						loading = true;
 						new UpdateDataAsyncTask().execute();
 					}
@@ -165,7 +164,7 @@ public class CenterFragmentVocabulary extends Fragment {
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				filter();
+				query();
 				return false;
 			}
 
@@ -248,7 +247,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				if (filterSpinnerInited) {
 					resetData();
 					sort();
-					filter();
+					query();
 				} else {
 					filterSpinnerInited = true;
 				}
@@ -273,7 +272,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				"title", "phon", "info", "img" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
 		listView.setAdapter(simpleAdapter);
 
-		searchView.setQueryHint(currentData.size() + "/"+wordListCount);
+		searchView.setQueryHint(currentData.size() + "/"+totalCount);
 
 	}
 
@@ -285,7 +284,11 @@ public class CenterFragmentVocabulary extends Fragment {
 			simpleAdapter.notifyDataSetChanged();
 		}
 	}
-
+	private void query() {
+		initData();
+		resetData();
+		updateFootView();
+	}
 	private void sort() {
 		long t1 = System.currentTimeMillis();
 		try {
@@ -301,26 +304,32 @@ public class CenterFragmentVocabulary extends Fragment {
 				});
 				break;
 			case 1:// a-z
-				Collections.sort(currentData, new Comparator<Map<String, Object>>() {
-					@Override
-					public int compare(Map<String, Object> lhs, Map<String, Object> rhs) {
-						String title1 = (String) lhs.get("title");
-						String title2 = (String) rhs.get("title");
-						return title1.compareTo(title2);
-					}
-				});
+				orderby = "b.word_vocabulary";
+				order ="asc";
+				query();
+//				Collections.sort(currentData, new Comparator<Map<String, Object>>() {
+//					@Override
+//					public int compare(Map<String, Object> lhs, Map<String, Object> rhs) {
+//						String title1 = (String) lhs.get("title");
+//						String title2 = (String) rhs.get("title");
+//						return title1.compareTo(title2);
+//					}
+//				});
 				break;
 			case 2:// z-a
-				Collections.sort(currentData, new Comparator<Map<String, Object>>() {
-
-					@Override
-					public int compare(Map<String, Object> lhs, Map<String, Object> rhs) {
-						String title1 = (String) lhs.get("title");
-						String title2 = (String) rhs.get("title");
-						return title2.compareTo(title1);
-					}
-
-				});
+				orderby = "b.word_vocabulary";
+				order ="desc";
+				query();
+//				Collections.sort(currentData, new Comparator<Map<String, Object>>() {
+//
+//					@Override
+//					public int compare(Map<String, Object> lhs, Map<String, Object> rhs) {
+//						String title1 = (String) lhs.get("title");
+//						String title2 = (String) rhs.get("title");
+//						return title2.compareTo(title1);
+//					}
+//
+//				});
 
 				break;
 			case 3:// 近-远
@@ -378,11 +387,23 @@ public class CenterFragmentVocabulary extends Fragment {
 	}
 
 	private void initData() {
-		WordsDao wordsDao = new WordsDao(context);
-		wordListCount = wordsDao.getWordListCount();
-		maxPage = wordListCount % pageSize == 0 ? wordListCount / pageSize : wordListCount / pageSize + 1;
+		listData0.clear();
+		listData1.clear();
+		listData2.clear();
+		listData3.clear();
+		listData4.clear();
+		listData5.clear();
 		
-		List<Word> wordList = wordsDao.getWordList(pageSize, currentPage * pageSize);
+		Logger.i(TAG, "initData: "+listView.getFooterViewsCount());
+		if(listView.getFooterViewsCount()==0){
+			listView.addFooterView(footerView);
+		}
+		currentPage = 0;
+		totalCount = wordsDao.getWordListCount(searchView.getQuery().toString());
+		maxPage = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;
+		
+		List<Word> wordList = wordsDao.getWordList(searchView.getQuery().toString(), orderby, order, pageSize, currentPage * pageSize);
+		
 		for (Word word : wordList) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("title", word.getWord_vocabulary());
@@ -416,14 +437,14 @@ public class CenterFragmentVocabulary extends Fragment {
 			listData0.add(map);
 		}
 		currentData = listData0;
-
+		Logger.i(TAG, "currentData.size: "+currentData.size());
 	}
 
 	private List<Map<String, Object>> updateData() {
 		Logger.i(TAG, "updateData I");
 		ArrayList<Map<String, Object>> cd = new ArrayList<Map<String, Object>>();
 		WordsDao wordsDao = new WordsDao(context);
-		List<Word> wordList = wordsDao.getWordList(pageSize, currentPage * pageSize);
+		List<Word> wordList = wordsDao.getWordList(searchView.getQuery().toString(), orderby, order, pageSize, currentPage * pageSize);
 		Logger.i(TAG, "updateData wordList " + wordList.size());
 		for (Word word : wordList) {
 			Map<String, Object> map = new HashMap<String, Object>();
@@ -444,7 +465,18 @@ public class CenterFragmentVocabulary extends Fragment {
 
 		return cd;
 	}
+	private void updateUI() {
+		simpleAdapter.notifyDataSetChanged();
+		searchView.setQueryHint(currentData.size() + "/"+totalCount);
+		updateFootView();
+	}
 
+	private void updateFootView() {
+		boolean b = currentData.size()==totalCount;
+		Logger.i(TAG, "b: "+b+", updateFootView: "+listView.getFooterViewsCount());
+		if(b)
+			listView.removeFooterView(footerView);
+	}
 	private class MySimpleAdapter extends SimpleAdapter {
 
 		public MySimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from,
@@ -493,24 +525,15 @@ public class CenterFragmentVocabulary extends Fragment {
 				currentData.addAll(updateData);
 
 				loading = false;
-				simpleAdapter.notifyDataSetChanged();
-				searchView.setQueryHint(currentData.size() + "/"+wordListCount);
-				if(currentData.size()==wordListCount)
-					listView.removeFooterView(footerView);
-				// loadingView.setHeight(0);
-
-				// if (listView.getFooterViewsCount() == 1) {
-				// Logger.i(TAG, "onPostExecute 4");
-				// 
-				// Logger.i(TAG, "onPostExecute 5");
-				// }
-				Logger.i(TAG, "onPostExecute 6");
+				updateUI();
 
 			} catch (Exception e) {
 				Logger.i(TAG, "onPostExecute E: " + e);
 			}
 
 		}
+
+		
 
 		@Override
 		protected void onProgressUpdate(Integer... values) {
