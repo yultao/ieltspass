@@ -39,12 +39,16 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class CenterFragmentVocabulary extends Fragment {
 	private static final String TAG = CenterFragmentVocabulary.class.getName();
@@ -99,9 +103,17 @@ public class CenterFragmentVocabulary extends Fragment {
 
 	private boolean toend = false;
 	private boolean loading;
-
+	private int wordListCount;
+	private ProgressBar footerView;
 	private void initListView() {
 		listView = (ListView) view.findViewById(R.id.listView1);
+		//loadingLayout = new LinearLayout(context);
+		ProgressBar progressBar = new ProgressBar(context);
+		//loadingLayout.addView(progressBar);
+		//final TextView loadingText = new TextView(context);
+		//loadingLayout.addView(loadingText);
+		
+		listView.addFooterView(progressBar);
 		listView.setOnScrollListener(new OnScrollListener() {
 
 			@Override
@@ -115,12 +127,10 @@ public class CenterFragmentVocabulary extends Fragment {
 					toend = (firstVisibleItem + visibleItemCount == totalItemCount);
 					if (toend && !loading && currentPage < maxPage) {
 						currentPage++;
+						//loadingText.setText("Loading "+((currentPage)*pageSize+1)+"-"+((currentPage+1)*pageSize)+"...");
 
-						// loadingView.setHeight(40);
-						// loadingView.setText("Loading "+((currentPage)*pageSize+1)+"-"+((currentPage+1)*pageSize));
 
-						// Toast.makeText(PageFragmentVocabulary.this.getActivity(), "第 " + currentPage +
-						// " 页  ",Toast.LENGTH_LONG).show();
+						//Toast.makeText(context, "第 " + currentPage +" 页  "+totalItemCount,Toast.LENGTH_LONG).show();
 
 						loading = true;
 						new UpdateDataAsyncTask().execute();
@@ -263,7 +273,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				"title", "phon", "info", "img" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
 		listView.setAdapter(simpleAdapter);
 
-		searchView.setQueryHint("共" + currentData.size() + "条");
+		searchView.setQueryHint(currentData.size() + "/"+wordListCount);
 
 	}
 
@@ -369,7 +379,7 @@ public class CenterFragmentVocabulary extends Fragment {
 
 	private void initData() {
 		WordsDao wordsDao = new WordsDao(context);
-		int wordListCount = wordsDao.getWordListCount();
+		wordListCount = wordsDao.getWordListCount();
 		maxPage = wordListCount % pageSize == 0 ? wordListCount / pageSize : wordListCount / pageSize + 1;
 		
 		List<Word> wordList = wordsDao.getWordList(pageSize, currentPage * pageSize);
@@ -469,11 +479,6 @@ public class CenterFragmentVocabulary extends Fragment {
 		@Override
 		protected String doInBackground(Integer... arg0) {
 			updateData = updateData();
-			try {
-				Thread.sleep(50);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 			return "DONE.";
 		}
 
@@ -489,12 +494,14 @@ public class CenterFragmentVocabulary extends Fragment {
 
 				loading = false;
 				simpleAdapter.notifyDataSetChanged();
-				searchView.setQueryHint("共" + currentData.size() + "条");
+				searchView.setQueryHint(currentData.size() + "/"+wordListCount);
+				if(currentData.size()==wordListCount)
+					listView.removeFooterView(footerView);
 				// loadingView.setHeight(0);
 
 				// if (listView.getFooterViewsCount() == 1) {
 				// Logger.i(TAG, "onPostExecute 4");
-				// listView.removeFooterView(loadingView);
+				// 
 				// Logger.i(TAG, "onPostExecute 5");
 				// }
 				Logger.i(TAG, "onPostExecute 6");
