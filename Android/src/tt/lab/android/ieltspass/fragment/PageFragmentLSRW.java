@@ -43,7 +43,7 @@ public class PageFragmentLSRW extends Fragment {
 	private Button button1, button2, button3, button4;
 	private Button[] buttons = new Button[4];
 	private View view;
-	private int type = 1;
+	private int type = 0;
 	private static String[] tt = { "听力", "口语", "阅读", "写作" };
 	private ExpandableListView expandableListView;
 	private ExpandableListAdapter adapter;
@@ -65,32 +65,47 @@ public class PageFragmentLSRW extends Fragment {
 		buttons[2] = button3;
 		buttons[3] = button4;
 
+		switch (type){
+		case 0://listening
+			itemSelected = new int[4][10];
+			break;
+		case 1:
+			itemSelected = new int[4][9];
+			break;
+		case 2:
+			itemSelected = new int[4][9];
+			break;
+		case 3:
+			itemSelected = new int[4][9];
+			break;
+		}
+		
 		refreshButtonColor(tabSelected);
 		buttons[0].setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				refreshExpandableList(1);
+				refreshExpandableList(0);
 				refreshButtonColor(0);
 			}
 		});
 		buttons[1].setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				refreshExpandableList(2);
+				refreshExpandableList(1);
 				refreshButtonColor(1);
 			}
 		});
 		buttons[2].setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				refreshExpandableList(3);
+				refreshExpandableList(2);
 				refreshButtonColor(2);
 			}
 		});
 		buttons[3].setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				refreshExpandableList(4);
+				refreshExpandableList(3);
 				refreshButtonColor(3);
 			}
 		});
@@ -109,6 +124,7 @@ public class PageFragmentLSRW extends Fragment {
 		buttons[index].setTextColor(getResources().getColor(R.color.red));
 
 		tabSelected = index;
+		
 		for (int i = 0; i < itemSelected[tabSelected].length; i++) {
 			if (itemSelected[tabSelected][i] != 0)
 				expandableListView.expandGroup(i);
@@ -147,7 +163,7 @@ public class PageFragmentLSRW extends Fragment {
 				Intent intent = new Intent();
 				LsrwItem lsrwItem = (LsrwItem) adapter.getChild(groupPosition, childPosition);
 				switch (lsrwItem.getType()) {
-				case 1:
+				case 0:
 					intent.setClass(getActivity(), ListeningActivity.class);
 					intent.putExtra("title", lsrwItem.getTitle());
 					intent.putExtra("type", lsrwItem.getType());
@@ -156,21 +172,21 @@ public class PageFragmentLSRW extends Fragment {
 					intent.putExtra("questions", lsrwItem.getQuestions());
 					intent.putExtra("answers", lsrwItem.getAnswers());
 					break;
-				case 2:
+				case 1:
 					intent.setClass(getActivity(), SpeakingActivity.class);
 					intent.putExtra("title", lsrwItem.getTitle());
 					intent.putExtra("type", lsrwItem.getType());
 					intent.putExtra("questions", lsrwItem.getQuestions());
 					intent.putExtra("answers", lsrwItem.getAnswers());
 					break;
-				case 3:
+				case 2:
 					intent.setClass(getActivity(), ReadingActivity.class);
 					intent.putExtra("title", lsrwItem.getTitle());
 					intent.putExtra("type", lsrwItem.getType());
 					intent.putExtra("questions", lsrwItem.getQuestions());
 					intent.putExtra("answers", lsrwItem.getAnswers());
 					break;
-				case 4:
+				case 3:
 					intent.setClass(getActivity(), WritingActivity.class);
 					intent.putExtra("title", lsrwItem.getTitle());
 					intent.putExtra("type", lsrwItem.getType());
@@ -193,44 +209,102 @@ public class PageFragmentLSRW extends Fragment {
 		this.setType(type);
 		resetList();
 	}
+	private String[] initParent() {
+		String[] generalsTypes = null;
+		switch (type){
+		case 0://listening
+			generalsTypes = new String[10];
+			generalsTypes[9] = "王陆807";
+			break;
+		case 1:
+			generalsTypes = new String[9];
+			break;
+		case 2:
+			generalsTypes = new String[9];
+			break;
+		case 3:
+			generalsTypes = new String[9];
+			break;
+		}
 
-	private LsrwItem[][] initData() {
-		LsrwItem[][] generals = new LsrwItem[9][];
-		String t = tt[type - 1];
+		for (int i = 0; i < 9; i++){
+			generalsTypes[i] = "剑桥雅思" + (i + 1);
+		}
+		return generalsTypes;
+	}
+	private LsrwItem[][] initChildren() {
+		
+		LsrwItem[][] generals = null;
+		switch (type){
+		case 0://listening
+			generals = new LsrwItem[10][];
+			generals[9] = init807();
+			break;
+		case 1:
+			generals = new LsrwItem[9][];
+			break;
+		case 2:
+			generals = new LsrwItem[9][];
+			break;
+		case 3:
+			generals = new LsrwItem[9][];
+			break;
+		}
 		for (int i = 0; i < 9; i++) {// cambridge
-			LsrwItem[] listeningItems = new LsrwItem[16];
-			for (int j = 0; j < 4; j++) {// test
-				for (int k = 0; k < 4; k++) {// section
-					String name = (i + 1) + "-" + (j + 1) + "-" + (k + 1);
-					LsrwItem lsrwItem = new LsrwItem();
-					lsrwItem.setTitle("剑桥雅思" + (i + 1) + "-" + t + (j + 1) + "-" + "Section" + (k + 1));
-					lsrwItem.setType(type);
-					lsrwItem.setQuestions(name + ".Q.html");
-					lsrwItem.setAnswers(name + ".A.html");
-					lsrwItem.setAudio(name + ".mp3");
-					lsrwItem.setLyrics(name + ".lrc");
-					listeningItems[j * 4 + k] = lsrwItem;
-				}
-			}
+			LsrwItem[] listeningItems = initCambridge(i);
 			generals[i] = listeningItems;
 		}
 		return generals;
+	}
+	private LsrwItem[] init807() {
+		LsrwItem[] listeningItems = new LsrwItem[1];
+		
+		String name = "基础词汇";
+		LsrwItem lsrwItem = new LsrwItem();
+		lsrwItem.setTitle("王陆807"+name);
+		lsrwItem.setType(type);
+		lsrwItem.setQuestions(name + ".Q.html");
+		lsrwItem.setAnswers(name + ".A.html");
+		lsrwItem.setAudio(name + ".mp3");
+		lsrwItem.setLyrics(name + ".lrc");
+		listeningItems[0] = lsrwItem;
+		
+		return listeningItems;
+	}
+	private LsrwItem[] initCambridge(int i) {
+		String t = tt[type];
+		LsrwItem[] listeningItems = new LsrwItem[16];
+		for (int j = 0; j < 4; j++) {// test
+			for (int k = 0; k < 4; k++) {// section
+				String name = (i + 1) + "-" + (j + 1) + "-" + (k + 1);
+				LsrwItem lsrwItem = new LsrwItem();
+				lsrwItem.setTitle("剑桥雅思" + (i + 1) + "-" + t + (j + 1) + "-" + "Section" + (k + 1));
+				lsrwItem.setType(type);
+				lsrwItem.setQuestions(name + ".Q.html");
+				lsrwItem.setAnswers(name + ".A.html");
+				lsrwItem.setAudio(name + ".mp3");
+				lsrwItem.setLyrics(name + ".lrc");
+				listeningItems[j * 4 + k] = lsrwItem;
+			}
+		}
+		return listeningItems;
 	}
 
 	private class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 		int[] logos = new int[] { R.drawable.c1, R.drawable.c2, R.drawable.c3, R.drawable.c4, R.drawable.c5,
-				R.drawable.c6, R.drawable.c7, R.drawable.c8, R.drawable.c9 };
+				R.drawable.c6, R.drawable.c7, R.drawable.c8, R.drawable.c9, R.drawable.c9 };
 
-		private String[] generalsTypes = new String[9];
+		private String[] generalsTypes = null;
 
 		private LsrwItem[][] generals;
 
 		public ExpandableListAdapter() {
-			for (int i = 0; i < 9; i++)
-				generalsTypes[i] = "剑桥雅思" + (i + 1);
-			generals = initData();
+			generalsTypes = initParent();
+			generals = initChildren();
 		}
+
+		
 
 		// 子视图图思
 		/*
