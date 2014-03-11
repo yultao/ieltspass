@@ -1,4 +1,4 @@
-package tt.lab.android.ieltspass.data;
+package tt.lab.android.ieltspass;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,8 +10,8 @@ import java.util.List;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import tt.lab.android.ieltspass.model.lyrics.Lyrics;
-import tt.lab.android.ieltspass.model.lyrics.Sentence;
+import tt.lab.android.ieltspass.model.Lyrics;
+import tt.lab.android.ieltspass.model.Sentence;
 
 public class Utilities {
 	public static ConnectivityManager connectivityManager;

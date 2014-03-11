@@ -7,6 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import tt.lab.android.ieltspass.Logger;
+import tt.lab.android.ieltspass.model.Example;
+import tt.lab.android.ieltspass.model.Explanation;
+import tt.lab.android.ieltspass.model.MemoryMethod;
+import tt.lab.android.ieltspass.model.Pic;
+import tt.lab.android.ieltspass.model.Word;
+
 /**
  * Created with IntelliJ IDEA.
  * User: hejind

@@ -1,4 +1,4 @@
-package tt.lab.android.ieltspass.data;
+package tt.lab.android.ieltspass;
 
 import android.content.res.AssetManager;
 import android.os.Environment;

@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
-import tt.lab.android.ieltspass.data.Constants;
+import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.data.Database;
-import tt.lab.android.ieltspass.data.Logger;
-import tt.lab.android.ieltspass.data.Utilities;
+import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentAnswers;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentLyrics;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentQuestions;
@@ -352,7 +352,7 @@ public class ListeningActivity extends FragmentActivity {
 
 	private void navigateUp() {
 		release();
-		NavUtils.navigateUpTo(this, new Intent(this, LaunchActivity.class));
+		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
 	}
 
 	private Runnable updateProgressThread = new Runnable() {

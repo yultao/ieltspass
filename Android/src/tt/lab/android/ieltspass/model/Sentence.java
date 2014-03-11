@@ -1,6 +1,5 @@
-package tt.lab.android.ieltspass.model.lyrics;
+package tt.lab.android.ieltspass.model;
 
-import tt.lab.android.ieltspass.data.Utilities;
 
 public class Sentence {
 	private int index;

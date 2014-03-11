@@ -1,4 +1,4 @@
-package tt.lab.android.ieltspass.data;
+package tt.lab.android.ieltspass;
 
 import java.io.File;
 import java.io.FileNotFoundException;

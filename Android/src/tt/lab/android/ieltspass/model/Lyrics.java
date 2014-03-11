@@ -1,4 +1,4 @@
-package tt.lab.android.ieltspass.model.lyrics;
+package tt.lab.android.ieltspass.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

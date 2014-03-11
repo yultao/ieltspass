@@ -1,17 +1,13 @@
 package tt.lab.android.ieltspass.activity;
 
-import tt.lab.android.ieltspass.data.Constants;
-import tt.lab.android.ieltspass.data.Utilities;
+import tt.lab.android.ieltspass.Constants;
+import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.fragment.CenterFragment;
-import tt.lab.android.ieltspass.fragment.CenterFragmentIndicator;
-import tt.lab.android.ieltspass.fragment.CenterFragmentPager;
-import tt.lab.android.ieltspass.fragment.CenterFragmentTab;
 import tt.lab.android.ieltspass.fragment.LeftFragment;
 import tt.lab.android.ieltspass.fragment.RightFragment;
 import tt.lab.android.ieltspass.fragment.CenterFragment.PageChangeListener;
 import tt.lab.android.ieltspass.view.SlidingMenuRelativeLayout;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,7 +20,7 @@ import android.view.Menu;
 import android.widget.Toast;
 import tt.lab.android.ieltspass.R;
 
-public class LaunchActivity extends FragmentActivity {
+public class LauncherActivity extends FragmentActivity {
 	private SlidingMenuRelativeLayout mSlidingMenuRelativeLayout;
 	private LeftFragment leftFragment;
 	private RightFragment rightFragment;
@@ -55,7 +51,7 @@ public class LaunchActivity extends FragmentActivity {
 		rightFragment = new RightFragment();
 		fragmentTransaction.replace(R.id.right_frame, rightFragment);
 
-		centerFragment = new CenterFragmentIndicator();
+		centerFragment = new CenterFragment();
 		fragmentTransaction.replace(R.id.center_frame, centerFragment);
 
 		fragmentTransaction.commit();

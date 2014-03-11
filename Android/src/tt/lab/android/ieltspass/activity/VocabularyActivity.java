@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 
+import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.R.id;
 import tt.lab.android.ieltspass.R.layout;
 import tt.lab.android.ieltspass.R.menu;
 import tt.lab.android.ieltspass.R.string;
-import tt.lab.android.ieltspass.data.Constants;
+import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.data.Database;
-import tt.lab.android.ieltspass.data.Logger;
-import tt.lab.android.ieltspass.data.Word;
 import tt.lab.android.ieltspass.data.WordsDao;
+import tt.lab.android.ieltspass.model.Word;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
@@ -169,7 +169,7 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 
 	private void navigateUp() {
-		NavUtils.navigateUpTo(this, new Intent(this, LaunchActivity.class));
+		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
 	}
 
 	private void refreshButtonText() {

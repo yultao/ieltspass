@@ -1,10 +1,10 @@
 package tt.lab.android.ieltspass.fragment;
 
+import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
-import tt.lab.android.ieltspass.data.Logger;
-import tt.lab.android.ieltspass.data.Utilities;
-import tt.lab.android.ieltspass.model.lyrics.Lyrics;
-import tt.lab.android.ieltspass.model.lyrics.Sentence;
+import tt.lab.android.ieltspass.Utilities;
+import tt.lab.android.ieltspass.model.Lyrics;
+import tt.lab.android.ieltspass.model.Sentence;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Bundle;

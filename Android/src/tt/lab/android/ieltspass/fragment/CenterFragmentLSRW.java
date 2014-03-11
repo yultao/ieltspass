@@ -1,17 +1,11 @@
 package tt.lab.android.ieltspass.fragment;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.activity.ListeningActivity;
 import tt.lab.android.ieltspass.activity.ReadingActivity;
-import tt.lab.android.ieltspass.activity.SettingsActivity;
 import tt.lab.android.ieltspass.activity.SpeakingActivity;
 import tt.lab.android.ieltspass.activity.WritingActivity;
-import tt.lab.android.ieltspass.data.Logger;
-import tt.lab.android.ieltspass.data.LsrwItem;
-import android.app.Activity;
+import tt.lab.android.ieltspass.model.LsrwItem;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,24 +16,20 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class PageFragmentLSRW extends Fragment {
+public class CenterFragmentLSRW extends Fragment {
 	private static int tabSelected;
 	private static int[][] itemSelected = new int[4][9];
-	private String TAG = PageFragmentLSRW.class.getName();
+	private String TAG = CenterFragmentLSRW.class.getName();
 	private Button button1, button2, button3, button4;
 	private Button[] buttons = new Button[4];
 	private View view;
@@ -315,7 +305,7 @@ public class PageFragmentLSRW extends Fragment {
 		 */
 		private TextView getTextView() {
 			AbsListView.LayoutParams lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 64);
-			TextView textView = new TextView(PageFragmentLSRW.this.getActivity());
+			TextView textView = new TextView(CenterFragmentLSRW.this.getActivity());
 			textView.setLayoutParams(lp);
 			textView.setGravity(Gravity.CENTER_VERTICAL);
 			textView.setPadding(10, 0, 0, 0);
@@ -357,9 +347,9 @@ public class PageFragmentLSRW extends Fragment {
 
 		public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
-			LinearLayout ll = new LinearLayout(PageFragmentLSRW.this.getActivity());
+			LinearLayout ll = new LinearLayout(CenterFragmentLSRW.this.getActivity());
 			ll.setOrientation(0);
-			ImageView logo = new ImageView(PageFragmentLSRW.this.getActivity());
+			ImageView logo = new ImageView(CenterFragmentLSRW.this.getActivity());
 			logo.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 75));
 			logo.setImageResource(logos[groupPosition]);
 			logo.setPadding(60, 0, 0, 0);
@@ -374,9 +364,9 @@ public class PageFragmentLSRW extends Fragment {
 
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView,
 				ViewGroup parent) {
-			LinearLayout ll = new LinearLayout(PageFragmentLSRW.this.getActivity());
+			LinearLayout ll = new LinearLayout(CenterFragmentLSRW.this.getActivity());
 			ll.setOrientation(0);
-			ImageView generallogo = new ImageView(PageFragmentLSRW.this.getActivity());
+			ImageView generallogo = new ImageView(CenterFragmentLSRW.this.getActivity());
 			// generallogo.setImageResource(generallogos[groupPosition][childPosition]);
 			ll.addView(generallogo);
 

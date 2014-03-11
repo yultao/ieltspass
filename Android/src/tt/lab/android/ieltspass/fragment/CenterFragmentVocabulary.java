@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -16,22 +15,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import tt.lab.android.ieltspass.Constants;
+import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
+import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.activity.VocabularyActivity;
-import tt.lab.android.ieltspass.data.Constants;
-import tt.lab.android.ieltspass.data.Database;
-import tt.lab.android.ieltspass.data.Logger;
-import tt.lab.android.ieltspass.data.Utilities;
-import tt.lab.android.ieltspass.data.Word;
 import tt.lab.android.ieltspass.data.WordsDao;
+import tt.lab.android.ieltspass.model.Word;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,14 +39,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.SeekBar;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 
-public class PageFragmentVocabulary extends Fragment {
-	private static final String TAG = PageFragmentVocabulary.class.getName();
+public class CenterFragmentVocabulary extends Fragment {
+	private static final String TAG = CenterFragmentVocabulary.class.getName();
 	private List<Map<String, Object>> currentData;
 	private List<Map<String, Object>> listData0 = new ArrayList<Map<String, Object>>(),
 			listData1 = new ArrayList<Map<String, Object>>(), listData2 = new ArrayList<Map<String, Object>>(),
