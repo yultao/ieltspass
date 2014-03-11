@@ -25,6 +25,7 @@
             android:id="@+id/textViewTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/btnPlay"
             android:textSize="22dp"
             android:textStyle="bold" />
 
@@ -46,8 +47,11 @@
             android:id="@+id/btnPlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textViewPhoetic"
+            android:layout_alignBaseline="@+id/textViewTitle"
+            android:layout_alignBottom="@+id/textViewTitle"
+            android:layout_alignParentRight="true"
             android:text="Start" />
+
     </RelativeLayout>
 
     <!-- This title strip will display the currently visible page title, as well as the page titles for adjacent pages. -->
