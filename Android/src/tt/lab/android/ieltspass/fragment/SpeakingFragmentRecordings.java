@@ -1,9 +1,14 @@
 package tt.lab.android.ieltspass.fragment;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.R;
+import tt.lab.android.ieltspass.Utilities;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,16 +17,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 public class SpeakingFragmentRecordings extends Fragment {
 	private static final String TAG = SpeakingFragmentRecordings.class.getName();
 	private String questions;
 	private ListView listView;
+	
 	private View view;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		view = inflater.inflate(R.layout.fragment_speaking_recordings, container, false);
+		
 		initList();
 		return view;
 	}
@@ -43,8 +51,19 @@ public class SpeakingFragmentRecordings extends Fragment {
 	private List<String> getData() {
 
 		List<String> data = new ArrayList<String>();
-		data.add("[2014-03-10 11:14:12] 时长：03:04");
-		data.add("[2014-03-11 18:24:13] 时长：13:12");
+//		data.add("[2014-03-10 11:14:12] 时长：03:04");
+//		data.add("[2014-03-11 18:24:13] 时长：13:12");
+		
+//		File home = new File(Constants.SPEAKING_AUDIO_PATH);
+//		
+//		for (File file : home.listFiles(new FilenameFilter(){
+//			@Override
+//			public boolean accept(File dir, String filename) {
+//				return (filename.endsWith(".amr"));
+//			}
+//		})){
+//			data.add(file.getName());
+//		}
 		return data;
 	}
 	public String getQuestions() {

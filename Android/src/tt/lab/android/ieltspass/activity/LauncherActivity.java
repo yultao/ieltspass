@@ -33,6 +33,8 @@ public class LauncherActivity extends FragmentActivity {
 		setContentView(R.layout.main);
 		Constants.assetManager = getAssets();
 		Utilities.ensurePath(Constants.VOCABULARY_IMAGE_PATH);
+		Utilities.ensurePath(Constants.SPEAKING_AUDIO_PATH);
+		
 		Utilities.connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 			init();
 			initListener();

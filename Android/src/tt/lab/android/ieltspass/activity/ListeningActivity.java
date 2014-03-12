@@ -147,7 +147,7 @@ public class ListeningActivity extends FragmentActivity {
 		pagerItemList.add(fragmentAnswers);
 
 	}
-
+	
 	private void enablePlayStopButton(boolean enabled) {
 		btnPlayStop.setEnabled(enabled);
 		refreshButtonText();

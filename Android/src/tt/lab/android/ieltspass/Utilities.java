@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
@@ -20,7 +22,21 @@ public class Utilities {
 	public static void main(String args[]) {
 		parseTime("03:02:01.83");
 	}
+	
+	public static String getRecordingFileName() {
+		return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+	}
+	
+	public static String getFormatedDate() {
+		return getFormatedDate(new Date());
+	}
 
+	public static String getFormatedDate(Date date) {
+		if (date == null)
+			return null;
+		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+	}
+	
 	public static int parseTime(String time) {
 		// Logger.i(TAG, "parseTime I: " + time);
 		// 03:02:01.83
