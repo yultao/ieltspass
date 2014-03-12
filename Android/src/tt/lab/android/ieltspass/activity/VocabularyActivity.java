@@ -85,13 +85,15 @@ public class VocabularyActivity extends FragmentActivity {
 		initTitle();
 		try {
 			TextView textViewTitle = (TextView) findViewById(R.id.textViewTitle);
-			TextView textViewPhoetic = (TextView) findViewById(R.id.textViewPhoetic);
+			TextView tvAPhoetic = (TextView) findViewById(R.id.tvAPhoetic);
+			TextView tvBPhoetic = (TextView) findViewById(R.id.tvBPhoetic);
 			TextView textViewDate = (TextView) findViewById(R.id.textViewDate);
 			btnPlayStop = (Button) findViewById(R.id.btnPlay);
 			
 			
 			textViewTitle.setText(word.getWord_vocabulary());
-			textViewPhoetic.setText(word.getBE_phonetic_symbol());
+			tvBPhoetic.setText(word.getBE_phonetic_symbol());
+			tvAPhoetic.setText(word.getAE_phonetic_symbol());
 			textViewDate.setText(word.getCategory());
 			btnPlayStop.setOnClickListener(new OnClickListener() {
 				@Override
