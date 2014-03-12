@@ -45,7 +45,7 @@ public class CenterFragmentLSRW extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		//Logger.i(TAG, "onCreateView " + view);
 
-		view = inflater.inflate(R.layout.fragment_lsrw, null);
+		view = inflater.inflate(R.layout.center_fragment_lsrw, null);
 		button1 = (Button) view.findViewById(R.id.button1);
 		button2 = (Button) view.findViewById(R.id.button2);
 		button3 = (Button) view.findViewById(R.id.button3);

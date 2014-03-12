@@ -12,7 +12,9 @@ import tt.lab.android.ieltspass.activity.ListeningActivity.SectionsPagerAdapter;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentAnswers;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentLyrics;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentQuestions;
+import tt.lab.android.ieltspass.fragment.SpeakingFragmentQuestions;
 import tt.lab.android.ieltspass.fragment.SpeakingFragmentRecordings;
+import tt.lab.android.ieltspass.fragment.SpeakingFragmentScripts;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -105,18 +107,15 @@ public class SpeakingActivity extends FragmentActivity {
 	}
 	
 	private void initFragement() {
-		ListeningFragmentQuestions fragmentQuestions = new ListeningFragmentQuestions();
+		SpeakingFragmentQuestions fragmentQuestions = new SpeakingFragmentQuestions();
 		fragmentQuestions.setQuestions(questions);
 		pagerItemList.add(fragmentQuestions);
 
-
-		ListeningFragmentAnswers fragmentAnswers = new ListeningFragmentAnswers();
-		fragmentAnswers.setAnswers(answers);
-		pagerItemList.add(fragmentAnswers);
-
 		SpeakingFragmentRecordings fragmentRecordings = new SpeakingFragmentRecordings();
 		pagerItemList.add(fragmentRecordings);
-
+		
+		SpeakingFragmentScripts fragmentAnswers = new SpeakingFragmentScripts();
+		pagerItemList.add(fragmentAnswers);
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -161,25 +160,5 @@ public class SpeakingActivity extends FragmentActivity {
 		}
 	}
 
-	/**
-	 * A dummy fragment representing a section of the app, but that simply displays dummy text.
-	 */
-	public static class DummySectionFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this fragment.
-		 */
-		public static final String ARG_SECTION_NUMBER = "section_number";
-
-		public DummySectionFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_speaking_dummy, container, false);
-			TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-			dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-			return rootView;
-		}
-	}
 
 }

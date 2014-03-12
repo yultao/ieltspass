@@ -11,13 +11,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 
-public class SpeakingFragmentQuestions extends Fragment {
-	private static final String TAG = SpeakingFragmentQuestions.class.getName();
+public class ReadingFragmentQuestions extends Fragment {
+	private static final String TAG = ReadingFragmentQuestions.class.getName();
 	private String questions;
 	private WebView webView;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_speaking_questions, container, false);
+		View rootView = inflater.inflate(R.layout.fragment_reading_questions, container, false);
 		
 		webView = (WebView) rootView.findViewById(R.id.webview);
 		WebSettings webSettings = webView.getSettings();

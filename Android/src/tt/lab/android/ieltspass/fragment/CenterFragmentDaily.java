@@ -24,7 +24,7 @@ public class CenterFragmentDaily extends Fragment {
 	private View view;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		//Logger.i(TAG, "onCreateView");
-		view = inflater.inflate(R.layout.fragment_daily, null);
+		view = inflater.inflate(R.layout.center_fragment_daily, null);
 		initList();
 		return view;
 	}

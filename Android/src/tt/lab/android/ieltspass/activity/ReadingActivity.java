@@ -1,5 +1,6 @@
 package tt.lab.android.ieltspass.activity;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import tt.lab.android.ieltspass.R;
@@ -7,6 +8,13 @@ import tt.lab.android.ieltspass.R.id;
 import tt.lab.android.ieltspass.R.layout;
 import tt.lab.android.ieltspass.R.menu;
 import tt.lab.android.ieltspass.R.string;
+import tt.lab.android.ieltspass.activity.SpeakingActivity.SectionsPagerAdapter;
+import tt.lab.android.ieltspass.fragment.ReadingFragmentAnswers;
+import tt.lab.android.ieltspass.fragment.ReadingFragmentArticles;
+import tt.lab.android.ieltspass.fragment.ReadingFragmentQuestions;
+import tt.lab.android.ieltspass.fragment.SpeakingFragmentQuestions;
+import tt.lab.android.ieltspass.fragment.SpeakingFragmentRecordings;
+import tt.lab.android.ieltspass.fragment.SpeakingFragmentScripts;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,6 +42,7 @@ public class ReadingActivity extends FragmentActivity {
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
 	SectionsPagerAdapter mSectionsPagerAdapter;
+	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private String title;
 	private String lyrics;
 	private String audio;
@@ -56,14 +65,8 @@ public class ReadingActivity extends FragmentActivity {
 		questions = bundle.getString("questions");
 		answers = bundle.getString("answers");
 		initTitle();
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-		// Set up the ViewPager with the sections adapter.
-		mViewPager = (ViewPager) findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-
+		initPager();
+		initFragement();
 	}
 	private void initTitle() {
 		Button back = (Button) findViewById(R.id.menuButton);
@@ -92,10 +95,26 @@ public class ReadingActivity extends FragmentActivity {
 		TextView titleText = (TextView) findViewById(R.id.titleText);
 		titleText.setText(title.toUpperCase());
 	}
+	private void initPager() {
+		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setAdapter(mSectionsPagerAdapter);
+	}
 	private void navigateUp() {
 		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
 	}
-	
+	private void initFragement() {
+		
+
+		ReadingFragmentArticles fragmentRecordings = new ReadingFragmentArticles();
+		pagerItemList.add(fragmentRecordings);
+		
+		ReadingFragmentQuestions fragmentQuestions = new ReadingFragmentQuestions();
+		pagerItemList.add(fragmentQuestions);
+		
+		ReadingFragmentAnswers fragmentAnswers = new ReadingFragmentAnswers();
+		pagerItemList.add(fragmentAnswers);
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -114,20 +133,13 @@ public class ReadingActivity extends FragmentActivity {
 
 		@Override
 		public Fragment getItem(int position) {
-			// getItem is called to instantiate the fragment for the given page.
-			// Return a DummySectionFragment (defined as a static inner class
-			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
-			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-			fragment.setArguments(args);
+			Fragment fragment = pagerItemList.get(position);
 			return fragment;
 		}
 
 		@Override
 		public int getCount() {
-			// Show 3 total pages.
-			return 3;
+			return pagerItemList.size();
 		}
 
 		@Override
@@ -135,34 +147,13 @@ public class ReadingActivity extends FragmentActivity {
 			Locale l = Locale.getDefault();
 			switch (position) {
 			case 0:
-				return getString(R.string.title_section1).toUpperCase(l);
+				return "文章".toUpperCase(l);
 			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
+				return "题目".toUpperCase(l);
 			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
+				return "答案".toUpperCase(l);
 			}
 			return null;
-		}
-	}
-
-	/**
-	 * A dummy fragment representing a section of the app, but that simply displays dummy text.
-	 */
-	public static class DummySectionFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this fragment.
-		 */
-		public static final String ARG_SECTION_NUMBER = "section_number";
-
-		public DummySectionFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_reading_dummy, container, false);
-			TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-			dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-			return rootView;
 		}
 	}
 

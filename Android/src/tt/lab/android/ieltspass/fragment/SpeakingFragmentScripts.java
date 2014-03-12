@@ -17,7 +17,7 @@ public class SpeakingFragmentScripts extends Fragment {
 	private WebView webView;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_listening_questions, container, false);
+		View rootView = inflater.inflate(R.layout.fragment_speaking_scripts, container, false);
 		
 		webView = (WebView) rootView.findViewById(R.id.webview);
 		WebSettings webSettings = webView.getSettings();

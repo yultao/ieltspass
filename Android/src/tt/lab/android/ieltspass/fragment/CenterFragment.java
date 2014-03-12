@@ -60,7 +60,7 @@ public class CenterFragment extends Fragment {
 	}
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
-		View view = inflater.inflate(R.layout.center_indicator, null);
+		View view = inflater.inflate(R.layout.center, null);
 		initTitle(view);
 		
 		initPager(view);

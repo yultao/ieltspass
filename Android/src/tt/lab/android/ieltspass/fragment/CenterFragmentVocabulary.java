@@ -65,13 +65,13 @@ public class CenterFragmentVocabulary extends Fragment {
 
 	private boolean filterSpinnerInited;
 	
-	private String orderby="b.word_vocabulary", order = "asc";
+	private String orderby="random()", order = "";
 	private int currentPage = 0, pageSize = 30, maxPage;
 	private WordsDao wordsDao;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Logger.i(TAG, "onCreateView");
 		context = this.getActivity();
-		view = inflater.inflate(R.layout.fragment_vocabulary, null);
+		view = inflater.inflate(R.layout.center_fragment_vocabulary, null);
 		wordsDao = new WordsDao(context);
 		/*
 		 * simpleAdapter.registerDataSetObserver(new DataSetObserver() { public void onChanged() {
@@ -183,7 +183,7 @@ public class CenterFragmentVocabulary extends Fragment {
 	}
 
 	private void initSortSpinner() {
-		final String[] sortCriteria = { "随机", "A-Z", "Z-A", "远-近", "近-远", "生-熟", "熟-生" };
+		final String[] sortCriteria = { "随机", "A-Z", "Z-A", /*"远-近", "近-远", */"生-熟", "熟-生" };
 		sortSpinner = (Spinner) view.findViewById(R.id.spinner);
 		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
 				sortCriteria);
@@ -225,19 +225,19 @@ public class CenterFragmentVocabulary extends Fragment {
 				case 0://
 					currentData = listData0;
 					break;
-				case 1:// a-z
+				case 1:
 					currentData = listData1;
 					break;
-				case 2:// z-a
+				case 2:
 					currentData = listData2;
 					break;
-				case 3:// 近-远
+				case 3:
 					currentData = listData3;
 					break;
-				case 4:// 近-远
+				case 4:
 					currentData = listData4;
 					break;
-				case 5:// 近-远
+				case 5:
 					currentData = listData5;
 					break;
 
@@ -268,7 +268,7 @@ public class CenterFragmentVocabulary extends Fragment {
 	 * @param data
 	 */
 	private void resetData() {
-		simpleAdapter = new MySimpleAdapter(context, currentData, R.layout.fragment_vocabulary_vlist, new String[] {
+		simpleAdapter = new MySimpleAdapter(context, currentData, R.layout.center_fragment_vocabulary_vlist, new String[] {
 				"title", "phon", "info", "img" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
 		listView.setAdapter(simpleAdapter);
 
@@ -295,13 +295,16 @@ public class CenterFragmentVocabulary extends Fragment {
 
 			switch (sortSpinner.getSelectedItemPosition()) {
 			case 0:// "随机"
-				Collections.sort(currentData, new Comparator<Map<String, Object>>() {
-					@Override
-					public int compare(Map<String, Object> lhs, Map<String, Object> rhs) {
-						int i = (int) (Math.random() * 10) - 5;
-						return i;
-					}
-				});
+				orderby = "random()";
+				order ="";
+				query();
+//				Collections.sort(currentData, new Comparator<Map<String, Object>>() {
+//					@Override
+//					public int compare(Map<String, Object> lhs, Map<String, Object> rhs) {
+//						int i = (int) (Math.random() * 10) - 5;
+//						return i;
+//					}
+//				});
 				break;
 			case 1:// a-z
 				orderby = "b.word_vocabulary";
@@ -332,6 +335,7 @@ public class CenterFragmentVocabulary extends Fragment {
 //				});
 
 				break;
+			/*
 			case 3:// 近-远
 				Collections.sort(currentData, new Comparator<Map<String, Object>>() {
 					@Override
@@ -352,7 +356,8 @@ public class CenterFragmentVocabulary extends Fragment {
 					}
 				});
 				break;
-			case 5:// 熟-生"
+			*/
+			case 3:// "生-熟"
 				Collections.sort(currentData, new Comparator<Map<String, Object>>() {
 					@Override
 					public int compare(Map<String, Object> lhs, Map<String, Object> rhs) {
@@ -362,7 +367,7 @@ public class CenterFragmentVocabulary extends Fragment {
 					}
 				});
 				break;
-			case 6:// "生-熟",
+			case 4:// 熟-生"
 				Collections.sort(currentData, new Comparator<Map<String, Object>>() {
 					@Override
 					public int compare(Map<String, Object> lhs, Map<String, Object> rhs) {
@@ -379,7 +384,7 @@ public class CenterFragmentVocabulary extends Fragment {
 			Log.e("sort", "e: " + e.getMessage());
 		}
 		long t2 = System.currentTimeMillis();
-		Logger.i(this.getClass().getName(), "sort: " + (t2 - t1) + " ms.");
+		Logger.i(TAG, "sort: " + (t2 - t1) + " ms.");
 	}
 
 	public void onActivityCreated(Bundle savedInstanceState) {
