@@ -23,6 +23,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,31 +43,31 @@ public class SpeakingActivity extends FragmentActivity {
 	SectionsPagerAdapter mSectionsPagerAdapter;
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private String title;
-	private String lyrics;
-	private String audio;
 	private String questions;
-	private String answers;
+	private String name;
 	private Button btnPlayStop, btnRecordStop;
 	private TextView currentPosition, percentage, duration;
 	private MediaPlayer player;
 	private MediaRecorder recorder;
-	private boolean playing;
 	private boolean recording;
 	private SeekBar seekBar;
 	private Handler handler = new Handler();
 	private String currentAudio;
-	
+
 	private long recordingStart;
+	private long MAX_RECORDING_LENGTH = 1000 * 60*5;//最长5分钟
+	private SpeakingFragmentRecordings fragmentRecordings;
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
+	private boolean autoStart;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_speaking);
-		
+
 		initParameters();
 		initTitle();
 		initButtons();
@@ -80,10 +81,8 @@ public class SpeakingActivity extends FragmentActivity {
 		Intent intent = this.getIntent();
 		Bundle bundle = intent.getExtras();
 		title = bundle.getString("title");
-		lyrics = bundle.getString("lyrics");
-		audio = bundle.getString("audio");
 		questions = bundle.getString("questions");
-		answers = bundle.getString("answers");
+		name = bundle.getString("name");
 	}
 
 	private void initButtons() {
@@ -123,55 +122,73 @@ public class SpeakingActivity extends FragmentActivity {
 				}
 			}
 		});
-		
+
 		btnRecordStop = (Button) findViewById(R.id.buttonRecord);
 		btnRecordStop.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
+				Logger.i(TAG, "recording I: " + recording);
 				try {
-					Logger.i(TAG, "recording: "+ recording);
-					if (!recording) {//开始录
-						Logger.i(TAG, "recording start");
-						
-						resetPlayerControls();
-						
-						currentAudio = Constants.SPEAKING_AUDIO_PATH+"/"+Utilities.getRecordingFileName()+".amr";
-						recorder = new MediaRecorder();
-						recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-						recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-						recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-						recorder.setOutputFile(currentAudio);
-						recorder.prepare();
-						recorder.start();
-						handler.post(updateDurationThread);
-					} else {//停止
-						Logger.i(TAG, "recording stop");
-						recorder.stop();
-						recorder.release();
-						recorder = null;
-						resetPlayer(currentAudio);
-						handler.removeCallbacks(updateDurationThread);
+					if (!recording) {// 开始录
+						startRecording();
+					} else {// 停止
+						stopRecording();
 					}
-					recording = !recording;
-					btnRecordStop.setBackgroundDrawable(getResources().getDrawable(recording? R.drawable.recordpausebutton:R.drawable.recordbutton));
-					
 				} catch (IOException e) {
-					Logger.i(TAG, "recording E: "+ e);
+					Logger.i(TAG, "recording E: " + e);
 					e.printStackTrace();
 				}
+				Logger.i(TAG, "recording O: " + recording);
 			}
+
+			private void startRecording() throws IOException {
+				Logger.i(TAG, "recording start");
+				recordingStart = System.currentTimeMillis();
+				resetPlayerControls();
+				String path = Constants.SPEAKING_AUDIO_PATH + "/" + name;
+				Utilities.ensurePath(path);
+				currentAudio = path + "/" + Utilities.getRecordingFileName() + ".amr";
+				recorder = new MediaRecorder();
+				recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+				recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+				recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+				recorder.setOutputFile(currentAudio);
+				recorder.prepare();
+				recorder.start();
+				handler.post(updateDurationThread);
+				recording = true;
+				
+				btnRecordStop.setBackgroundDrawable(getResources().getDrawable(R.drawable.recordpausebutton));
+			}
+
+			
 		});
-		
+
 		currentPosition = (TextView) findViewById(R.id.currentPosition1);
 		percentage = (TextView) findViewById(R.id.percentage1);
 		duration = (TextView) findViewById(R.id.duration1);
 	}
-	private void initPlayer(){
+	
+	private void stopRecording() {
+		Logger.i(TAG, "recording stop");
+		recorder.stop();
+		recorder.release();
+		recorder = null;
+		recording = false;
+		resetPlayer(currentAudio, false);
+		fragmentRecordings.refreshListView();
+		handler.removeCallbacks(updateDurationThread);
+		btnRecordStop.setBackgroundDrawable(getResources().getDrawable(R.drawable.recordbutton));
+	}
+	private void initPlayer() {
 		player = new MediaPlayer();
 		player.setOnPreparedListener(new OnPreparedListener() {
 			@Override
 			public void onPrepared(MediaPlayer mp) {
 				Logger.i(TAG, "onPrepared");
+				if (autoStart) {// 点击列表项
+					start();
+				}
 				enablePlayStopButton(true);
 				seekBar.setEnabled(true);
 				percentage.setText("");
@@ -203,36 +220,51 @@ public class SpeakingActivity extends FragmentActivity {
 				return false;
 			}
 		});
-		
+
 	}
-	
-	public void resetPlayer(String url){
-		currentAudio = url;
-		try {
-			player.reset();
-			percentage.setText("Setting");
-			player.setDataSource(url);
-			percentage.setText("Preparing.");
-			player.prepareAsync();
-			percentage.setText("Preparing..");
-		} catch (Exception e) {
-			Logger.i(TAG, "resetPlayer: E " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
+
+	/**
+	 * Called when recording starts.
+	 */
 	private void resetPlayerControls() {
-		stop();
+		Logger.i(TAG, "resetPlayerControls I");
+		pause();
 		btnPlayStop.setEnabled(false);
 		refreshButtonText();
 		seekBar.setProgress(0);
 		seekBar.setEnabled(false);
 		currentPosition.setText("00:00");
-		
 	}
+
+	public boolean resetPlayer(String url, boolean autoStart) {
+		Logger.i(TAG, "resetPlayer I: url: " + url + ", autoStart: " + autoStart);
+		if (!recording) {// 不在录音状态
+
+			this.autoStart = autoStart;
+			currentAudio = url;
+			try {
+				player.reset();
+				percentage.setText("Setting");
+				player.setDataSource(url);
+				percentage.setText("Preparing.");
+				player.prepareAsync();
+				percentage.setText("Preparing..");
+			} catch (Exception e) {
+				Logger.i(TAG, "resetPlayer: E " + e);
+				e.printStackTrace();
+			}
+		}
+		boolean success = !recording;
+		Logger.i(TAG, "resetPlayer O: success? " + success);
+
+		return success;
+	}
+
 	private void enablePlayStopButton(boolean enabled) {
 		btnPlayStop.setEnabled(enabled);
 		refreshButtonText();
 	}
+
 	private void start() {
 		if (player != null) {
 			// Logger.i(TAG, "start I");
@@ -243,7 +275,7 @@ public class SpeakingActivity extends FragmentActivity {
 				currentPosition.setText(Utilities.formatTime(player.getCurrentPosition()));
 				refreshButtonText();
 			} catch (Exception e) {
-				Logger.i(TAG, "start: " + e.getMessage());
+				Logger.i(TAG, "start: " + e);
 				e.printStackTrace();
 			}
 		}
@@ -251,49 +283,40 @@ public class SpeakingActivity extends FragmentActivity {
 	}
 
 	private void pause() {
-		// Logger.i(TAG, "pause I ");
+		Logger.i(TAG, "pause I： " + player + ", playing: " + player.isPlaying());
 		try {
-			if (player != null) {
+			if (player != null && player.isPlaying()) {
 				/* 发生错误时也解除资源与MediaPlayer的赋值 */
 				player.pause();
 				// tv.setText("播放发生异常!");
-				handler.removeCallbacks(updateProgressThread);
-				refreshButtonText();
+				
 			}
-
+			handler.removeCallbacks(updateProgressThread);
+			refreshButtonText();
 		} catch (Exception e) {
-			Logger.i(TAG, "pause: E: " + e.getMessage());
+			Logger.i(TAG, "pause: E: " + e);
 			e.printStackTrace();
 		}
-		// Logger.i(TAG, "pause O");
+		Logger.i(TAG, "pause O");
 	}
-	private void stop() {
-		try {
-			if (player != null) {
-				player.stop();
-				handler.removeCallbacks(updateProgressThread);
-				refreshButtonText();
-			}
 
-		} catch (Exception e) {
-			Logger.i(TAG, "stop: E: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
 	private void release() {
 		// Logger.i(TAG, "release I");
 		try {
 			if (player != null) {
-				refreshButtonText();
+				
 				player.release();
-				handler.removeCallbacks(updateProgressThread);
+				
 				// Logger.i(TAG, "release: 3: ");
 			}
+			refreshButtonText();
+			handler.removeCallbacks(updateProgressThread);
 		} catch (Exception e) {
 			Logger.i(TAG, "release: E: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
+
 	private Runnable updateProgressThread = new Runnable() {
 		public void run() {
 			try {
@@ -306,19 +329,24 @@ public class SpeakingActivity extends FragmentActivity {
 
 		}
 	};
-	
+
 	private Runnable updateDurationThread = new Runnable() {
 		public void run() {
 			try {
-				duration.setText(Utilities.formatTimeSecond((int)(System.currentTimeMillis()-recordingStart)));
+				int length = (int) (System.currentTimeMillis() - recordingStart);
+
+				duration.setText(Utilities.formatTimeSecond(length));
 				handler.postDelayed(updateDurationThread, 500);
+				if (length > MAX_RECORDING_LENGTH) {
+					stopRecording();
+				}
 			} catch (Exception e) {
 				Logger.i(TAG, "updateDurationThread: " + e.getMessage());
 			}
 
 		}
 	};
-	
+
 	private void refreshButtonText() {
 		int a = 0;
 		if (btnPlayStop.isEnabled()) {
@@ -328,7 +356,7 @@ public class SpeakingActivity extends FragmentActivity {
 				a = R.drawable.playbutton;
 			}
 		} else {
-			if (player!=null && player.isPlaying()) {
+			if (player != null && player.isPlaying()) {
 				a = R.drawable.pause;
 			} else {
 				a = R.drawable.play;
@@ -336,6 +364,7 @@ public class SpeakingActivity extends FragmentActivity {
 		}
 		btnPlayStop.setBackgroundDrawable(getResources().getDrawable(a));
 	}
+
 	private void initPager() {
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -375,12 +404,15 @@ public class SpeakingActivity extends FragmentActivity {
 	}
 
 	private void initFragement() {
+
+		fragmentRecordings = new SpeakingFragmentRecordings();
+		fragmentRecordings.setSpeakingActivity(this);
+		fragmentRecordings.setName(name);
+		pagerItemList.add(fragmentRecordings);
+
 		SpeakingFragmentQuestions fragmentQuestions = new SpeakingFragmentQuestions();
 		fragmentQuestions.setQuestions(questions);
 		pagerItemList.add(fragmentQuestions);
-
-		SpeakingFragmentRecordings fragmentRecordings = new SpeakingFragmentRecordings();
-		pagerItemList.add(fragmentRecordings);
 
 		SpeakingFragmentScripts fragmentAnswers = new SpeakingFragmentScripts();
 		pagerItemList.add(fragmentAnswers);
@@ -391,6 +423,14 @@ public class SpeakingActivity extends FragmentActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		// getMenuInflater().inflate(R.menu.speaking, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			release();
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 
 	/**
@@ -418,9 +458,9 @@ public class SpeakingActivity extends FragmentActivity {
 			Locale l = Locale.getDefault();
 			switch (position) {
 			case 0:
-				return "题目".toUpperCase(l);
-			case 1:
 				return "录音".toUpperCase(l);
+			case 1:
+				return "题目".toUpperCase(l);
 			case 2:
 				return "讲稿".toUpperCase(l);
 			}
