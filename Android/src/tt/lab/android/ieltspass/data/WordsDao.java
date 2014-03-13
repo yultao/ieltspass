@@ -11,6 +11,7 @@ import java.util.List;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.model.Example;
 import tt.lab.android.ieltspass.model.Explanation;
+import tt.lab.android.ieltspass.model.ExplanationCategory;
 import tt.lab.android.ieltspass.model.MemoryMethod;
 import tt.lab.android.ieltspass.model.Pic;
 import tt.lab.android.ieltspass.model.Word;
@@ -65,7 +66,7 @@ public class WordsDao {
         return word;
     }
 
-    private List<Example> getExamplesForSingleWord(String word_vocabulary) {
+    public List<Example> getExamplesForSingleWord(String word_vocabulary) {
         List<Example> exampleList = new ArrayList<Example>();
         SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
         Cursor cursor = db.rawQuery("select * from examples where word_vocabulary=?", new String[]{word_vocabulary});
@@ -84,7 +85,7 @@ public class WordsDao {
         return exampleList;
     }
 
-    private List<Pic> getPicsForSingleWord(String word_vocabulary) {
+    public List<Pic> getPicsForSingleWord(String word_vocabulary) {
 
         List<Pic> picList = new ArrayList<Pic>();
 
@@ -105,7 +106,7 @@ public class WordsDao {
         return picList;
     }
 
-    private List<MemoryMethod> getMmsForSingleWord(String word_vocabulary) {
+    public List<MemoryMethod> getMmsForSingleWord(String word_vocabulary) {
         List<MemoryMethod> mmList = new ArrayList<MemoryMethod>();
 
         SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
@@ -123,7 +124,7 @@ public class WordsDao {
         return mmList;
     }
 
-    private List<Explanation> getExplanationsForSingleWord(String word_vocabulary) {
+    public List<Explanation> getExplanationsForSingleWord(String word_vocabulary) {
         List<Explanation> explanationList = new ArrayList<Explanation>();
         SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
         Cursor cursor = db.rawQuery("select * from explanations where word_vocabulary=?", new String[]{word_vocabulary});
@@ -139,6 +140,28 @@ public class WordsDao {
             explanation.setContent(content);
             explanation.setPart_of_speech(part_of_speech);
             explanation.setCategory(category);
+            explanationList.add(explanation);
+        }
+        cursor.close();
+        return explanationList;
+    }
+    
+    public List<Explanation> getExplanationsForSingleWordByCategory(String word_vocabulary, ExplanationCategory category) {
+        List<Explanation> explanationList = new ArrayList<Explanation>();
+        SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
+        Cursor cursor = db.rawQuery("select * from explanations where word_vocabulary=? and category=?", 
+        		new String[]{word_vocabulary, category.toString().toLowerCase()});
+        while (cursor.moveToNext()) {
+            Explanation explanation = new Explanation();
+            int seq = Integer.parseInt(cursor.getString(0));
+            String content = cursor.getString(1);
+            String part_of_speech = cursor.getString(2);
+
+
+            explanation.setSeq(seq);
+            explanation.setContent(content);
+            explanation.setPart_of_speech(part_of_speech);
+            explanation.setCategory(category.toString());
             explanationList.add(explanation);
         }
         cursor.close();

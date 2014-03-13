@@ -1,26 +1,19 @@
 package tt.lab.android.ieltspass.activity;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
+import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
-import tt.lab.android.ieltspass.R.id;
-import tt.lab.android.ieltspass.R.layout;
-import tt.lab.android.ieltspass.R.menu;
-import tt.lab.android.ieltspass.R.string;
-import tt.lab.android.ieltspass.Constants;
-import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.data.WordsDao;
+import tt.lab.android.ieltspass.model.Explanation;
+import tt.lab.android.ieltspass.model.ExplanationCategory;
 import tt.lab.android.ieltspass.model.Word;
 import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,10 +22,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -60,7 +51,8 @@ public class VocabularyActivity extends FragmentActivity {
 
 	SectionBasicFragment sectionBasicFragment;
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
-	private Button btnPlayStop;
+	private Button btnPlayStopA;
+	private Button btnPlayStopB;
 	private boolean playing;
 	private MediaPlayer player;
 	private WordsDao wordsDao;
@@ -88,14 +80,15 @@ public class VocabularyActivity extends FragmentActivity {
 			TextView tvAPhoetic = (TextView) findViewById(R.id.tvAPhoetic);
 			TextView tvBPhoetic = (TextView) findViewById(R.id.tvBPhoetic);
 			TextView textViewDate = (TextView) findViewById(R.id.textViewDate);
-			btnPlayStop = (Button) findViewById(R.id.btnPlay);
+			btnPlayStopA = (Button) findViewById(R.id.btnPlayA);
+			btnPlayStopB = (Button) findViewById(R.id.btnPlayB);
 			
 			
 			textViewTitle.setText(word.getWord_vocabulary());
-			tvBPhoetic.setText(word.getBE_phonetic_symbol());
 			tvAPhoetic.setText(word.getAE_phonetic_symbol());
+			tvBPhoetic.setText(word.getBE_phonetic_symbol());
 			textViewDate.setText(word.getCategory());
-			btnPlayStop.setOnClickListener(new OnClickListener() {
+			btnPlayStopA.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					if (playing) {
@@ -103,6 +96,14 @@ public class VocabularyActivity extends FragmentActivity {
 					} else {
 						startPlaying();
 					}
+				}
+			});
+			btnPlayStopB.setOnClickListener( new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					
 				}
 			});
 			
@@ -118,6 +119,7 @@ public class VocabularyActivity extends FragmentActivity {
 	private void initFragement() {
 		sectionBasicFragment = new SectionBasicFragment();
 		sectionBasicFragment.setWord(word);
+		sectionBasicFragment.setWordsDao(wordsDao);
 		pagerItemList.add(sectionBasicFragment);
 
 		DummySectionFragment fragment = new DummySectionFragment();
@@ -176,9 +178,9 @@ public class VocabularyActivity extends FragmentActivity {
 
 	private void refreshButtonText() {
 		if (playing) {
-			btnPlayStop.setText("Stop");
+			btnPlayStopA.setText("Stop");
 		} else {
-			btnPlayStop.setText("Start");
+			btnPlayStopA.setText("Start");
 		}
 	}
 
@@ -336,30 +338,57 @@ public class VocabularyActivity extends FragmentActivity {
 	 * 
 	 */
 	public static class SectionBasicFragment extends Fragment {
+		private WordsDao wordsDao;
 		private Word word;
+		private List<Explanation> workdExplains = new ArrayList<Explanation>();
 
 		/**
 		 * The fragment argument representing the section number for this fragment.
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
 
+		
+		
 		public SectionBasicFragment() {
 		}
 
 		public void setWord(Word word) {
 			this.word = word;
+		}
 
+		public void setWordsDao(WordsDao wordsDao) {
+			this.wordsDao = wordsDao;
 		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			workdExplains = wordsDao.getExplanationsForSingleWordByCategory(word.getWord_vocabulary(), ExplanationCategory.CHINESE);
 
+			
 			View rootView = inflater.inflate(R.layout.fragment_vocabulary_section_basic, container, false);
 			TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
 			TextView textView1 = (TextView) rootView.findViewById(R.id.titleText);
 			TextView textView2 = (TextView) rootView.findViewById(R.id.textView2);
 			TextView textView3 = (TextView) rootView.findViewById(R.id.duration);
-			textView1.setText("1");
+			
+			if (workdExplains.size() > 0) {
+				Explanation explanation = workdExplains.get(0);
+				textView1.setText(explanation.getPart_of_speech() + " " + explanation.getContent());
+			} else {
+				textView1.setText("");
+			}
+			if (workdExplains.size() > 1) {
+				Explanation explanation = workdExplains.get(1);
+				textView2.setText(explanation.getPart_of_speech() + " " +explanation.getContent());
+			} else {
+				textView2.setText("");
+			}
+			if (workdExplains.size() > 2) {
+				Explanation explanation = workdExplains.get(2);
+				textView3.setText(explanation.getPart_of_speech() + " " +explanation.getContent());
+			} else {
+				textView3.setText("");
+			}
 //			if (word == null) {
 //				
 //			} else {
