@@ -1,6 +1,11 @@
 package tt.lab.android.ieltspass.activity;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -52,10 +57,10 @@ public class SpeakingActivity extends FragmentActivity {
 	private boolean recording;
 	private SeekBar seekBar;
 	private Handler handler = new Handler();
-	private String currentAudio;
+	private File currentAudio;
 
 	private long recordingStart;
-	private long MAX_RECORDING_LENGTH = 1000+1000 * 60*5;//最长5分钟
+	private long MAX_RECORDING_LENGTH = 1000 + 1000 * 60 * 5;// 最长5分钟
 	private SpeakingFragmentRecordings fragmentRecordings;
 	/**
 	 * The {@link ViewPager} that will host the section contents.
@@ -141,45 +146,56 @@ public class SpeakingActivity extends FragmentActivity {
 				Logger.i(TAG, "recording O: " + recording);
 			}
 
-			private void startRecording() throws IOException {
-				Logger.i(TAG, "recording start");
-				recordingStart = System.currentTimeMillis();
-				resetPlayerControls();
-				String path = Constants.SPEAKING_AUDIO_PATH + "/" + name;
-				Utilities.ensurePath(path);
-				currentAudio = path + "/" + Utilities.getRecordingFileName() + ".amr";
-				recorder = new MediaRecorder();
-				recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-				recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-				recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-				recorder.setOutputFile(currentAudio);
-				recorder.prepare();
-				recorder.start();
-				handler.post(updateDurationThread);
-				recording = true;
-				
-				btnRecordStop.setBackgroundDrawable(getResources().getDrawable(R.drawable.recordpausebutton));
-			}
-
-			
 		});
 
 		currentPosition = (TextView) findViewById(R.id.currentPosition1);
 		percentage = (TextView) findViewById(R.id.percentage1);
 		duration = (TextView) findViewById(R.id.duration1);
 	}
-	
+
+	private void startRecording() throws IOException {
+		Logger.i(TAG, "recording start");
+		recordingStart = System.currentTimeMillis();
+		resetPlayerControls();
+		String path = Constants.SPEAKING_AUDIO_PATH + "/" + name;
+		Utilities.ensurePath(path);
+
+		currentAudio = new File(path + "/" + Utilities.getRecordingFileName() + ".amr");
+		recorder = new MediaRecorder();
+		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+		recorder.setOutputFile(currentAudio.getAbsolutePath());
+		recorder.prepare();
+		recorder.start();
+		handler.post(updateDurationThread);
+		recording = true;
+
+		btnRecordStop.setBackgroundDrawable(getResources().getDrawable(R.drawable.recordpausebutton));
+	}
+
 	private void stopRecording() {
 		Logger.i(TAG, "recording stop");
-		recorder.stop();
-		recorder.release();
-		recorder = null;
-		recording = false;
-		resetPlayer(currentAudio, false);
-		fragmentRecordings.refreshListView();
-		handler.removeCallbacks(updateDurationThread);
-		btnRecordStop.setBackgroundDrawable(getResources().getDrawable(R.drawable.recordbutton));
+		if (recording) {
+			recorder.stop();
+			recorder.release();
+			recorder = null;
+			recording = false;
+			resetPlayer(currentAudio.getAbsolutePath(), false);
+			handler.removeCallbacks(updateDurationThread);
+			btnRecordStop.setBackgroundDrawable(getResources().getDrawable(R.drawable.recordbutton));
+			write(currentAudio.getName(), recordingStart, (int) (System.currentTimeMillis() - recordingStart));
+			fragmentRecordings.refreshListView();
+		}
 	}
+
+	private void write(String name, long start, int length) {
+		String s = Utilities.formatTimeLong(start) + "\t" + Utilities.formatTimeSecond(length) + "\t" + name;
+		String currentAudioLog = currentAudio.getAbsolutePath().replace("amr", "t");
+		Utilities.writeFile(currentAudioLog, s);
+
+	}
+
 	private void initPlayer() {
 		player = new MediaPlayer();
 		player.setOnPreparedListener(new OnPreparedListener() {
@@ -241,7 +257,7 @@ public class SpeakingActivity extends FragmentActivity {
 		if (!recording) {// 不在录音状态
 
 			this.autoStart = autoStart;
-			currentAudio = url;
+			// currentAudio = new File(url);
 			try {
 				player.reset();
 				percentage.setText("Setting");
@@ -289,7 +305,7 @@ public class SpeakingActivity extends FragmentActivity {
 				/* 发生错误时也解除资源与MediaPlayer的赋值 */
 				player.pause();
 				// tv.setText("播放发生异常!");
-				
+
 			}
 			handler.removeCallbacks(updateProgressThread);
 			refreshButtonText();
@@ -304,15 +320,12 @@ public class SpeakingActivity extends FragmentActivity {
 		// Logger.i(TAG, "release I");
 		try {
 			if (player != null) {
-				
 				player.release();
-				
-				// Logger.i(TAG, "release: 3: ");
 			}
 			refreshButtonText();
 			handler.removeCallbacks(updateProgressThread);
 		} catch (Exception e) {
-			Logger.i(TAG, "release: E: " + e.getMessage());
+			Logger.i(TAG, "release: E: " + e);
 			e.printStackTrace();
 		}
 	}
@@ -429,6 +442,7 @@ public class SpeakingActivity extends FragmentActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			release();
+			stopRecording();
 		}
 		return super.onKeyDown(keyCode, event);
 	}
