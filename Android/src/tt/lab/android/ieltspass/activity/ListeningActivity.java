@@ -131,16 +131,14 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void initFragement() {
+		ListeningFragmentLyrics fragmentLyrics = new ListeningFragmentLyrics();
+		fragmentLyrics.setPlayer(player, seekBar, lyrics);
+		pagerItemList.add(fragmentLyrics);
+		
 		ListeningFragmentQuestions fragmentQuestions = new ListeningFragmentQuestions();
 		fragmentQuestions.setQuestions(questions);
 		pagerItemList.add(fragmentQuestions);
 
-		ListeningFragmentLyrics fragmentLyrics = new ListeningFragmentLyrics();
-		// Bundle args = new Bundle();
-		// args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 1);
-		// fragmentLyrics.setArguments(args);
-		fragmentLyrics.setPlayer(player, seekBar, lyrics);
-		pagerItemList.add(fragmentLyrics);
 
 		ListeningFragmentAnswers fragmentAnswers = new ListeningFragmentAnswers();
 		fragmentAnswers.setAnswers(answers);
@@ -476,9 +474,9 @@ public class ListeningActivity extends FragmentActivity {
 			Locale l = Locale.getDefault();
 			switch (position) {
 			case 0:
-				return getString(R.string.title_listening_section1).toUpperCase(l);
-			case 1:
 				return getString(R.string.title_listening_section2).toUpperCase(l);
+			case 1:
+				return getString(R.string.title_listening_section1).toUpperCase(l);
 			case 2:
 				return getString(R.string.title_listening_section3).toUpperCase(l);
 			}

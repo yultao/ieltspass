@@ -155,6 +155,7 @@ public class CenterFragmentLSRW extends Fragment {
 				switch (lsrwItem.getType()) {
 				case 0:
 					intent.setClass(getActivity(), ListeningActivity.class);
+					intent.putExtra("name", lsrwItem.getName());
 					intent.putExtra("title", lsrwItem.getTitle());
 					intent.putExtra("type", lsrwItem.getType());
 					intent.putExtra("audio", lsrwItem.getAudio());
@@ -164,6 +165,7 @@ public class CenterFragmentLSRW extends Fragment {
 					break;
 				case 1:
 					intent.setClass(getActivity(), SpeakingActivity.class);
+					intent.putExtra("name", lsrwItem.getName());
 					intent.putExtra("title", lsrwItem.getTitle());
 					intent.putExtra("type", lsrwItem.getType());
 					intent.putExtra("questions", lsrwItem.getQuestions());
@@ -171,6 +173,7 @@ public class CenterFragmentLSRW extends Fragment {
 					break;
 				case 2:
 					intent.setClass(getActivity(), ReadingActivity.class);
+					intent.putExtra("name", lsrwItem.getName());
 					intent.putExtra("title", lsrwItem.getTitle());
 					intent.putExtra("type", lsrwItem.getType());
 					intent.putExtra("questions", lsrwItem.getQuestions());
@@ -178,6 +181,7 @@ public class CenterFragmentLSRW extends Fragment {
 					break;
 				case 3:
 					intent.setClass(getActivity(), WritingActivity.class);
+					intent.putExtra("name", lsrwItem.getName());
 					intent.putExtra("title", lsrwItem.getTitle());
 					intent.putExtra("type", lsrwItem.getType());
 					intent.putExtra("questions", lsrwItem.getQuestions());
@@ -274,6 +278,7 @@ public class CenterFragmentLSRW extends Fragment {
 				lsrwItem.setAnswers(name + ".A.html");
 				lsrwItem.setAudio(name + ".mp3");
 				lsrwItem.setLyrics(name + ".lrc");
+				lsrwItem.setName(name);
 				listeningItems[j * 4 + k] = lsrwItem;
 			}
 		}
