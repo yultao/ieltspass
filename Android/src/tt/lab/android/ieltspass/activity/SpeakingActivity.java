@@ -55,7 +55,7 @@ public class SpeakingActivity extends FragmentActivity {
 	private String currentAudio;
 
 	private long recordingStart;
-	private long MAX_RECORDING_LENGTH = 1000 * 60*5;//最长5分钟
+	private long MAX_RECORDING_LENGTH = 1000+1000 * 60*5;//最长5分钟
 	private SpeakingFragmentRecordings fragmentRecordings;
 	/**
 	 * The {@link ViewPager} that will host the section contents.
