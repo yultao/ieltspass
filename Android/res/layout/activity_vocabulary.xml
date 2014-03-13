@@ -156,11 +156,6 @@
 	            android:text="Start" />
 	    </LinearLayout>
 
-         <RatingBar
-             android:id="@+id/ratingBar1"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"/>
-
     </LinearLayout>
 
     <!-- This title strip will display the currently visible page title, as well as the page titles for adjacent pages. -->
