@@ -13,6 +13,7 @@ import tt.lab.android.ieltspass.model.ExplanationCategory;
 import tt.lab.android.ieltspass.model.Word;
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -54,7 +55,7 @@ public class VocabularyActivity extends FragmentActivity {
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private Button btnPlayStopA;
 	private Button btnPlayStopB;
-	private boolean playing;
+	private Button btnFamiliar;
 	private AudioPlayer player = new AudioPlayer();
 	private WordsDao wordsDao;
 
@@ -76,12 +77,19 @@ public class VocabularyActivity extends FragmentActivity {
 		wordsDao = new WordsDao(this.getApplicationContext());
 		
 		initTitle();
+		
+
+		initFragement();
+	}
+	
+	private void initData() {
 		try {
 			TextView textViewTitle = (TextView) findViewById(R.id.textViewTitle);
 			TextView tvAPhoetic = (TextView) findViewById(R.id.tvAPhoetic);
 			TextView tvBPhoetic = (TextView) findViewById(R.id.tvBPhoetic);
 			btnPlayStopA = (Button) findViewById(R.id.btnPlayA);
 			btnPlayStopB = (Button) findViewById(R.id.btnPlayB);
+			btnFamiliar = (Button)findViewById(R.id.btnFamiliar);			
 						
 			textViewTitle.setText(word.getWord_vocabulary());
 			tvAPhoetic.setText(word.getAE_phonetic_symbol());
@@ -100,14 +108,27 @@ public class VocabularyActivity extends FragmentActivity {
 					play(btnPlayStopB, word.getBE_sound());
 				}
 			});
+			btnFamiliar.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
 			
+			if (word.getFamiliarity() == 0) {
+				btnFamiliar.setBackgroundColor(Color.CYAN);
+			} else if (word.getFamiliarity() == 1) {
+				btnFamiliar.setBackgroundColor(Color.BLUE);
+			} else if (word.getFamiliarity() == 2) {
+				btnFamiliar.setBackgroundColor(Color.GREEN);
+			}
 
 		} catch (Exception e) {
 			Logger.i(TAG, "Exception: " + e.getMessage());
 			e.printStackTrace();
 		}
-
-		initFragement();
 	}
 
 	private void initFragement() {
@@ -171,14 +192,6 @@ public class VocabularyActivity extends FragmentActivity {
 	private void navigateUp() {
 		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
 	}
-
-	private void refreshButtonText() {
-		if (playing) {
-			btnPlayStopA.setText("Stop");
-		} else {
-			btnPlayStopA.setText("Start");
-		}
-	}
 	
 	public static class AudioPlayer {
 		private MediaPlayer player;
@@ -196,15 +209,10 @@ public class VocabularyActivity extends FragmentActivity {
 						/*
 						 * 解除资源与MediaPlayer的赋值关系 让资源可以为其它程序利用
 						 */
-						player.release();
-						/* 改变TextView为播放结束 */
-						// tv.setText("音乐播发结束!");
 
 					} catch (Exception e) {
-						// tv.setText(e.toString());
 						e.printStackTrace();
 					}
-					//refreshButtonText();
 				}
 			});
 
@@ -216,12 +224,9 @@ public class VocabularyActivity extends FragmentActivity {
 					try {
 						/* 发生错误时也解除资源与MediaPlayer的赋值 */
 						player.release();
-						// tv.setText("播放发生异常!");
 					} catch (Exception e) {
-						// tv.setText(e.toString());
 						e.printStackTrace();
 					}
-					//refreshButtonText();
 					return false;
 				}
 			});
@@ -231,20 +236,15 @@ public class VocabularyActivity extends FragmentActivity {
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					player.start();
-					//playing = true;
 				}
 			});
 		}
 		
 		public void play(String url) {			
-			stop();
-			
-			//Logger.i(this.getClass().getName(), "Playing " + file.getAbsolutePath());
 			try {
 				player.reset();
 				player.setDataSource(url);
 				player.prepareAsync();
-				//refreshButtonText();
 			} catch (Exception e) {
 				Logger.i(this.getClass().getName(), "Exception: " + e.getMessage());
 				e.printStackTrace();
@@ -255,8 +255,7 @@ public class VocabularyActivity extends FragmentActivity {
 			try {
 				/* 发生错误时也解除资源与MediaPlayer的赋值 */
 				if (player != null)
-					player.release();
-				// tv.setText("播放发生异常!");
+					player.stop();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

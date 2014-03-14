@@ -82,81 +82,96 @@
             android:layout_alignBottom="@+id/textViewTitle"
             android:layout_alignParentRight="true"
             android:textColor="#888888" />
-    </RelativeLayout>
+    </RelativeLayout> 
     -->
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/basic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/title"
-        android:orientation="vertical" >
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" 
-            android:orientation="horizontal">
+        android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/textViewTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="10dp"
-                android:text=" aa  aaa aaa "
-                android:textSize="22dp"
-                android:textStyle="bold" />
-            
-        </RelativeLayout>
-        
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" 
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/lblAP"
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textViewTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:paddingLeft="10dp"
+                    android:text=" aa  aaa aaa "
+                    android:textSize="22dp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="美音"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/tvAPhoetic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#888888" />
-            
-	        <Button
-	            android:id="@+id/btnPlayA"
-	            android:layout_width="36dp"
-	            android:layout_height="29dp"
-	            android:text="Start" />
-	       
-	        <TextView
-	            android:id="@+id/lblBP"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:paddingLeft="10dp"
-	            android:text="英音"
-	            android:textAppearance="?android:attr/textAppearanceSmall" />
-	        
-	        <TextView
-	            android:id="@+id/tvBPhoetic"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:textColor="#888888" />
-        
-	        <Button
-	            android:id="@+id/btnPlayB"
-	            android:layout_width="31dp"
-	            android:layout_height="31dp"
-	            android:text="Start" />
-	    </LinearLayout>
+                <TextView
+                    android:id="@+id/lblAP"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:text="美音"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/tvAPhoetic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#888888" />
+
+                <Button
+                    android:id="@+id/btnPlayA"
+                    android:layout_width="36dp"
+                    android:layout_height="29dp"
+                    android:text="Start" />
+
+                <TextView
+                    android:id="@+id/lblBP"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:text="英音"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <TextView
+                    android:id="@+id/tvBPhoetic"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#888888" />
+
+                <Button
+                    android:id="@+id/btnPlayB"
+                    android:layout_width="31dp"
+                    android:layout_height="31dp"
+                    android:text="Start" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnFamiliar"
+            android:layout_width="15dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="1dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true" />
+
+    </RelativeLayout>
 
     <!-- This title strip will display the currently visible page title, as well as the page titles for adjacent pages. -->
 
