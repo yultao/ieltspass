@@ -12,16 +12,12 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.model.Lyrics;
 import tt.lab.android.ieltspass.model.Sentence;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 public class Utilities {
 	public static ConnectivityManager connectivityManager;
@@ -30,11 +26,11 @@ public class Utilities {
 	public static void main(String args[]) {
 		parseTime("03:02:01.83");
 	}
-	
+
 	public static String getRecordingFileName() {
 		return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 	}
-	
+
 	public static String getFormatedDate() {
 		return getFormatedDate(new Date());
 	}
@@ -44,7 +40,7 @@ public class Utilities {
 			return null;
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
 	}
-	
+
 	public static int parseTime(String time) {
 		// Logger.i(TAG, "parseTime I: " + time);
 		// 03:02:01.83
@@ -131,45 +127,42 @@ public class Utilities {
 	public static Lyrics parseLyrics(String lyricsName) {
 		Lyrics lyrics = new Lyrics();
 		try {
-			String path = Constants.LISTENING_AUDIO_PATH + "/" + lyricsName;
-			File f = new File(path);
-			if (f.exists()) {
-				InputStream is = new FileInputStream(f);
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-				String s = null;
-				Sentence previousSentence = null;
-				// int index = 0;
-				while ((s = bufferedReader.readLine()) != null) {
-					try {
-						String ss = s.trim();
-						if (ss.length() != 0 && ss.startsWith("[")) {
-							// [02:01.83]我却受控在你手里
-							// [02:06.44]
-							String time = ss.substring(ss.indexOf("[") + 1, ss.indexOf("]"));
-							String text = ss.substring(ss.indexOf("]") + 1).trim();
-							Sentence sentence = new Sentence();
-							sentence.setIndex(lyrics.getSentenceCount());
-							sentence.setRaw(ss);
-							sentence.setStart(Utilities.parseTime(time));
-							sentence.setTime(time.substring(0, time.indexOf(".")));// remove milliseconds
-							sentence.setText(text);
-							if (previousSentence != null) {
-								previousSentence.setNextSentence(sentence);
-							}
-
-							lyrics.addSentence(sentence);
-							previousSentence = sentence;
+			String path = Constants.LISTENING_LYRICS_PATH + "/" + lyricsName;
+			InputStream is = Constants.assetManager.open(path);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+			String s = null;
+			Sentence previousSentence = null;
+			// int index = 0;
+			while ((s = bufferedReader.readLine()) != null) {
+				try {
+					String ss = s.trim();
+					if (ss.length() != 0 && ss.startsWith("[")) {
+						// [02:01.83]我却受控在你手里
+						// [02:06.44]
+						String time = ss.substring(ss.indexOf("[") + 1, ss.indexOf("]"));
+						String text = ss.substring(ss.indexOf("]") + 1).trim();
+						Sentence sentence = new Sentence();
+						sentence.setIndex(lyrics.getSentenceCount());
+						sentence.setRaw(ss);
+						sentence.setStart(Utilities.parseTime(time));
+						sentence.setTime(time.substring(0, time.indexOf(".")));// remove milliseconds
+						sentence.setText(text);
+						if (previousSentence != null) {
+							previousSentence.setNextSentence(sentence);
 						}
-					} catch (Exception e) {
-						Logger.i(TAG, "parseLyrics E: " + e.getMessage());
+
+						lyrics.addSentence(sentence);
+						previousSentence = sentence;
 					}
+				} catch (Exception e) {
+					Logger.i(TAG, "parseLyrics E: " + e.getMessage());
 				}
-				is.close();
-				bufferedReader.close();
 			}
+			is.close();
+			bufferedReader.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-			Logger.i(TAG, "parseLyrics Exception: " + e.getMessage());
+			Logger.i(TAG, "parseLyrics E: " + e);
 		}
 		return lyrics;
 	}
@@ -262,7 +255,7 @@ public class Utilities {
 	}
 
 	public static boolean isWifiConnected() {
-		
+
 		NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 		if (networkInfo != null) {
 			return networkInfo.isConnected();
@@ -285,21 +278,21 @@ public class Utilities {
 		}
 		return -1;
 	}
-	
 
 	/**
-	 * TODO 
+	 * TODO
+	 * 
 	 * @param picurl
 	 * @return
 	 */
-	public static String getTinyPic(String picurl){
+	public static String getTinyPic(String picurl) {
 		String url = null;
 		boolean local = false;
-		if(picurl!=null){
-			String filename = picurl.substring(picurl.lastIndexOf("/")+1);
-			File file = new File(Constants.VOCABULARY_IMAGE_PATH+"/"+filename);
+		if (picurl != null) {
+			String filename = picurl.substring(picurl.lastIndexOf("/") + 1);
+			File file = new File(Constants.VOCABULARY_IMAGE_PATH + "/" + filename);
 			local = file.exists();
-			if(local){
+			if (local) {
 				url = file.getAbsolutePath();
 			} else {
 				url = picurl;
@@ -307,7 +300,7 @@ public class Utilities {
 		}
 		return url;
 	}
-	
+
 	public static void ensurePath(String path) {
 		File dir = new File(path);
 		if (!dir.exists()) {

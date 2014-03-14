@@ -3,22 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff" >
-
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:text=""
-        android:textColor="@color/blue"
-        android:textSize="40sp" />
-<!--
-
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" 
-  -->
     <ListView
         android:id="@+id/listView1"
         android:layout_width="match_parent"

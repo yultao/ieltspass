@@ -203,7 +203,9 @@ public class ListeningActivity extends FragmentActivity {
 		boolean fromLocal = file.exists();
 		String url = fromLocal ? file.getAbsolutePath() : "http://taog.ueuo.com/" + audio;
 		if (checkNetwork(fromLocal)) {
-			new DownloadAsyncTask(seekBar, url).execute();
+			if(!fromLocal){
+				new DownloadAsyncTask(seekBar, url).execute();
+			}
 			// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
 			// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 			player = new MediaPlayer();

@@ -157,7 +157,7 @@ public class SpeakingFragmentRecordings extends Fragment {
 				}
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "listAudios E: " + e);
+			Logger.i(TAG, "listAudios: " + e);
 		}
 		Logger.i(TAG, "listAudios: " + data.size());
 		return data;

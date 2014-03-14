@@ -25,6 +25,7 @@ public class Word {
     private String part_of_speech;
     private String explanation;
     private String tinyPic;
+    private int familiarity;
     
     
 
@@ -179,4 +180,12 @@ public class Word {
 	public void setExplanation(String explanation) {
 		this.explanation = explanation;
 	}
+
+    public int getFamiliarity() {
+        return familiarity;
+    }
+
+    public void setFamiliarity(int familiarity) {
+        this.familiarity = familiarity;
+    }
 }

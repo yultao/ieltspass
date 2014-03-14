@@ -315,6 +315,3 @@ public class WordsDao {
     }
 
 }
-
-
-
