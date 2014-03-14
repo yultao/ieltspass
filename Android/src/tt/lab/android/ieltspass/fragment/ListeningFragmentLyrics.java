@@ -151,6 +151,7 @@ public class ListeningFragmentLyrics extends Fragment {
 		textView.setLayoutParams(lp);
 		textView.setTextSize(18);
 		textView.setText(text);
+		textView.setPadding(10, 4, 10, 4);
 		textView.setBackgroundDrawable(getResources().getDrawable(R.drawable.lyrics_background));
 
 		return textView;
