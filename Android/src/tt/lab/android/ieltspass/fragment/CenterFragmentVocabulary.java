@@ -198,7 +198,7 @@ public class CenterFragmentVocabulary extends Fragment {
 	}
 
 	private void initFilterSpinner() {
-		final String[] filters = { "全部", "1.很生", "2.较生", "3.一般", "4.较熟", "5.很熟" };
+		final String[] filters = { "0.全部", "1.很生", "2.较生", "3.一般", "4.较熟", "5.很熟" };
 		filterSpinner = (Spinner) view.findViewById(R.id.spinner2);
 		ArrayAdapter<String> filtersArrayAdapter = new ArrayAdapter<String>(context,
 				android.R.layout.simple_spinner_item, filters);
