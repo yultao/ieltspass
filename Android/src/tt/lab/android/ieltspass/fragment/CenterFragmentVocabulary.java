@@ -9,8 +9,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +52,8 @@ public class CenterFragmentVocabulary extends Fragment {
 	private View view;
 	private Context context;
 	private ListView listView;
+	int familarity[] = new int[]{R.drawable.category_0,R.drawable.category_1,R.drawable.category_2,R.drawable.category_3,R.drawable.category_4,R.drawable.category_5};
+
 	private SimpleAdapter simpleAdapter;
 
 	private SearchView searchView;
@@ -198,7 +198,7 @@ public class CenterFragmentVocabulary extends Fragment {
 	}
 
 	private void initFilterSpinner() {
-		final String[] filters = { "0.全部", "1.很生", "2.较生", "3.一般", "4.较熟", "5.很熟" };
+		final String[] filters = { "全部", "1.很生", "2.较生", "3.一般", "4.较熟", "5.很熟" };
 		filterSpinner = (Spinner) view.findViewById(R.id.spinner2);
 		ArrayAdapter<String> filtersArrayAdapter = new ArrayAdapter<String>(context,
 				android.R.layout.simple_spinner_item, filters);
@@ -234,8 +234,8 @@ public class CenterFragmentVocabulary extends Fragment {
 	 */
 	private void resetData() {
 		simpleAdapter = new MySimpleAdapter(context, listData, R.layout.center_fragment_vocabulary_vlist,
-				new String[] { "title", "phon", "info", "img" },
-				new int[] { R.id.title, R.id.phon, R.id.info, R.id.img });
+				new String[] { "title", "phon", "info", "img" , "fami" },
+				new int[] { R.id.title, R.id.phon, R.id.info, R.id.img, R.id.fami });
 		listView.setAdapter(simpleAdapter);
 
 		searchView.setQueryHint(listData.size() + "/" + totalCount);
@@ -252,9 +252,11 @@ public class CenterFragmentVocabulary extends Fragment {
 	}
 
 	private void query() {
+		Logger.i(TAG, "\n==================\nquery I");
 		initData();
 		resetData();
 		updateFootView();
+		Logger.i(TAG, "query O\n==================\n");
 	}
 
 	private void setSortCriteria() {
@@ -277,11 +279,11 @@ public class CenterFragmentVocabulary extends Fragment {
 				break;
 			case 3:// "生-熟"
 				orderby = "f.familiarity_class";
-				order = "desc";
+				order = "asc";
 				break;
 			case 4:// 熟-生"
 				orderby = "f.familiarity_class";
-				order = "asc";
+				order = "desc";
 				break;
 			}
 
@@ -310,15 +312,19 @@ public class CenterFragmentVocabulary extends Fragment {
 				filterSpinner.getSelectedItemPosition());
 		maxPage = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;
 
+		listWords(listData);
+		Logger.i(TAG, "listData.size: " + listData.size());
+	}
+
+	private void listWords(List<Map<String, Object>> listData) {
 		List<Word> wordList = wordsDao.getWordList(searchView.getQuery().toString(),
 				filterSpinner.getSelectedItemPosition(), orderby, order, pageSize, currentPage * pageSize);
-
 		for (Word word : wordList) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("title", word.getWord_vocabulary());
 			map.put("phon", word.getBE_phonetic_symbol());
 			map.put("info", word.getExplanation());
-			map.put("category", word.getCategory());
+			map.put("fami", String.valueOf(familarity[word.getFamiliarity()]));
 
 			if (word.getTinyPic() == null || word.getTinyPic().trim().equals("")) {
 				map.put("img", String.valueOf(R.drawable.no_pic));
@@ -328,33 +334,13 @@ public class CenterFragmentVocabulary extends Fragment {
 			}
 			listData.add(map);
 		}
-		Logger.i(TAG, "listData.size: " + listData.size());
 	}
 
 	private List<Map<String, Object>> updateData() {
 		Logger.i(TAG, "updateData I");
 		ArrayList<Map<String, Object>> cd = new ArrayList<Map<String, Object>>();
-		WordsDao wordsDao = new WordsDao(context);
-		List<Word> wordList = wordsDao.getWordList(searchView.getQuery().toString(),
-				filterSpinner.getSelectedItemPosition(), orderby, order, pageSize, currentPage * pageSize);
-		Logger.i(TAG, "updateData wordList " + wordList.size());
-		for (Word word : wordList) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("title", word.getWord_vocabulary());
-			map.put("phon", word.getBE_phonetic_symbol());
-			map.put("info", word.getExplanation());
-			map.put("category", word.getCategory());
-
-			if (word.getTinyPic() == null || word.getTinyPic().trim().equals("")) {
-				map.put("img", String.valueOf(R.drawable.no_pic));
-			} else {
-
-				map.put("img", Utilities.getTinyPic(word.getTinyPic()));
-			}
-			cd.add(map);
-		}
+		listWords(cd);
 		Logger.i(TAG, "updateData O " + listData.size());
-
 		return cd;
 	}
 
