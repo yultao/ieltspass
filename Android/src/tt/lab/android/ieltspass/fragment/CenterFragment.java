@@ -97,11 +97,11 @@ public class CenterFragment extends Fragment {
 		CenterFragmentLSRW pageLSRW = new CenterFragmentLSRW();
 		//PageFragmentLSRW pageLSRW1 = new PageFragmentLSRW();
 		//pagerItemList.add(pageLSRW1);
-		pagerItemList.add(pageDaily);
+		//pagerItemList.add(pageDaily);
 		pagerItemList.add(pageVocabulary);
 		pagerItemList.add(pageLSRW);
 		//titles.add(VOCABULARY+"m");
-		titles.add(DAILY);
+		//titles.add(DAILY);
 		titles.add(VOCABULARY);
 		titles.add(LSRW);
 		

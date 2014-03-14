@@ -24,7 +24,7 @@ public class Constants {
 	public static final String SPEAKING_AUDIO_PATH=STORAGE+"/"+ROOT_PATH+"/Speaking/Audios";
 
 	public static final String VOCABULARY_IMAGE_PATH=STORAGE+"/"+ROOT_PATH+"/Vocabulary/Images";
-	public static final String LOG_PATH=STORAGE+"/"+ROOT_PATH+"/LOG";
+	public static final String LOG_PATH=STORAGE+"/"+ROOT_PATH+"/Logs";
 	public static  AssetManager assetManager;
 	
 	public static class Preference{

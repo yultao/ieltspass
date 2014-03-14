@@ -3,15 +3,23 @@ package tt.lab.android.ieltspass;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.model.Lyrics;
 import tt.lab.android.ieltspass.model.Sentence;
 
@@ -285,7 +293,6 @@ public class Utilities {
 	 * @return
 	 */
 	public static String getTinyPic(String picurl){
-		long t1 = System.currentTimeMillis();
 		String url = null;
 		boolean local = false;
 		if(picurl!=null){
@@ -298,8 +305,6 @@ public class Utilities {
 				url = picurl;
 			}
 		}
-		long t2 = System.currentTimeMillis();
-		//Logger.i(TAG, "url "+url+", time elapsed: "+(t2-t1)+" ms.");
 		return url;
 	}
 	
@@ -307,6 +312,38 @@ public class Utilities {
 		File dir = new File(path);
 		if (!dir.exists()) {
 			dir.mkdirs();
+		}
+	}
+
+	public static String formatTimeLong(long millis) {
+		Date date = new Date(millis);
+		return getFormatedDate(date);
+	}
+
+	public static List<String> readFile(String absFileName) {
+		List<String> list = new ArrayList<String>();
+		try {
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(absFileName)));
+			String s = null;
+			while ((s = bufferedReader.readLine()) != null) {
+				list.add(s);
+			}
+			bufferedReader.close();
+		} catch (Exception e) {
+			Logger.i(TAG, "readFile E: " + e);
+			e.printStackTrace();
+		}
+		return list;
+	}
+
+	public static void writeFile(String absFileName, String s) {
+		try {
+			PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(absFileName)));
+			writer.println(s);
+			writer.close();
+		} catch (FileNotFoundException e) {
+			Logger.i(TAG, "writeFile E: " + e);
+			e.printStackTrace();
 		}
 	}
 }
