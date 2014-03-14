@@ -264,6 +264,7 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 	
 	private void play(Button invoker, String url) {
+		Logger.i(this.getClass().getName(), "play url:" + url);
 		player.play(url);
 		if (invoker.getText().equals("Start")) {
 			invoker.setText("Stop");
