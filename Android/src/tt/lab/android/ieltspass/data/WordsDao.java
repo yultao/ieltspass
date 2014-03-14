@@ -217,6 +217,8 @@ public class WordsDao {
 	            String part_of_speech = cursor.getString(i++);
 	            String explanation = cursor.getString(i++);
 	            String tinyPic = cursor.getString(i++);
+                String familiarity = cursor.getString(i++);
+                familiarity= familiarity==null?"0":familiarity;
 	            Word word = new Word();
 	            word.setWord_vocabulary(word_vocabulary);
 	            word.setBE_phonetic_symbol(BE_phonetic_symbol);
@@ -227,7 +229,7 @@ public class WordsDao {
 	            word.setIs_writing(Integer.parseInt(is_writing));
 	            word.setTinyPic(tinyPic);
 	            word.setExplanation(explanation);
-	            word.setPart_of_speech(part_of_speech);
+	            word.setFamiliarity(Integer.parseInt(familiarity));
 	            
 	            wordList.add(word);
 	            
