@@ -168,13 +168,18 @@ public class WordsDao {
         return explanationList;
     }
     
-    public int getWordListCount(String query) {
+    public int getWordListCount(String query, int familiarityClass) {
     	Logger.i(TAG, "\n");
     	long t1= System.currentTimeMillis();
     	int count = 0;
 		String sql = Database.getSql("getWordListCount");
+		String familiarityClause = getFamiliarityClause(familiarityClass);
+		sql = String.format(sql, familiarityClause);
+
+		Logger.i(TAG, "formated sql: "+sql);
     	SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
     	Cursor cursor = db.rawQuery(sql, new String[]{query+"%"});
+    	
         if (cursor.moveToNext()) {
         	count = Integer.parseInt(cursor.getString(0));
         }
@@ -184,8 +189,19 @@ public class WordsDao {
         
         return count;
     }
+
+
+	private String getFamiliarityClause(int familiarityClass) {
+		String familiarityClause = null;
+		if(familiarityClass==0){
+			familiarityClause = "and f.familiarity_class is null";
+		} else {
+			familiarityClause = "and f.familiarity_class = "+familiarityClass;
+		}
+		return familiarityClause;
+	}
     
-    public List<Word> getWordList(String query, String orderBy, String order, int count, int offset) {
+    public List<Word> getWordList(String query, int familiarityClass, String orderBy, String order, int count, int offset) {
     	ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     	ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
     	activityManager.getMemoryInfo(memoryInfo);
@@ -197,12 +213,14 @@ public class WordsDao {
     	try{
     		
     		String sql = Database.getSql("getWordList");
-    		sql = String.format(sql, orderBy, order);
-    		Logger.i(TAG, sql);
+    		String familiarityClause = getFamiliarityClause(familiarityClass);
+    		sql = String.format(sql, familiarityClause, orderBy, order);
+    		
     		SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
 	        cursor = db.rawQuery(sql, new String[]{
-	        		query+"%", 
-	        		String.valueOf(count), String.valueOf(offset)});
+	        		query+"%",
+	        		String.valueOf(count), 
+	        		String.valueOf(offset)});
 	        
 	        
 	        while (cursor.moveToNext()) {
@@ -217,6 +235,8 @@ public class WordsDao {
 	            String part_of_speech = cursor.getString(i++);
 	            String explanation = cursor.getString(i++);
 	            String tinyPic = cursor.getString(i++);
+                String familiarity = cursor.getString(i++);
+                familiarity= familiarity==null?"0":familiarity;
 	            Word word = new Word();
 	            word.setWord_vocabulary(word_vocabulary);
 	            word.setBE_phonetic_symbol(BE_phonetic_symbol);
@@ -227,7 +247,7 @@ public class WordsDao {
 	            word.setIs_writing(Integer.parseInt(is_writing));
 	            word.setTinyPic(tinyPic);
 	            word.setExplanation(explanation);
-	            word.setPart_of_speech(part_of_speech);
+	            word.setFamiliarity(Integer.parseInt(familiarity));
 	            
 	            wordList.add(word);
 	            
@@ -315,3 +335,6 @@ public class WordsDao {
     }
 
 }
+
+
+
