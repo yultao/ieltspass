@@ -127,7 +127,7 @@ public class WordsDao {
     public List<Explanation> getExplanationsForSingleWord(String word_vocabulary) {
         List<Explanation> explanationList = new ArrayList<Explanation>();
         SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
-        Cursor cursor = db.rawQuery("select * from explanations where word_vocabulary=?", new String[]{word_vocabulary});
+        Cursor cursor = db.rawQuery("select * from explanations where word_vocabulary=? order by seq, category", new String[]{word_vocabulary});
         while (cursor.moveToNext()) {
             Explanation explanation = new Explanation();
             int seq = Integer.parseInt(cursor.getString(0));

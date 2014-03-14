@@ -1,14 +1,13 @@
 package tt.lab.android.ieltspass.activity;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.data.WordsDao;
+import tt.lab.android.ieltspass.model.Example;
 import tt.lab.android.ieltspass.model.Explanation;
 import tt.lab.android.ieltspass.model.ExplanationCategory;
 import tt.lab.android.ieltspass.model.Word;
@@ -22,13 +21,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class VocabularyActivity extends FragmentActivity {
@@ -49,12 +51,11 @@ public class VocabularyActivity extends FragmentActivity {
 	ViewPager mViewPager;
 	Word word;
 
-	SectionBasicFragment sectionBasicFragment;
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
 	private Button btnPlayStopA;
 	private Button btnPlayStopB;
 	private boolean playing;
-	private MediaPlayer player;
+	private AudioPlayer player = new AudioPlayer();
 	private WordsDao wordsDao;
 
 	@Override
@@ -79,31 +80,24 @@ public class VocabularyActivity extends FragmentActivity {
 			TextView textViewTitle = (TextView) findViewById(R.id.textViewTitle);
 			TextView tvAPhoetic = (TextView) findViewById(R.id.tvAPhoetic);
 			TextView tvBPhoetic = (TextView) findViewById(R.id.tvBPhoetic);
-			//TextView textViewDate = (TextView) findViewById(R.id.textViewDate);
 			btnPlayStopA = (Button) findViewById(R.id.btnPlayA);
 			btnPlayStopB = (Button) findViewById(R.id.btnPlayB);
-			
-			
+						
 			textViewTitle.setText(word.getWord_vocabulary());
 			tvAPhoetic.setText(word.getAE_phonetic_symbol());
 			tvBPhoetic.setText(word.getBE_phonetic_symbol());
-			//textViewDate.setText(word.getCategory());
+
 			btnPlayStopA.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					if (playing) {
-						stopPlaying();
-					} else {
-						startPlaying();
-					}
+					play(btnPlayStopA, word.getAE_sound());
 				}
 			});
 			btnPlayStopB.setOnClickListener( new OnClickListener() {
 				
 				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					
+				public void onClick(View v) {					
+					play(btnPlayStopB, word.getBE_sound());
 				}
 			});
 			
@@ -117,20 +111,24 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 
 	private void initFragement() {
-		sectionBasicFragment = new SectionBasicFragment();
-		sectionBasicFragment.setWord(word);
-		sectionBasicFragment.setWordsDao(wordsDao);
-		pagerItemList.add(sectionBasicFragment);
+		SectionBasicFragment fragment = new ChineseExplanationFragment();
+		fragment.setWord(word);
+		fragment.setWordsDao(wordsDao);
+		pagerItemList.add(fragment);
 
-		DummySectionFragment fragment = new DummySectionFragment();
+		fragment = new EnglishExplanationFragment();
+		fragment.setWord(word);
+		fragment.setWordsDao(wordsDao);
 		Bundle args = new Bundle();
-		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 2);
+		args.putInt(SectionBasicFragment.ARG_SECTION_NUMBER, 2);
 		fragment.setArguments(args);
 		pagerItemList.add(fragment);
 
-		fragment = new DummySectionFragment();
+		fragment = new ExampleFragment();
+		fragment.setWord(word);
+		fragment.setWordsDao(wordsDao);
 		args = new Bundle();
-		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, 3);
+		args.putInt(SectionBasicFragment.ARG_SECTION_NUMBER, 3);
 		fragment.setArguments(args);
 		pagerItemList.add(fragment);
 	}
@@ -164,12 +162,10 @@ public class VocabularyActivity extends FragmentActivity {
 
 		Intent intent = this.getIntent();
 		Bundle bundle = intent.getExtras();
-		String string = bundle.getString("title");
-		//Map<String, Word> wordMap = Database.getWords();
-		//word = wordMap.get(string);
-		word = wordsDao.getSingleWordInfo(string);
+		String wordTitle = bundle.getString("title");
+		word = wordsDao.getSingleWordInfo(wordTitle);
 
-		title.setText(string);
+		title.setText(wordTitle);
 	}
 
 	private void navigateUp() {
@@ -183,87 +179,102 @@ public class VocabularyActivity extends FragmentActivity {
 			btnPlayStopA.setText("Start");
 		}
 	}
+	
+	public static class AudioPlayer {
+		private MediaPlayer player;
+		
+		public AudioPlayer() {
+			player = new MediaPlayer();
+			
+			/* 当MediaPlayer.OnCompletionLister会运行的Listener */
+			player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
-	private void startPlaying() {
-		String name = Constants.LISTENING_AUDIO_PATH + "/test.mp3";
-		// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
-		// am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
-		player = new MediaPlayer();
+				// @Override
+				/* 覆盖文件播出完毕事件 */
+				public void onCompletion(MediaPlayer arg0) {
+					try {
+						/*
+						 * 解除资源与MediaPlayer的赋值关系 让资源可以为其它程序利用
+						 */
+						player.release();
+						/* 改变TextView为播放结束 */
+						// tv.setText("音乐播发结束!");
 
-		/* 当MediaPlayer.OnCompletionLister会运行的Listener */
-		player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-			// @Override
-			/* 覆盖文件播出完毕事件 */
-			public void onCompletion(MediaPlayer arg0) {
-				playing = false;
-				try {
-					/*
-					 * 解除资源与MediaPlayer的赋值关系 让资源可以为其它程序利用
-					 */
-					player.release();
-					/* 改变TextView为播放结束 */
-					// tv.setText("音乐播发结束!");
-
-				} catch (Exception e) {
-					// tv.setText(e.toString());
-					e.printStackTrace();
+					} catch (Exception e) {
+						// tv.setText(e.toString());
+						e.printStackTrace();
+					}
+					//refreshButtonText();
 				}
-				refreshButtonText();
-			}
-		});
+			});
 
-		/* 当MediaPlayer.OnErrorListener会运行的Listener */
-		player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-			@Override
-			/* 覆盖错误处理事件 */
-			public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
-				playing = false;
-				try {
-					/* 发生错误时也解除资源与MediaPlayer的赋值 */
-					player.release();
-					// tv.setText("播放发生异常!");
-				} catch (Exception e) {
-					// tv.setText(e.toString());
-					e.printStackTrace();
+			/* 当MediaPlayer.OnErrorListener会运行的Listener */
+			player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+				@Override
+				/* 覆盖错误处理事件 */
+				public boolean onError(MediaPlayer arg0, int arg1, int arg2) {
+					try {
+						/* 发生错误时也解除资源与MediaPlayer的赋值 */
+						player.release();
+						// tv.setText("播放发生异常!");
+					} catch (Exception e) {
+						// tv.setText(e.toString());
+						e.printStackTrace();
+					}
+					//refreshButtonText();
+					return false;
 				}
-				refreshButtonText();
-				return false;
-			}
-		});
-
-		File file = new File(name);
-		if (file.exists()) {
-			Logger.i(this.getClass().getName(), "Playing " + file.getAbsolutePath());
+			});
+			
+			player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+				
+				@Override
+				public void onPrepared(MediaPlayer mp) {
+					player.start();
+					//playing = true;
+				}
+			});
+		}
+		
+		public void play(String url) {			
+			stop();
+			
+			//Logger.i(this.getClass().getName(), "Playing " + file.getAbsolutePath());
 			try {
 				player.reset();
-				player.setDataSource(file.getAbsolutePath());
-				player.prepare();
-				player.start();
-				playing = true;
-				refreshButtonText();
+				player.setDataSource(url);
+				player.prepareAsync();
+				//refreshButtonText();
 			} catch (Exception e) {
 				Logger.i(this.getClass().getName(), "Exception: " + e.getMessage());
 				e.printStackTrace();
+			}			
+		}
+		
+		public void stop() {
+			try {
+				/* 发生错误时也解除资源与MediaPlayer的赋值 */
+				if (player != null)
+					player.release();
+				// tv.setText("播放发生异常!");
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} else {
-			Logger.i(this.getClass().getName(), file.getAbsolutePath() + " does not exist.");
 		}
-		Logger.i(this.getClass().getName(), "Release " + file.getAbsolutePath());
-
 	}
-
-	private void stopPlaying() {
-		playing = false;
-		try {
-			/* 发生错误时也解除资源与MediaPlayer的赋值 */
-			if (player != null)
-				player.release();
-			// tv.setText("播放发生异常!");
-		} catch (Exception e) {
-			e.printStackTrace();
+	
+	private void play(Button invoker, String url) {
+		player.play(url);
+		if (invoker.getText().equals("Start")) {
+			invoker.setText("Stop");
+		} else {
+			invoker.setText("Start");
 		}
-		refreshButtonText();
+	}
+	
+	private void stop() {
+		btnPlayStopA.setText("Start");
+		btnPlayStopB.setText("Start");
 	}
 
 	@Override
@@ -322,7 +333,7 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 
 	private void back() {
-		stopPlaying();
+		stop();
 	}
 
 	@Override
@@ -337,18 +348,15 @@ public class VocabularyActivity extends FragmentActivity {
 	 * @author taog
 	 * 
 	 */
-	public static class SectionBasicFragment extends Fragment {
-		private WordsDao wordsDao;
-		private Word word;
-		private List<Explanation> workdExplains = new ArrayList<Explanation>();
+	public static abstract class SectionBasicFragment extends Fragment {
+		protected WordsDao wordsDao;
+		protected Word word;
 
 		/**
 		 * The fragment argument representing the section number for this fragment.
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
 
-		
-		
 		public SectionBasicFragment() {
 		}
 
@@ -362,69 +370,86 @@ public class VocabularyActivity extends FragmentActivity {
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			workdExplains = wordsDao.getExplanationsForSingleWordByCategory(word.getWord_vocabulary(), ExplanationCategory.CHINESE);
-
-			
 			View rootView = inflater.inflate(R.layout.fragment_vocabulary_section_basic, container, false);
-			TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-			TextView textView1 = (TextView) rootView.findViewById(R.id.titleText);
-			TextView textView2 = (TextView) rootView.findViewById(R.id.textView2);
-			TextView textView3 = (TextView) rootView.findViewById(R.id.duration);
-			
-			if (workdExplains.size() > 0) {
-				Explanation explanation = workdExplains.get(0);
-				textView1.setText(explanation.getPart_of_speech() + " " + explanation.getContent());
-			} else {
-				textView1.setText("");
-			}
-			if (workdExplains.size() > 1) {
-				Explanation explanation = workdExplains.get(1);
-				textView2.setText(explanation.getPart_of_speech() + " " +explanation.getContent());
-			} else {
-				textView2.setText("");
-			}
-			if (workdExplains.size() > 2) {
-				Explanation explanation = workdExplains.get(2);
-				textView3.setText(explanation.getPart_of_speech() + " " +explanation.getContent());
-			} else {
-				textView3.setText("");
-			}
-//			if (word == null) {
-//				
-//			} else {
-//
-//				dummyTextView.setText(word.);
-//
-//				textView1.setText(word.getPhoneticSymbol());
-//
-//				textView2.setText(word.getDate());
-//
-//				textView3.setText(word.getExplanation());
-//			}
+			buildContent(rootView, container, savedInstanceState);
 			return rootView;
+		}
+		
+		public abstract void buildContent(View rootView, ViewGroup container, Bundle savedInstanceState);
+		
+		protected TextView createTextView() {
+			AbsListView.LayoutParams lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			TextView textView = new TextView(SectionBasicFragment.this.getActivity());
+			textView.setLayoutParams(lp);
+			textView.setGravity(Gravity.CENTER_VERTICAL);
+			textView.setPadding(10, 0, 0, 0);
+			textView.setTextSize(15);
+			
+			return textView;
 		}
 
 	}
-
-	/**
-	 * A dummy fragment representing a section of the app, but that simply displays dummy text.
-	 */
-	public static class DummySectionFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this fragment.
-		 */
-		public static final String ARG_SECTION_NUMBER = "section_number";
-
-		public DummySectionFragment() {
-		}
+	
+	public static class ChineseExplanationFragment extends SectionBasicFragment {
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_vocabulary_dummy, container, false);
-			TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-			dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-			return rootView;
+		public void buildContent(View rootView, ViewGroup container, Bundle savedInstanceState) {
+			List<Explanation> wordExplains = wordsDao.getExplanationsForSingleWord(word.getWord_vocabulary());
+			
+			LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
+			for(Explanation explanation : wordExplains) {
+				if (explanation.getCategory().equalsIgnoreCase(ExplanationCategory.BASIC.name())) {
+					TextView tv = createTextView();
+					tv.setText(explanation.getPart_of_speech() + " " + explanation.getContent());
+					layout.addView(tv);
+				} else if (explanation.getCategory().equalsIgnoreCase(ExplanationCategory.CHINESE.name())) {
+					TextView tv = createTextView();
+					tv.setText(explanation.getContent());
+					layout.addView(tv);
+					tv.setPadding(30, 0, 0, 10);
+				}
+			}
 		}
+		
+	}
+	
+	public static class EnglishExplanationFragment extends SectionBasicFragment {
+
+		@Override
+		public void buildContent(View rootView, ViewGroup container, Bundle savedInstanceState) {
+			List<Explanation> wordExplains = wordsDao.getExplanationsForSingleWord(word.getWord_vocabulary());
+			
+			LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
+			for(Explanation explanation : wordExplains) {
+				if (explanation.getCategory().equalsIgnoreCase(ExplanationCategory.ENGLISH.name())) {
+					TextView tv = createTextView();
+					tv.setText(explanation.getContent());
+					layout.addView(tv);
+				}
+			}			
+		}
+		
+	}
+	
+	public static class ExampleFragment extends SectionBasicFragment {
+
+		@Override
+		public void buildContent(View rootView, ViewGroup container, Bundle savedInstanceState) {
+			List<Example> examples = wordsDao.getExamplesForSingleWord(word.getWord_vocabulary());
+			
+			LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
+			for(Example example : examples) {
+				TextView tv = createTextView();
+				tv.setText(example.getSentence());
+				layout.addView(tv);
+				
+				tv = createTextView();
+				tv.setText(example.getCn_explanation());
+				layout.addView(tv);
+				tv.setPadding(tv.getPaddingLeft(), 0, 0, 10);
+			}				
+		}
+		
 	}
 
 }
