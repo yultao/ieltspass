@@ -17,5 +17,5 @@
     <string name="title_activity_speaking">SpeakingActivity</string>
     <string name="title_activity_writing">WritingActivity</string>
     <string name="title_activity_reading">ReadingActivity</string>
-
+    <string name="title_activity_settings">SettingsActivity</string>
 </resources>
