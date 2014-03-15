@@ -5,10 +5,12 @@ import android.os.Environment;
 
 public class Constants {
 	public static String SD_PATH="";
+	public static String INTERNAL_PATH="";
 	static {
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			SD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
 		}
+		Environment.getRootDirectory();
 	}
 	public static final String STORAGE = SD_PATH;//could be sd card, or something else.
 	private static final String ROOT_PATH="IELTSPASS";

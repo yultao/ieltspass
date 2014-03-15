@@ -286,18 +286,22 @@ public class Utilities {
 	 * @return
 	 */
 	public static String getTinyPic(String picurl) {
-		String url = null;
-		boolean local = false;
-		if (picurl != null) {
-			String filename = picurl.substring(picurl.lastIndexOf("/") + 1);
-			File file = new File(Constants.VOCABULARY_IMAGE_PATH + "/" + filename);
-			local = file.exists();
-			if (local) {
-				url = file.getAbsolutePath();
-			} else {
-				url = picurl;
+		//Logger.i(TAG, "getTinyPic I "+picurl);
+		String url = picurl;
+		try{
+			if (picurl != null) {
+				String filename = picurl.substring(picurl.lastIndexOf("/") + 1);
+				File file = new File(Constants.VOCABULARY_IMAGE_PATH + "/" + filename);
+				if (file.exists()) {
+					url = file.getAbsolutePath();
+				} else {
+					url = picurl;
+				}
 			}
+		} catch (Exception e){
+			Logger.i(TAG, "getTinyPic E:"+e);
 		}
+		//Logger.i(TAG, "getTinyPic O "+url);
 		return url;
 	}
 
