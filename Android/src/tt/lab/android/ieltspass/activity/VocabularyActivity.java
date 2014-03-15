@@ -22,6 +22,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -53,12 +55,13 @@ public class VocabularyActivity extends FragmentActivity {
 	Word word;
 
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
-	private Button btnPlayStopA;
-	private Button btnPlayStopB;
+	private ImageView imgPlayStopA;
+	private ImageView imgPlayStopB;
+	private ImageView imgCurrentPlaying = null;
 	private Button btnFamiliar;
-	private AudioPlayer player = new AudioPlayer();
+	private AudioPlayer player;
 	private WordsDao wordsDao;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -69,6 +72,27 @@ public class VocabularyActivity extends FragmentActivity {
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+		
+		player =  new AudioPlayer() {
+
+			@Override
+			public void handleCompletion() {
+				resetButton();				
+			}
+
+			@Override
+			public void handleError() {
+				resetButton();				
+			}
+
+			@Override
+			public void handlePrepared() {
+				if (imgCurrentPlaying != null) {
+					imgCurrentPlaying.setImageResource(R.drawable.soundon);
+				}
+			}
+			
+		};
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -83,36 +107,36 @@ public class VocabularyActivity extends FragmentActivity {
 	
 	private void initData() {
 		try {
+			
 			TextView textViewTitle = (TextView) findViewById(R.id.textViewTitle);
 			TextView tvAPhoetic = (TextView) findViewById(R.id.tvAPhoetic);
 			TextView tvBPhoetic = (TextView) findViewById(R.id.tvBPhoetic);
-			btnPlayStopA = (Button) findViewById(R.id.btnPlayA);
-			btnPlayStopB = (Button) findViewById(R.id.btnPlayB);
+			imgPlayStopA = (ImageView) findViewById(R.id.btnPlayA);
+			imgPlayStopB = (ImageView) findViewById(R.id.btnPlayB);
 			btnFamiliar = (Button)findViewById(R.id.btnFamiliar);			
 						
 			textViewTitle.setText(word.getWord_vocabulary());
 			tvAPhoetic.setText(word.getAE_phonetic_symbol());
 			tvBPhoetic.setText(word.getBE_phonetic_symbol());
 
-			btnPlayStopA.setOnClickListener(new OnClickListener() {
+			imgPlayStopA.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					play(btnPlayStopA, word.getAE_sound());
+					play(imgPlayStopA, word.getAE_sound());
 				}
 			});
-			btnPlayStopB.setOnClickListener( new OnClickListener() {
+			imgPlayStopB.setOnClickListener( new OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {					
-					play(btnPlayStopB, word.getBE_sound());
+					play(imgPlayStopB, word.getBE_sound());
 				}
 			});
 			btnFamiliar.setOnClickListener(new OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					
+					//				
 				}
 			});
 			
@@ -192,7 +216,7 @@ public class VocabularyActivity extends FragmentActivity {
 		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
 	}
 	
-	public static class AudioPlayer {
+	public static abstract class AudioPlayer {
 		private MediaPlayer player;
 		
 		public AudioPlayer() {
@@ -208,6 +232,7 @@ public class VocabularyActivity extends FragmentActivity {
 						/*
 						 * 解除资源与MediaPlayer的赋值关系 让资源可以为其它程序利用
 						 */
+						handleCompletion();
 
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -223,6 +248,7 @@ public class VocabularyActivity extends FragmentActivity {
 					try {
 						/* 发生错误时也解除资源与MediaPlayer的赋值 */
 						player.release();
+						handleError();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -235,6 +261,7 @@ public class VocabularyActivity extends FragmentActivity {
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					player.start();
+					handlePrepared();
 				}
 			});
 		}
@@ -259,21 +286,22 @@ public class VocabularyActivity extends FragmentActivity {
 				e.printStackTrace();
 			}
 		}
+		
+		public abstract void handleCompletion();
+		public abstract void handlePrepared();
+		public abstract void handleError();
 	}
 	
-	private void play(Button invoker, String url) {
-		Logger.i(this.getClass().getName(), "play url:" + url);
+	private void play(ImageView invoker, String url) {
+		//Log.v(this.getClass().getName(), "play url:" + url + invoker.getDrawable().equals(this.getApplicationContext().getResources().getDrawable(R.drawable.soundoff)));
 		player.play(url);
-		if (invoker.getText().equals("Start")) {
-			invoker.setText("Stop");
-		} else {
-			invoker.setText("Start");
-		}
+		imgCurrentPlaying = invoker;	
 	}
 	
-	private void stop() {
-		btnPlayStopA.setText("Start");
-		btnPlayStopB.setText("Start");
+	private void resetButton() {
+		imgPlayStopA.setImageResource(R.drawable.soundoff);
+		imgPlayStopB.setImageResource(R.drawable.soundoff);
+		imgCurrentPlaying = null;
 	}
 
 	@Override
@@ -332,7 +360,7 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 
 	private void back() {
-		stop();
+		resetButton();
 	}
 
 	@Override
