@@ -18,4 +18,8 @@
     <string name="title_activity_writing">WritingActivity</string>
     <string name="title_activity_reading">ReadingActivity</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_feedback">FeedbackActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="title_activity_download">DownloadActivity</string>
+
 </resources>

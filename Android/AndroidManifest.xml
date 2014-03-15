@@ -76,6 +76,18 @@
             android:name="tt.lab.android.ieltspass.activity.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
+        <activity
+            android:name="tt.lab.android.ieltspass.activity.FeedbackActivity"
+            android:label="@string/title_activity_feedback" >
+        </activity>
+        <activity
+            android:name="tt.lab.android.ieltspass.activity.AboutActivity"
+            android:label="@string/title_activity_about" >
+        </activity>
+        <activity
+            android:name="tt.lab.android.ieltspass.activity.DownloadActivity"
+            android:label="@string/title_activity_download" >
+        </activity>
     </application>
 
 </manifest>
