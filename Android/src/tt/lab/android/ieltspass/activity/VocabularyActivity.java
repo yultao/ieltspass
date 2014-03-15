@@ -77,8 +77,7 @@ public class VocabularyActivity extends FragmentActivity {
 		wordsDao = new WordsDao(this.getApplicationContext());
 		
 		initTitle();
-		
-
+		initData();
 		initFragement();
 	}
 	
