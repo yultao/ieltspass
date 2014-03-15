@@ -26,18 +26,21 @@ public class LauncherActivity extends FragmentActivity {
 	private RightFragment rightFragment;
 	private CenterFragment centerFragment;
 	private boolean isExit;
-	
+
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		setContentView(R.layout.main);
+		initApp();
+		init();
+		initListener();
+	}
+
+	private void initApp() {
 		Constants.assetManager = getAssets();
 		Utilities.ensurePath(Constants.VOCABULARY_IMAGE_PATH);
 		Utilities.ensurePath(Constants.SPEAKING_AUDIO_PATH);
-		
 		Utilities.connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-			init();
-			initListener();
 	}
 
 	private void init() {
