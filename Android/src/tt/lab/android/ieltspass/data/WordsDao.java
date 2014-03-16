@@ -189,7 +189,7 @@ public class WordsDao {
 				cursor.close();
 		}
 		long t2 = System.currentTimeMillis();
-		Logger.i(TAG, "query: " + query + ", count: " + count + ", time elapsed: " + (t2 - t1) + " ms.");
+		Logger.i(TAG, "query: " + query + ", count: " + count + ", time elapsed: " + (t2 - t1) + " ms.\n");
 
 		return count;
 	}
@@ -204,6 +204,7 @@ public class WordsDao {
 
 	public List<Word> getWordList(String query, int familiarityClass, String orderBy, String order, int count,
 			int offset) {
+		Logger.i(TAG, "getWordList: I\n");
 		ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 		ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
 		activityManager.getMemoryInfo(memoryInfo);
@@ -217,7 +218,7 @@ public class WordsDao {
 			String sql = Database.getSql("getWordList");
 			String familiarityClause = getFamiliarityClause(familiarityClass);
 			sql = String.format(sql, familiarityClause, orderBy, order);
-
+			Logger.i(TAG, "formated sql: " + sql);
 			SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
 			cursor = db.rawQuery(sql, new String[] { query + "%", String.valueOf(count), String.valueOf(offset) });
 
@@ -261,9 +262,9 @@ public class WordsDao {
 		activityManager.getMemoryInfo(memoryInfo);
 		long m2 = memoryInfo.availMem;
 
-		Logger.i(TAG, "query: " + query + ", orderby: " + orderBy + ", order: " + order + ", limit: " + count
+		Logger.i(TAG, "getWordList O: query: " + query + ", orderby: " + orderBy + ", order: " + order + ", limit: " + count
 				+ ", offset: " + offset + ", words retrived: " + wordList.size() + ", time elapsed: " + (t2 - t1)
-				+ " ms, memory consumed: " + (m1 - m2) / 1024 + "k.");
+				+ " ms, memory consumed: " + (m1 - m2) / 1024 + "k.\n");
 		return wordList;
 	}
 

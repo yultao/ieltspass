@@ -52,7 +52,8 @@ public class CenterFragmentVocabulary extends Fragment {
 	private View view;
 	private Context context;
 	private ListView listView;
-	int familarity[] = new int[]{R.drawable.category_0,R.drawable.category_1,R.drawable.category_2,R.drawable.category_3,R.drawable.category_4,R.drawable.category_5};
+	int familarity[] = new int[] { R.drawable.category_0, R.drawable.category_1, R.drawable.category_2,
+			R.drawable.category_3, R.drawable.category_4, R.drawable.category_5 };
 
 	private SimpleAdapter simpleAdapter;
 
@@ -65,13 +66,12 @@ public class CenterFragmentVocabulary extends Fragment {
 	private boolean toend = false;
 	private boolean loading;
 	private ProgressBar footerView;
-	
-	private String queryStr="";
+
+	private String queryStr = "";
 	private int familarityClass;
 	private String orderby = "random()", order = "";
 	private int totalCount, currentPage = 0, pageSize = 20, maxPage;
 	private WordsDao wordsDao;
-	
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Logger.i(TAG, "onCreateView");
@@ -82,6 +82,7 @@ public class CenterFragmentVocabulary extends Fragment {
 		// List View
 		initListView();
 		initListFootView();
+
 		// Search View
 		initSearchView();
 
@@ -90,16 +91,13 @@ public class CenterFragmentVocabulary extends Fragment {
 
 		// Filter Spinner
 		initFilterSpinner();
-		
-		
-		queryAsync();
+
+		query();
 		return view;
 	}
 
 	private void initListFootView() {
 		footerView = new ProgressBar(context);
-
-		Logger.i(TAG, "initListFootView " + footerView);
 	}
 
 	private void initListView() {
@@ -114,16 +112,17 @@ public class CenterFragmentVocabulary extends Fragment {
 
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				if (totalItemCount != 0) {
+				if (totalItemCount > 1) {//skip footview.
 					toend = (firstVisibleItem + visibleItemCount == totalItemCount);
-					
+
 					if (toend && !loading && currentPage < maxPage - 1) {
 						currentPage++;
 						// loadingText.setText("Loading "+((currentPage)*pageSize+1)+"-"+((currentPage+1)*pageSize)+"...");
 
 						// Toast.makeText(context, "第 " + currentPage +" 页  "+totalItemCount,Toast.LENGTH_LONG).show();
 						Logger.i(TAG, "Loading " + ((currentPage) * pageSize + 1) + "-"
-								+ ((currentPage + 1) * pageSize) + "toend: "+firstVisibleItem+", "+visibleItemCount+", "+totalItemCount+"...");
+								+ ((currentPage + 1) * pageSize) + "toend: " + firstVisibleItem + ", "
+								+ visibleItemCount + ", " + totalItemCount + "...");
 						loading = true;
 						new UpdateDataAsyncTask().execute();
 					}
@@ -167,7 +166,7 @@ public class CenterFragmentVocabulary extends Fragment {
 
 			@Override
 			public boolean onClose() {
-				postInitData();
+				//postInitData();
 				return false;
 			}
 
@@ -239,33 +238,46 @@ public class CenterFragmentVocabulary extends Fragment {
 	}
 	private void query() {
 		addFootView();
+		listData.clear();
+		new InitDataAsyncTask().execute();
+	}
+	private void querySync() {
+		addFootView();
 		initData();
 		postInitData();
 	}
+
+	
 	private void initData() {
 		Logger.i(TAG, "initData I");
-		try{
+		try {
 			listData.clear();
 			currentPage = 0;
 			totalCount = wordsDao.getWordListCount(queryStr, familarityClass);
 			maxPage = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;
-	
+			
 			listWords(listData);
-		} catch (Exception e){
-			Logger.i(TAG, "initData E:"+e);
+		} catch (Exception e) {
+			Logger.i(TAG, "initData E:" + e);
 		}
 		Logger.i(TAG, "initData O");
 	}
-	private void updateData() {
+
+
+	private List<Map<String, Object>> updateData() {
+		List<Map<String, Object>> listData = new ArrayList<Map<String, Object>>();
 		listWords(listData);
+		return listData;
 	}
+
 	private void postInitData() {
-		simpleAdapter = new MySimpleAdapter(context, listData, R.layout.center_fragment_vocabulary_vlist,
-				new String[] { "title", "phon", "info", "img" , "fami" },
-				new int[] { R.id.title, R.id.phon, R.id.info, R.id.img, R.id.fami });
+		simpleAdapter = new MySimpleAdapter(context, listData, R.layout.center_fragment_vocabulary_vlist, new String[] {
+				"title", "phon", "info", "img", "fami" }, new int[] { R.id.title, R.id.phon, R.id.info, R.id.img,
+				R.id.fami });
 		listView.setAdapter(simpleAdapter);
 		postRefreshData();
 	}
+
 	private void postUpdateData() {
 		simpleAdapter.notifyDataSetChanged();
 		postRefreshData();
@@ -276,12 +288,14 @@ public class CenterFragmentVocabulary extends Fragment {
 		removeFootView();
 	}
 
-	private void setQueryString(){
-		queryStr=searchView.getQuery().toString();
+	private void setQueryString() {
+		queryStr = searchView.getQuery().toString();
 	}
+
 	private void setFamilarityClass() {
 		this.familarityClass = filterSpinner.getSelectedItemPosition();
 	}
+
 	private void setSortCriteria() {
 		try {
 
@@ -309,48 +323,52 @@ public class CenterFragmentVocabulary extends Fragment {
 				break;
 			}
 
-			
-			//simpleAdapter.notifyDataSetChanged();
+			// simpleAdapter.notifyDataSetChanged();
 		} catch (Exception e) {
 			Log.e("sort", "e: " + e.getMessage());
 		}
 	}
 
-	private void addFootView(){
+	private void addFootView() {
 		if (listView.getFooterViewsCount() == 0) {
 			listView.addFooterView(footerView);
 		}
 	}
+
 	private void removeFootView() {
 		if (listData.size() == totalCount) {
 			listView.removeFooterView(footerView);
 		}
 	}
-	
-	
+
 	private void listWords(List<Map<String, Object>> listData) {
-		Logger.i(TAG, "listWords I");
-		List<Word> wordList = wordsDao.getWordList(queryStr,
-				familarityClass, orderby, order, pageSize, currentPage * pageSize);
-		for (Word word : wordList) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("title", word.getWord_vocabulary());
-			map.put("phon", word.getBE_phonetic_symbol());
-			map.put("info", word.getExplanation());
-			map.put("fami", String.valueOf(familarity[word.getFamiliarity()]));
+		Logger.i(TAG, "listWords I: "+listData.size());
+		try {
 
-			if (word.getTinyPic() == null || word.getTinyPic().trim().equals("")) {
-				map.put("img", String.valueOf(R.drawable.no_pic));
-			} else {
+			List<Word> wordList = wordsDao.getWordList(queryStr, familarityClass, orderby, order, pageSize, currentPage
+					* pageSize);
 
-				map.put("img", Utilities.getTinyPic(word.getTinyPic()));
+			for (Word word : wordList) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("title", word.getWord_vocabulary());
+				map.put("phon", word.getBE_phonetic_symbol());
+				map.put("info", word.getExplanation());
+				map.put("fami", String.valueOf(familarity[word.getFamiliarity()]));
+
+				if (word.getTinyPic() == null || word.getTinyPic().trim().equals("")) {
+					map.put("img", String.valueOf(R.drawable.no_pic));
+				} else {
+
+					map.put("img", Utilities.getTinyPic(word.getTinyPic()));
+				}
+
+				listData.add(map);
 			}
-			listData.add(map);
+		} catch (Exception e) {
+			Logger.i(TAG, "listWords E: "+e);
 		}
-		Logger.i(TAG, "listWords O");
+		Logger.i(TAG, "listWords O: "+listData.size());
 	}
-
-	
 
 	private class MySimpleAdapter extends SimpleAdapter {
 
@@ -360,43 +378,79 @@ public class CenterFragmentVocabulary extends Fragment {
 		}
 
 		public void setViewImage(ImageView v, String value) {
-			// Logger.i(TAG, "setViewImage: "+v.getId()+", "+value);
-			// 从网络下载
-			if (value != null && value.toLowerCase().startsWith("http")) {
-				if (Utilities.isWifiConnected() || (Utilities.isMobileConnected() && !Constants.Preference.onlyUseWifi)) {
-					new DownloadImageAsyncTask(v, value).execute();
+			try {
+
+				// Logger.i(TAG, "setViewImage: "+v.getId()+", "+value);
+				// 从网络下载
+				if (value != null && value.toLowerCase().startsWith("http")) {
+					if (Utilities.isWifiConnected()
+							|| (Utilities.isMobileConnected() && !Constants.Preference.onlyUseWifi)) {
+						new DownloadImageAsyncTask(v, value).execute();
+					} else {
+						super.setViewImage(v, String.valueOf(R.drawable.no_net));
+					}
+				} else if (value.startsWith("/")) {
+					// super.setViewImage(v, value);
+					// new DisplayImageAsyncTask(v, value).execute();
+					Bitmap bitmap = BitmapFactory.decodeFile(value);
+					v.setImageBitmap(bitmap);
 				} else {
-					super.setViewImage(v, String.valueOf(R.drawable.no_net));
+					super.setViewImage(v, value);// 会变小
 				}
-			} else if (value.startsWith("/")) {
-				// super.setViewImage(v, value);
-				// new DisplayImageAsyncTask(v, value).execute();
-				Bitmap bitmap = BitmapFactory.decodeFile(value);
-				v.setImageBitmap(bitmap);
-			} else {
-				super.setViewImage(v, value);// 会变小
+			} catch (Exception e) {
+				Logger.i(TAG, "setViewImage E: " + e + ", ImageView: " + v + ", value: " + value);
 			}
 		}
 
 	}
-	private class InitDataAsyncTask extends AsyncTask<Integer, Integer, String> {
+
+	private class InitDataAsyncTask1 extends AsyncTask<Integer, Integer, String> {
 		@Override
 		protected String doInBackground(Integer... arg0) {
-			Logger.i(TAG, "doInBackground I");
+			Logger.i(TAG, "InitDataAsyncTask doInBackground I");
 			initData();
-			Logger.i(TAG, "doInBackground O");
+			Logger.i(TAG, "InitDataAsyncTask doInBackground O");
 			return "DONE.";
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
-			Logger.i(TAG, "onPostExecute I");
+			Logger.i(TAG, "InitDataAsyncTask onPostExecute I");
 			try {
 				postInitData();
 			} catch (Exception e) {
-				Logger.i(TAG, "onPostExecute i E: " + e);
+				Logger.i(TAG, "InitDataAsyncTask onPostExecute E: " + e);
 			}
-			Logger.i(TAG, "onPostExecute O");
+			Logger.i(TAG, "InitDataAsyncTask onPostExecute O");
+		}
+
+	}
+	private class InitDataAsyncTask extends AsyncTask<Integer, Integer, String> {
+		private List<Map<String, Object>> updateData;
+		
+		@Override
+		protected String doInBackground(Integer... arg0) {
+			Logger.i(TAG, "InitDataAsyncTask2 doInBackground I");
+			
+			currentPage = 0;
+			totalCount = wordsDao.getWordListCount(queryStr, familarityClass);
+			maxPage = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;
+			
+			updateData = updateData();//先将查询到的数据缓存下来，等到执行完再对listData更新，否则偶尔会闪退
+			Logger.i(TAG, "InitDataAsyncTask2 doInBackground O");
+			return "DONE.";
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			Logger.i(TAG, "InitDataAsyncTask2 onPostExecute I");
+			try {
+				listData.addAll(updateData);
+				postInitData();
+			} catch (Exception e) {
+				Logger.i(TAG, "InitDataAsyncTask2 onPostExecute E: " + e);
+			}
+			Logger.i(TAG, "InitDataAsyncTask2 onPostExecute O");
 		}
 
 	}
@@ -405,20 +459,24 @@ public class CenterFragmentVocabulary extends Fragment {
 
 		@Override
 		protected String doInBackground(Integer... arg0) {
-			updateData();
+			Logger.i(TAG, "UpdateDataAsyncTask doInBackground I");
+			updateData = updateData();//先将查询到的数据缓存下来，等到执行完再对listData更新，否则偶尔会闪退
+			Logger.i(TAG, "UpdateDataAsyncTask doInBackground O");
 			return "DONE.";
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
+			Logger.i(TAG, "UpdateDataAsyncTask onPostExecute I: " + result);
 			try {
 				loading = false;
+				listData.addAll(updateData);
 				postUpdateData();
 
 			} catch (Exception e) {
-				Logger.i(TAG, "onPostExecute u E: " + e);
+				Logger.i(TAG, "UpdateDataAsyncTask onPostExecute E: " + e);
 			}
-
+			Logger.i(TAG, "UpdateDataAsyncTask onPostExecute O");
 		}
 	}
 
