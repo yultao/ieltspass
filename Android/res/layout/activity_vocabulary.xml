@@ -50,7 +50,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
-                    android:text="美音"
+                    android:text="美"
+                    android:textSize="18dp"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <TextView
@@ -61,8 +62,8 @@
 
                 <ImageView
                     android:id="@+id/btnPlayA"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:paddingLeft="3dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/soundoff" />
@@ -72,7 +73,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
-                    android:text="英音"
+                    android:text="英"
+                    android:textSize="18dp"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <TextView
@@ -84,8 +86,8 @@
 
 				<ImageView
                     android:id="@+id/btnPlayB"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:paddingLeft="3dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/soundoff" />                
@@ -94,12 +96,22 @@
 
         <Button
             android:id="@+id/btnFamiliar"
-            android:layout_width="15dp"
+            android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginTop="1dp"
             android:layout_marginBottom="1dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true" />
+        
+        <!-- <ImageView
+            android:id="@+id/btnPlayB"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="1dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/category_1" />  -->
 
     </RelativeLayout>
 
