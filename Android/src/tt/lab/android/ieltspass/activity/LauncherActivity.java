@@ -37,6 +37,7 @@ public class LauncherActivity extends FragmentActivity {
 	}
 
 	private void initApp() {
+		Constants.APP_PATH = getFilesDir().getAbsolutePath();
 		Constants.assetManager = getAssets();
 		Utilities.ensurePath(Constants.VOCABULARY_IMAGE_PATH);
 		Utilities.ensurePath(Constants.SPEAKING_AUDIO_PATH);

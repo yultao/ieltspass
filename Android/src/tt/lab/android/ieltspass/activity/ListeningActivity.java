@@ -18,6 +18,7 @@ import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.data.Database;
+import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentAnswers;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentLyrics;
@@ -316,7 +317,7 @@ public class ListeningActivity extends FragmentActivity {
 			initPlayer = true;
 		} else if (mobile) {
 			//Toast.makeText(this, "有非WIFI", Toast.LENGTH_SHORT).show();
-			if (!Constants.Preference.onlyUseWifi) {
+			if (!Settings.onlyUseWifi) {
 				initPlayer = true;
 			} else {
 				Toast.makeText(this, "仅有手机网络，不允许", Toast.LENGTH_SHORT).show();

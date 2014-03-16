@@ -5,7 +5,7 @@
     android:background="#fff" >
 
     <LinearLayout
-        android:layout_width="200dp"
+        android:layout_width="220dp"
         android:layout_height="fill_parent"
         android:background="@color/bg_color_deep"
         android:orientation="vertical" >
@@ -109,6 +109,7 @@
 
         <ListView
             android:id="@+id/listView1"
+            android:paddingLeft="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
         </ListView>

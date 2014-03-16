@@ -18,6 +18,7 @@ import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.activity.VocabularyActivity;
+import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.data.WordsDao;
 import tt.lab.android.ieltspass.model.Word;
 import android.content.Context;
@@ -238,7 +239,6 @@ public class CenterFragmentVocabulary extends Fragment {
 	}
 	private void query() {
 		addFootView();
-		listData.clear();
 		new InitDataAsyncTask().execute();
 	}
 	private void querySync() {
@@ -251,7 +251,8 @@ public class CenterFragmentVocabulary extends Fragment {
 	private void initData() {
 		Logger.i(TAG, "initData I");
 		try {
-			listData.clear();
+
+			listData = new ArrayList<Map<String, Object>>();
 			currentPage = 0;
 			totalCount = wordsDao.getWordListCount(queryStr, familarityClass);
 			maxPage = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;
@@ -384,7 +385,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				// 从网络下载
 				if (value != null && value.toLowerCase().startsWith("http")) {
 					if (Utilities.isWifiConnected()
-							|| (Utilities.isMobileConnected() && !Constants.Preference.onlyUseWifi)) {
+							|| (Utilities.isMobileConnected() && !Settings.onlyUseWifi)) {
 						new DownloadImageAsyncTask(v, value).execute();
 					} else {
 						super.setViewImage(v, String.valueOf(R.drawable.no_net));
@@ -430,27 +431,27 @@ public class CenterFragmentVocabulary extends Fragment {
 		
 		@Override
 		protected String doInBackground(Integer... arg0) {
-			Logger.i(TAG, "InitDataAsyncTask2 doInBackground I");
-			
+			//Logger.i(TAG, "InitDataAsyncTask doInBackground I");
+			listData = new ArrayList<Map<String, Object>>();//重来
 			currentPage = 0;
 			totalCount = wordsDao.getWordListCount(queryStr, familarityClass);
 			maxPage = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;
 			
 			updateData = updateData();//先将查询到的数据缓存下来，等到执行完再对listData更新，否则偶尔会闪退
-			Logger.i(TAG, "InitDataAsyncTask2 doInBackground O");
+			//Logger.i(TAG, "InitDataAsyncTask doInBackground O");
 			return "DONE.";
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
-			Logger.i(TAG, "InitDataAsyncTask2 onPostExecute I");
+			//Logger.i(TAG, "InitDataAsyncTask onPostExecute I");
 			try {
 				listData.addAll(updateData);
 				postInitData();
 			} catch (Exception e) {
-				Logger.i(TAG, "InitDataAsyncTask2 onPostExecute E: " + e);
+				Logger.i(TAG, "InitDataAsyncTask onPostExecute E: " + e);
 			}
-			Logger.i(TAG, "InitDataAsyncTask2 onPostExecute O");
+			//Logger.i(TAG, "InitDataAsyncTask onPostExecute O");
 		}
 
 	}
@@ -459,15 +460,15 @@ public class CenterFragmentVocabulary extends Fragment {
 
 		@Override
 		protected String doInBackground(Integer... arg0) {
-			Logger.i(TAG, "UpdateDataAsyncTask doInBackground I");
+			//Logger.i(TAG, "UpdateDataAsyncTask doInBackground I");
 			updateData = updateData();//先将查询到的数据缓存下来，等到执行完再对listData更新，否则偶尔会闪退
-			Logger.i(TAG, "UpdateDataAsyncTask doInBackground O");
+			//Logger.i(TAG, "UpdateDataAsyncTask doInBackground O");
 			return "DONE.";
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
-			Logger.i(TAG, "UpdateDataAsyncTask onPostExecute I: " + result);
+			//Logger.i(TAG, "UpdateDataAsyncTask onPostExecute I: " + result);
 			try {
 				loading = false;
 				listData.addAll(updateData);
@@ -476,7 +477,7 @@ public class CenterFragmentVocabulary extends Fragment {
 			} catch (Exception e) {
 				Logger.i(TAG, "UpdateDataAsyncTask onPostExecute E: " + e);
 			}
-			Logger.i(TAG, "UpdateDataAsyncTask onPostExecute O");
+			//Logger.i(TAG, "UpdateDataAsyncTask onPostExecute O");
 		}
 	}
 
