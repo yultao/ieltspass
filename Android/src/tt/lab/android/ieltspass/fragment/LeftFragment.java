@@ -16,6 +16,7 @@ import tt.lab.android.ieltspass.activity.FeedbackActivity;
 import tt.lab.android.ieltspass.activity.LoginActivity;
 import tt.lab.android.ieltspass.activity.SettingsActivity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -75,7 +76,22 @@ public class LeftFragment extends Fragment {
 					intent.setClass(getActivity(), DownloadActivity.class);
 					break;
 				case 2:
-					intent.setClass(getActivity(), FeedbackActivity.class);
+//					String[] reciver = new String[] { "yulta@gmail.com" };  
+//			        String[] mySbuject = new String[] { "雅思通IELTSPASS意见反馈" };  
+//			        String myCc = "";  
+//			        String mybody = "";  
+//			        Intent myIntent = new Intent(android.content.Intent.ACTION_SEND);  
+//			        myIntent.setType("plain/text");  
+//			        myIntent.putExtra(android.content.Intent.EXTRA_EMAIL, reciver);  
+//			        myIntent.putExtra(android.content.Intent.EXTRA_CC, myCc);  
+//			        myIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, mySbuject);  
+//			        myIntent.putExtra(android.content.Intent.EXTRA_TEXT, mybody);  
+//			        startActivity(Intent.createChooser(myIntent, "意见反馈"));  
+					Uri uri=Uri.parse("mailto: yulta@gmail.com");
+			        Intent emailIntent=new Intent(Intent.ACTION_SENDTO,uri);
+
+			        startActivity(emailIntent);
+					//intent.setClass(getActivity(), FeedbackActivity.class);
 					break;
 				case 3:
 					intent.setClass(getActivity(), AboutActivity.class);
