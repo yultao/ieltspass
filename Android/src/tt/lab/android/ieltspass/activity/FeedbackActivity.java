@@ -1,5 +1,7 @@
 package tt.lab.android.ieltspass.activity;
 
+import tt.lab.android.ieltspass.Logger;
+import tt.lab.android.ieltspass.MailSender;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.R.layout;
 import tt.lab.android.ieltspass.R.menu;
@@ -14,12 +16,26 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class FeedbackActivity extends Activity {
-
+	private static final String TAG=FeedbackActivity.class.getName();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_feedback);
 		initTitle();
+		Button send = (Button)this.findViewById(R.id.button1);
+		send.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				MailSender mailSender = new MailSender();
+				try{
+				mailSender.prepareAndSendAsync("ttt");
+				}catch (Throwable e){
+					Logger.i(TAG, "prepareAndSendAsync E: "+e);
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	@Override
