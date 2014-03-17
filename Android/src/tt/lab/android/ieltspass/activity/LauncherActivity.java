@@ -2,6 +2,7 @@ package tt.lab.android.ieltspass.activity;
 
 import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.Utilities;
+import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.fragment.CenterFragment;
 import tt.lab.android.ieltspass.fragment.LeftFragment;
 import tt.lab.android.ieltspass.fragment.RightFragment;
@@ -26,7 +27,7 @@ public class LauncherActivity extends FragmentActivity {
 	private RightFragment rightFragment;
 	private CenterFragment centerFragment;
 	private boolean isExit;
-
+	private Settings settings;
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
@@ -37,10 +38,10 @@ public class LauncherActivity extends FragmentActivity {
 	}
 
 	private void initApp() {
-		Constants.APP_PATH = getFilesDir().getAbsolutePath();
+		settings = Settings.getInstance(this);//Init Settings
+		
+		//Constants.APP_PATH = getFilesDir().getAbsolutePath();
 		Constants.assetManager = getAssets();
-		Utilities.ensurePath(Constants.VOCABULARY_IMAGE_PATH);
-		Utilities.ensurePath(Constants.SPEAKING_AUDIO_PATH);
 		Utilities.connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 	}
 

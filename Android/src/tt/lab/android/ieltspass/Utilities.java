@@ -285,13 +285,13 @@ public class Utilities {
 	 * @param picurl
 	 * @return
 	 */
-	public static String getTinyPic(String picurl) {
+	public static String getTinyPic(String imagePath, String picurl) {
 		//Logger.i(TAG, "getTinyPic I "+picurl);
 		String url = picurl;
 		try{
 			if (picurl != null) {
 				String filename = picurl.substring(picurl.lastIndexOf("/") + 1);
-				File file = new File(Constants.VOCABULARY_IMAGE_PATH + "/" + filename);
+				File file = new File(imagePath + "/" + filename);
 				if (file.exists()) {
 					url = file.getAbsolutePath();
 				} else {
@@ -342,5 +342,26 @@ public class Utilities {
 			Logger.i(TAG, "writeFile E: " + e);
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getSql(String sqlFile) {
+		Logger.i(TAG, "getSql sqlFile "+ sqlFile);
+		StringBuilder sb = new StringBuilder();
+		try {
+			InputStream is = Constants.assetManager.open("sqls/"+sqlFile+".sql");
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+			String s = null;
+			while ((s = bufferedReader.readLine()) != null) {
+				sb.append("\n "+s );
+			}
+			is.close();
+			bufferedReader.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.i(TAG, "getSql E: " + e.getMessage());
+		}
+		String sql  =sb.toString();
+		Logger.i(TAG, "getSql sql "+ sql);
+		return sql;
 	}
 }

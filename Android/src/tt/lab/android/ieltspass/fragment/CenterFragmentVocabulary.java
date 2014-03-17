@@ -73,10 +73,11 @@ public class CenterFragmentVocabulary extends Fragment {
 	private String orderby = "random()", order = "";
 	private int totalCount, currentPage = 0, pageSize = 20, maxPage;
 	private WordsDao wordsDao;
-
+	private Settings settings;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Logger.i(TAG, "onCreateView");
 		context = this.getActivity();
+		settings = Settings.getInstance(context);
 		view = inflater.inflate(R.layout.center_fragment_vocabulary, null);
 		wordsDao = new WordsDao(context);
 
@@ -360,7 +361,7 @@ public class CenterFragmentVocabulary extends Fragment {
 					map.put("img", String.valueOf(R.drawable.no_pic));
 				} else {
 
-					map.put("img", Utilities.getTinyPic(word.getTinyPic()));
+					map.put("img", Utilities.getTinyPic(settings.getVocabularyImagesPath(), word.getTinyPic()));
 				}
 
 				listData.add(map);
@@ -384,8 +385,8 @@ public class CenterFragmentVocabulary extends Fragment {
 				// Logger.i(TAG, "setViewImage: "+v.getId()+", "+value);
 				// 从网络下载
 				if (value != null && value.toLowerCase().startsWith("http")) {
-					if (Utilities.isWifiConnected()
-							|| (Utilities.isMobileConnected() && !Settings.onlyUseWifi)) {
+					if (!settings.isNetwordForbidden() && (Utilities.isWifiConnected()
+							|| (Utilities.isMobileConnected() && settings.isWifiAndMobile()))) {
 						new DownloadImageAsyncTask(v, value).execute();
 					} else {
 						super.setViewImage(v, String.valueOf(R.drawable.no_net));
@@ -504,8 +505,8 @@ public class CenterFragmentVocabulary extends Fragment {
 				is = openConnection.getInputStream();
 
 				String name = strurl.substring(strurl.lastIndexOf("/") + 1);
-
-				String filename = Constants.VOCABULARY_IMAGE_PATH + "/" + name;
+				Utilities.ensurePath(settings.getVocabularyImagesPath());
+				String filename = settings.getVocabularyImagesPath() + "/" + name;
 				String tmpfilename = filename + ".d";
 				File tmp = new File(tmpfilename);
 				os = new FileOutputStream(tmp);

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tt.lab.android.ieltspass.Logger;
+import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.model.Example;
 import tt.lab.android.ieltspass.model.Explanation;
 import tt.lab.android.ieltspass.model.ExplanationCategory;
@@ -168,7 +169,7 @@ public class WordsDao {
 		Logger.i(TAG, "\n");
 		long t1 = System.currentTimeMillis();
 		int count = 0;
-		String sql = Database.getSql("getWordListCount");
+		String sql = Utilities.getSql("getWordListCount");
 		String familiarityClause = getFamiliarityClause(familiarityClass);
 		sql = String.format(sql, familiarityClause);
 
@@ -215,7 +216,7 @@ public class WordsDao {
 		Cursor cursor = null;
 		try {
 
-			String sql = Database.getSql("getWordList");
+			String sql = Utilities.getSql("getWordList");
 			String familiarityClause = getFamiliarityClause(familiarityClass);
 			sql = String.format(sql, familiarityClause, orderBy, order);
 			Logger.i(TAG, "formated sql: " + sql);
