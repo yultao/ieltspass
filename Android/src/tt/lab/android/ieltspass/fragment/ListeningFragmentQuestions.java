@@ -2,6 +2,7 @@ package tt.lab.android.ieltspass.fragment;
 
 import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.R;
+import tt.lab.android.ieltspass.data.Settings;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,6 +16,11 @@ public class ListeningFragmentQuestions extends Fragment {
 	private static final String TAG = ListeningFragmentQuestions.class.getName();
 	private String questions;
 	private WebView webView;
+	private Settings settings;
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		settings = Settings.getInstance(this.getActivity());
+	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_listening_questions, container, false);
@@ -37,7 +43,7 @@ public class ListeningFragmentQuestions extends Fragment {
 //		}  
 //		webSettings.setDefaultZoom(zoomDensity); 
 		webSettings.setLayoutAlgorithm(LayoutAlgorithm.NORMAL); 		//webView.loadUrl("file:///android_asset/cambridge/listening/"+questions );//
-		webView.loadUrl("file://"+Constants.LISTENING_QUESTION_PATH+"/"+questions );
+		webView.loadUrl("file://"+settings.getListeningQuestionsPath()+"/"+questions );
 //		ImageView imageView = (ImageView)rootView.findViewById(R.id.imageView1);
 //		
 //		String myJpgPath = Constants.SD_PATH+"/"+Constants.AUDIO_PATH+"/C6T1S2.Q.png";//"file:///android_asset/cambridge/listening/C6T1S2.Q.png";

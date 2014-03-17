@@ -5,7 +5,6 @@ import java.util.Map;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.R.layout;
 import tt.lab.android.ieltspass.R.menu;
-import tt.lab.android.ieltspass.data.Database;
 import tt.lab.android.ieltspass.model.Word;
 import android.net.Uri;
 import android.os.Bundle;

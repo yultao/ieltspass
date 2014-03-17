@@ -13,6 +13,7 @@ import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.Utilities;
+import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.fragment.SpeakingFragmentQuestions;
 import tt.lab.android.ieltspass.fragment.SpeakingFragmentRecordings;
 import tt.lab.android.ieltspass.fragment.SpeakingFragmentScripts;
@@ -62,6 +63,8 @@ public class SpeakingActivity extends FragmentActivity {
 	private long recordingStart;
 	private long MAX_RECORDING_LENGTH = 1000 + 1000 * 60 * 5;// 最长5分钟
 	private SpeakingFragmentRecordings fragmentRecordings;
+	private Settings settings;
+	
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
@@ -72,7 +75,7 @@ public class SpeakingActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_speaking);
-
+		settings = Settings.getInstance(this);
 		initParameters();
 		initTitle();
 		initButtons();
@@ -157,7 +160,7 @@ public class SpeakingActivity extends FragmentActivity {
 		Logger.i(TAG, "recording start");
 		recordingStart = System.currentTimeMillis();
 		resetPlayerControls();
-		String path = Constants.SPEAKING_AUDIO_PATH + "/" + name;
+		String path = settings.getSpeakingAudiosPath() + "/" + name;
 		Utilities.ensurePath(path);
 
 		currentAudio = new File(path + "/" + Utilities.getRecordingFileName() + ".amr");

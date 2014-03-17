@@ -17,7 +17,7 @@ import java.util.Map;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.Constants;
-import tt.lab.android.ieltspass.data.Database;
+import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentAnswers;
 import tt.lab.android.ieltspass.fragment.ListeningFragmentLyrics;
@@ -67,11 +67,13 @@ public class ListeningActivity extends FragmentActivity {
 	private String audio;
 	private String questions;
 	private String answers;
+	private Settings settings;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_listening);
+		settings = Settings.getInstance(this);
 		initParameters();
 		initPager();
 		initTitle();
@@ -93,7 +95,7 @@ public class ListeningActivity extends FragmentActivity {
 	}
 
 	private void initAudio() {
-		String name = Constants.LISTENING_AUDIO_PATH + "/" + audio;
+		String name = settings.getListeningAudiosPath() + "/" + audio;
 		file = new File(name);
 	}
 
@@ -134,18 +136,17 @@ public class ListeningActivity extends FragmentActivity {
 		ListeningFragmentLyrics fragmentLyrics = new ListeningFragmentLyrics();
 		fragmentLyrics.setPlayer(player, seekBar, lyrics);
 		pagerItemList.add(fragmentLyrics);
-		
+
 		ListeningFragmentQuestions fragmentQuestions = new ListeningFragmentQuestions();
 		fragmentQuestions.setQuestions(questions);
 		pagerItemList.add(fragmentQuestions);
-
 
 		ListeningFragmentAnswers fragmentAnswers = new ListeningFragmentAnswers();
 		fragmentAnswers.setAnswers(answers);
 		pagerItemList.add(fragmentAnswers);
 
 	}
-	
+
 	private void enablePlayStopButton(boolean enabled) {
 		btnPlayStop.setEnabled(enabled);
 		refreshButtonText();
@@ -203,7 +204,7 @@ public class ListeningActivity extends FragmentActivity {
 		boolean fromLocal = file.exists();
 		String url = fromLocal ? file.getAbsolutePath() : "http://taog.ueuo.com/" + audio;
 		if (checkNetwork(fromLocal)) {
-			if(!fromLocal){
+			if (!fromLocal) {
 				new DownloadAsyncTask(seekBar, url).execute();
 			}
 			// AudioManager am = (AudioManager) this.getActivity().getSystemService(Context.AUDIO_SERVICE);
@@ -286,15 +287,15 @@ public class ListeningActivity extends FragmentActivity {
 
 			try {
 				player.reset();
-				//Logger.i(TAG, "initPlayer " + 2 + ", " + url);
+				// Logger.i(TAG, "initPlayer " + 2 + ", " + url);
 				percentage.setText("Setting");
 				player.setDataSource(url);
-				//Logger.i(TAG, "initPlayer " + 3);
+				// Logger.i(TAG, "initPlayer " + 3);
 				percentage.setText("Preparing.");
 				player.prepareAsync();
-				//Logger.i(TAG, "initPlayer " + 4);
+				// Logger.i(TAG, "initPlayer " + 4);
 				percentage.setText("Preparing..");
-				//Logger.i(TAG, "initPlayer " + 5);
+				// Logger.i(TAG, "initPlayer " + 5);
 
 			} catch (Exception e) {
 				Logger.i(TAG, "initPlayer: E " + e.getMessage());
@@ -306,28 +307,32 @@ public class ListeningActivity extends FragmentActivity {
 
 	private boolean checkNetwork(boolean fromLocal) {
 		boolean initPlayer = false;
+		boolean isNetworkConnected = Utilities.isNetworkConnected();
 		boolean wifi = Utilities.isWifiConnected();
 		boolean mobile = Utilities.isMobileConnected();
 		if (fromLocal) {// 如果本地文件存在，直接用
-			//Toast.makeText(this, "使用本地缓存", Toast.LENGTH_SHORT).show();
 			initPlayer = true;
-		} else if (wifi) {
-			//Toast.makeText(this, "有WIFI", Toast.LENGTH_SHORT).show();
-			initPlayer = true;
-		} else if (mobile) {
-			//Toast.makeText(this, "有非WIFI", Toast.LENGTH_SHORT).show();
-			if (!Constants.Preference.onlyUseWifi) {
-				initPlayer = true;
-			} else {
-				Toast.makeText(this, "仅有手机网络，不允许", Toast.LENGTH_SHORT).show();
-			}
 		} else {
-			Toast.makeText(this, "无网络，本地也无缓存", Toast.LENGTH_SHORT).show();
+			if (isNetworkConnected) {
+				if (settings.isNetwordForbidden()) {
+					Toast.makeText(this, "有网络，但已设置禁止", Toast.LENGTH_SHORT).show();
+				} else {
+					if (wifi) {
+						initPlayer = true;
+					} else if (mobile) {
+						if (settings.isWifiAndMobile()) {
+							initPlayer = true;
+						} else {
+							Toast.makeText(this, "仅有手机网络，但已设置禁止", Toast.LENGTH_SHORT).show();
+						}
+					}
+				}
+			} else {
+				Toast.makeText(this, "无网络，本地也无缓存", Toast.LENGTH_SHORT).show();
+			}
 		}
-		Logger.i(TAG, " wifi? " + wifi
-				+" mobile? "+ mobile
-				+" network? " + Utilities.isNetworkConnected()
-				+" type? " + Utilities.getConnectedType());
+		Logger.i(TAG, " wifi? " + wifi + " mobile? " + mobile + " network? " + Utilities.isNetworkConnected()
+				+ " type? " + Utilities.getConnectedType());
 
 		return initPlayer;
 	}
@@ -341,7 +346,7 @@ public class ListeningActivity extends FragmentActivity {
 				a = R.drawable.playbutton;
 			}
 		} else {
-			if (player!=null && player.isPlaying()) {
+			if (player != null && player.isPlaying()) {
 				a = R.drawable.pause;
 			} else {
 				a = R.drawable.play;
@@ -500,7 +505,7 @@ public class ListeningActivity extends FragmentActivity {
 			InputStream is = null;
 			OutputStream os = null;
 			try {
-				//Logger.i(TAG, "doInBackground " + arg0);
+				// Logger.i(TAG, "doInBackground " + arg0);
 				URL url = new URL(strurl);
 				String name = strurl.substring(strurl.lastIndexOf("/") + 1);
 				Logger.i(TAG, "doInBackground name " + name);
@@ -509,10 +514,10 @@ public class ListeningActivity extends FragmentActivity {
 				is = openConnection.getInputStream();
 				int available = is.available();
 				// Logger.i(TAG, "doInBackground "+21+", "+available);
-				String filename = Constants.LISTENING_AUDIO_PATH + "/" + name;
-				//Logger.i(TAG, "doInBackground filename " + filename + ", " + available);
+				String filename = settings.getListeningAudiosPath() + "/" + name;
+				// Logger.i(TAG, "doInBackground filename " + filename + ", " + available);
 				String tmpfilename = filename + ".d";
-				//Logger.i(TAG, "doInBackground tmpfilename " + tmpfilename);
+				// Logger.i(TAG, "doInBackground tmpfilename " + tmpfilename);
 				File tmp = new File(tmpfilename);
 				os = new FileOutputStream(tmp);
 				byte[] buffer = new byte[1024];
@@ -523,23 +528,23 @@ public class ListeningActivity extends FragmentActivity {
 					// Logger.i(TAG, "doInBackground "+3+", "+len);
 					os.write(buffer, 0, len);
 				}
-//				is.close();
-//				os.close();
-				
-				//Logger.i(TAG, "doInBackground read " + read);
-				if(read>1024*1024){//1M
+				// is.close();
+				// os.close();
+
+				// Logger.i(TAG, "doInBackground read " + read);
+				if (read > 1024 * 1024) {// 1M
 					File file = new File(filename);
 					boolean renameTo = tmp.renameTo(file);
-					//Logger.i(TAG, "doInBackground renameTo " + renameTo);
+					// Logger.i(TAG, "doInBackground renameTo " + renameTo);
 				} else {
 					boolean delete = tmp.delete();
-					//Logger.i(TAG, "doInBackground delete " + delete);
+					// Logger.i(TAG, "doInBackground delete " + delete);
 				}
 			} catch (Exception e) {
 				Logger.i(TAG, "doInBackground E: " + e.getMessage());
 				e.printStackTrace();
 			} finally {
-				if(is!=null){
+				if (is != null) {
 					try {
 						is.close();
 					} catch (IOException e) {
@@ -547,7 +552,7 @@ public class ListeningActivity extends FragmentActivity {
 						e.printStackTrace();
 					}
 				}
-				if(os!=null){
+				if (os != null) {
 					try {
 						os.close();
 					} catch (IOException e) {
@@ -562,13 +567,13 @@ public class ListeningActivity extends FragmentActivity {
 		@Override
 		protected void onPreExecute() {
 			downloading = true;
-			//Logger.i(TAG, "onPreExecute");
+			// Logger.i(TAG, "onPreExecute");
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
 			downloading = false;
-			//Logger.i(TAG, "onPostExecute: " + result);
+			// Logger.i(TAG, "onPostExecute: " + result);
 		}
 
 		@Override

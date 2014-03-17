@@ -2,6 +2,7 @@ package tt.lab.android.ieltspass.fragment;
 
 import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.R;
+import tt.lab.android.ieltspass.data.Settings;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,12 +14,16 @@ public class ListeningFragmentAnswers extends Fragment {
 	private static final String TAG = ListeningFragmentAnswers.class.getName();
 	private String answers;
 	private WebView webView;
-
+	private Settings settings;
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		settings = Settings.getInstance(this.getActivity());
+	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_listening_answers, container, false);
 		webView = (WebView) rootView.findViewById(R.id.webview);
-		webView.loadUrl("file://"+Constants.LISTENING_ANSWER_PATH+"/"+answers);
+		webView.loadUrl("file://"+settings.getListeningAnswersPath()+"/"+answers);
 		return rootView;
 	}
 

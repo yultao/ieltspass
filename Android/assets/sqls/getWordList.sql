@@ -1,6 +1,9 @@
-select b.word_vocabulary, b.BE_phonetic_symbol, b.BE_sound, b.is_listening, b.is_speaking, b.is_reading, b.is_writing, b.part_of_speech, b.explanation, b.tinyPic
-from words b
-where  b.word_vocabulary like ?
+select w.word_vocabulary, w.BE_phonetic_symbol, w.BE_sound, w.is_listening, w.is_speaking, w.is_reading, w.is_writing, w.part_of_speech, w.explanation, w.tinyPic,f.familiarity_class
+from words w
+LEFT JOIN familiarity f
+ON w.word_vocabulary = f.word_vocabulary
+where  w.word_vocabulary like ?
+%s
 order by %s %s
 limit ?
 offset ?

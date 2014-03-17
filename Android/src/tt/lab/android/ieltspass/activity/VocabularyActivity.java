@@ -13,6 +13,7 @@ import tt.lab.android.ieltspass.model.ExplanationCategory;
 import tt.lab.android.ieltspass.model.Word;
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,6 +32,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -52,12 +55,13 @@ public class VocabularyActivity extends FragmentActivity {
 	Word word;
 
 	private ArrayList<Fragment> pagerItemList = new ArrayList<Fragment>();
-	private Button btnPlayStopA;
-	private Button btnPlayStopB;
-	private boolean playing;
-	private AudioPlayer player = new AudioPlayer();
+	private ImageView imgPlayStopA;
+	private ImageView imgPlayStopB;
+	private ImageView imgCurrentPlaying = null;
+	private Button btnFamiliar;
+	private AudioPlayer player;
 	private WordsDao wordsDao;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -68,6 +72,27 @@ public class VocabularyActivity extends FragmentActivity {
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+		
+		player =  new AudioPlayer() {
+
+			@Override
+			public void handleCompletion() {
+				resetButton();				
+			}
+
+			@Override
+			public void handleError() {
+				resetButton();				
+			}
+
+			@Override
+			public void handlePrepared() {
+				if (imgCurrentPlaying != null) {
+					imgCurrentPlaying.setImageResource(R.drawable.soundon);
+				}
+			}
+			
+		};
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -76,38 +101,71 @@ public class VocabularyActivity extends FragmentActivity {
 		wordsDao = new WordsDao(this.getApplicationContext());
 		
 		initTitle();
+		initData();
+		initFragement();
+	}
+	
+	private void initData() {
 		try {
+			
 			TextView textViewTitle = (TextView) findViewById(R.id.textViewTitle);
 			TextView tvAPhoetic = (TextView) findViewById(R.id.tvAPhoetic);
 			TextView tvBPhoetic = (TextView) findViewById(R.id.tvBPhoetic);
-			btnPlayStopA = (Button) findViewById(R.id.btnPlayA);
-			btnPlayStopB = (Button) findViewById(R.id.btnPlayB);
+			imgPlayStopA = (ImageView) findViewById(R.id.btnPlayA);
+			imgPlayStopB = (ImageView) findViewById(R.id.btnPlayB);
+			btnFamiliar = (Button)findViewById(R.id.btnFamiliar);			
 						
 			textViewTitle.setText(word.getWord_vocabulary());
 			tvAPhoetic.setText(word.getAE_phonetic_symbol());
 			tvBPhoetic.setText(word.getBE_phonetic_symbol());
 
-			btnPlayStopA.setOnClickListener(new OnClickListener() {
+			imgPlayStopA.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					play(btnPlayStopA, word.getAE_sound());
+					play(imgPlayStopA, word.getAE_sound());
 				}
 			});
-			btnPlayStopB.setOnClickListener( new OnClickListener() {
+			imgPlayStopB.setOnClickListener( new OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {					
-					play(btnPlayStopB, word.getBE_sound());
+					play(imgPlayStopB, word.getBE_sound());
 				}
 			});
+			btnFamiliar.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					//				
+				}
+			});
+			
+			/*if (word.getFamiliarity() == 0) {
+				btnFamiliar.setBackgroundColor(Color.CYAN);
+			} else if (word.getFamiliarity() == 1) {
+				btnFamiliar.setBackgroundColor(Color.BLUE);
+			} else if (word.getFamiliarity() == 2) {
+				btnFamiliar.setBackgroundColor(Color.GREEN);
+			}*/
+			if (word.getFamiliarity() == 0) {
+				btnFamiliar.setBackgroundResource(R.drawable.category_1);//TODO
+			} else if (word.getFamiliarity() == 1) {
+				btnFamiliar.setBackgroundResource(R.drawable.category_1);
+			} else if (word.getFamiliarity() == 2) {
+				btnFamiliar.setBackgroundResource(R.drawable.category_2);
+			} else if (word.getFamiliarity() == 3) {
+				btnFamiliar.setBackgroundResource(R.drawable.category_3);
+			} else if (word.getFamiliarity() == 4) {
+				btnFamiliar.setBackgroundResource(R.drawable.category_4);
+			} else if (word.getFamiliarity() == 5) {
+				btnFamiliar.setBackgroundResource(R.drawable.category_5);
+			}
 			
 
 		} catch (Exception e) {
 			Logger.i(TAG, "Exception: " + e.getMessage());
 			e.printStackTrace();
 		}
-
-		initFragement();
 	}
 
 	private void initFragement() {
@@ -127,6 +185,7 @@ public class VocabularyActivity extends FragmentActivity {
 		fragment = new ExampleFragment();
 		fragment.setWord(word);
 		fragment.setWordsDao(wordsDao);
+		fragment.setPlayer(player);
 		args = new Bundle();
 		args.putInt(SectionBasicFragment.ARG_SECTION_NUMBER, 3);
 		fragment.setArguments(args);
@@ -171,16 +230,8 @@ public class VocabularyActivity extends FragmentActivity {
 	private void navigateUp() {
 		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
 	}
-
-	private void refreshButtonText() {
-		if (playing) {
-			btnPlayStopA.setText("Stop");
-		} else {
-			btnPlayStopA.setText("Start");
-		}
-	}
 	
-	public static class AudioPlayer {
+	public static abstract class AudioPlayer {
 		private MediaPlayer player;
 		
 		public AudioPlayer() {
@@ -196,15 +247,11 @@ public class VocabularyActivity extends FragmentActivity {
 						/*
 						 * 解除资源与MediaPlayer的赋值关系 让资源可以为其它程序利用
 						 */
-						player.release();
-						/* 改变TextView为播放结束 */
-						// tv.setText("音乐播发结束!");
+						handleCompletion();
 
 					} catch (Exception e) {
-						// tv.setText(e.toString());
 						e.printStackTrace();
 					}
-					//refreshButtonText();
 				}
 			});
 
@@ -216,12 +263,10 @@ public class VocabularyActivity extends FragmentActivity {
 					try {
 						/* 发生错误时也解除资源与MediaPlayer的赋值 */
 						player.release();
-						// tv.setText("播放发生异常!");
+						handleError();
 					} catch (Exception e) {
-						// tv.setText(e.toString());
 						e.printStackTrace();
 					}
-					//refreshButtonText();
 					return false;
 				}
 			});
@@ -231,20 +276,16 @@ public class VocabularyActivity extends FragmentActivity {
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					player.start();
-					//playing = true;
+					handlePrepared();
 				}
 			});
 		}
 		
 		public void play(String url) {			
-			stop();
-			
-			//Logger.i(this.getClass().getName(), "Playing " + file.getAbsolutePath());
 			try {
 				player.reset();
 				player.setDataSource(url);
 				player.prepareAsync();
-				//refreshButtonText();
 			} catch (Exception e) {
 				Logger.i(this.getClass().getName(), "Exception: " + e.getMessage());
 				e.printStackTrace();
@@ -255,26 +296,28 @@ public class VocabularyActivity extends FragmentActivity {
 			try {
 				/* 发生错误时也解除资源与MediaPlayer的赋值 */
 				if (player != null)
-					player.release();
-				// tv.setText("播放发生异常!");
+					player.stop();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		
+		public abstract void handleCompletion();
+		public abstract void handlePrepared();
+		public abstract void handleError();
 	}
 	
-	private void play(Button invoker, String url) {
+	private void play(ImageView invoker, String url) {
+		//Log.v(this.getClass().getName(), "play url:" + url + invoker.getDrawable().equals(this.getApplicationContext().getResources().getDrawable(R.drawable.soundoff)));
 		player.play(url);
-		if (invoker.getText().equals("Start")) {
-			invoker.setText("Stop");
-		} else {
-			invoker.setText("Start");
-		}
+		imgCurrentPlaying = invoker;	
 	}
 	
-	private void stop() {
-		btnPlayStopA.setText("Start");
-		btnPlayStopB.setText("Start");
+	private void resetButton() {
+		if (imgCurrentPlaying != null) {
+			imgCurrentPlaying.setImageResource(R.drawable.soundoff);
+		}
+		imgCurrentPlaying = null;
 	}
 
 	@Override
@@ -333,7 +376,7 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 
 	private void back() {
-		stop();
+		resetButton();
 	}
 
 	@Override
@@ -351,6 +394,7 @@ public class VocabularyActivity extends FragmentActivity {
 	public static abstract class SectionBasicFragment extends Fragment {
 		protected WordsDao wordsDao;
 		protected Word word;
+		protected AudioPlayer player;
 
 		/**
 		 * The fragment argument representing the section number for this fragment.
@@ -367,6 +411,10 @@ public class VocabularyActivity extends FragmentActivity {
 		public void setWordsDao(WordsDao wordsDao) {
 			this.wordsDao = wordsDao;
 		}
+		
+		public void setPlayer(AudioPlayer player) {
+			this.player = player;
+		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -379,13 +427,22 @@ public class VocabularyActivity extends FragmentActivity {
 		
 		protected TextView createTextView() {
 			AbsListView.LayoutParams lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			TextView textView = new TextView(SectionBasicFragment.this.getActivity());
+			TextView textView = new TextView(this.getActivity());
 			textView.setLayoutParams(lp);
 			textView.setGravity(Gravity.CENTER_VERTICAL);
 			textView.setPadding(10, 0, 0, 0);
 			textView.setTextSize(15);
 			
 			return textView;
+		}
+		
+		protected ImageView createImageView() {
+			ImageView imageView = new ImageView(this.getActivity());
+			int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, this.getResources().getDisplayMetrics());
+			int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, this.getResources().getDisplayMetrics());
+			AbsListView.LayoutParams params = new AbsListView.LayoutParams(width, height);
+			imageView.setLayoutParams(params);
+			return imageView;
 		}
 
 	}
@@ -432,20 +489,43 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 	
 	public static class ExampleFragment extends SectionBasicFragment {
-
+		
 		@Override
 		public void buildContent(View rootView, ViewGroup container, Bundle savedInstanceState) {
 			List<Example> examples = wordsDao.getExamplesForSingleWord(word.getWord_vocabulary());
 			
-			LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
-			for(Example example : examples) {
+			LinearLayout mainLayout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
+
+			for(final Example example : examples) {
+				LinearLayout exampleSetenseLayout = new LinearLayout(this.getActivity());
+				exampleSetenseLayout.setOrientation(LinearLayout.HORIZONTAL);
+				AbsListView.LayoutParams params = new AbsListView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);				
+				exampleSetenseLayout.setLayoutParams(params);
+				mainLayout.addView(exampleSetenseLayout);
+				
+				final ImageView imageView = createImageView();
+				imageView.setImageResource(R.drawable.soundoff);
+				imageView.setPadding(0, 10, 0, 0);
+				imageView.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						if (player != null) {
+							player.play(example.getSentence_sound());
+							//play(imageView, example.getSentence_sound());
+						}
+						
+					}
+				});
+				exampleSetenseLayout.addView(imageView);
+				
 				TextView tv = createTextView();
 				tv.setText(example.getSentence());
-				layout.addView(tv);
-				
+				exampleSetenseLayout.addView(tv);
+
 				tv = createTextView();
 				tv.setText(example.getCn_explanation());
-				layout.addView(tv);
+				mainLayout.addView(tv);
 				tv.setPadding(tv.getPaddingLeft(), 0, 0, 10);
 			}				
 		}

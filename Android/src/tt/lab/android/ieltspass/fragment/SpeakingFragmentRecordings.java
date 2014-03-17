@@ -14,6 +14,7 @@ import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.activity.SpeakingActivity;
+import tt.lab.android.ieltspass.data.Settings;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
@@ -37,12 +38,16 @@ public class SpeakingFragmentRecordings extends Fragment {
 	private SpeakingActivity speakingActivity;
 	private String questions;
 	private ListView listView;
+	private Settings settings;
 
 	private View view;
 	private SimpleAdapter simpleAdapter;
 	private List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
 	private String name;
-
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		settings = Settings.getInstance(this.getActivity());
+	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		view = inflater.inflate(R.layout.fragment_speaking_recordings, container, false);
@@ -124,7 +129,7 @@ public class SpeakingFragmentRecordings extends Fragment {
 		List<Map<String, String>> data = new ArrayList<Map<String, String>>();
 		try {
 
-			File dir = new File(Constants.SPEAKING_AUDIO_PATH + "/" + name);
+			File dir = new File(settings.getSpeakingAudiosPath() + "/" + name);
 			if (dir.exists()) {
 				for (File file : dir.listFiles(new FilenameFilter() {
 					@Override
