@@ -30,7 +30,7 @@
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="4dp"
                 android:layout_toRightOf="@+id/head_view"
-                android:text="NAME"
+                android:text="游客"
                 android:textColor="@color/black"
                 android:textSize="15sp" />
 
@@ -40,76 +40,12 @@
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/name_textview"
                 android:layout_below="@+id/name_textview"
-                android:text="用户名"
+                android:text="登录/注册"
                 android:textColor="@color/text_color"
                 android:textSize="12sp" />
         </RelativeLayout>
-        <!--
-        <include
-            android:layout_width="fill_parent"
-            android:layout_height="2px"
-            layout="@layout/line" >
-        </include>
-
-        
-		<TextView
-            android:id="@+id/my_draft_box_textview"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:text="设置"
-            android:textColor="@color/text_color"
-            android:textSize="15sp" />
-        <include
-            android:layout_width="fill_parent"
-            android:layout_height="2px"
-            layout="@layout/line" >
-        </include>
-        <TextView
-            android:id="@+id/my_collection_textview"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:text="离线包"
-            android:textColor="@color/text_color"
-            android:textSize="15sp" />
-
-        <include
-            android:layout_width="fill_parent"
-            android:layout_height="2px"
-            layout="@layout/line" >
-        </include>
-        <TextView
-            android:id="@+id/my_focus_textview"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:text="意见反馈"
-            android:textColor="@color/text_color"
-            android:textSize="15sp" />
-
-        <include
-            android:layout_width="fill_parent"
-            android:layout_height="2px"
-            layout="@layout/line" >
-        </include>
-		<TextView
-            android:id="@+id/my_wallet_textview"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:text="关于"
-            android:textColor="@color/text_color"
-            android:textSize="15sp" />
-        -->
-
         <ListView
             android:id="@+id/listView1"
-            android:paddingLeft="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
         </ListView>

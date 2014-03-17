@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="right"
+    android:background="#fff" 
     tools:context=".SettingsActivity" >
 
     <include
@@ -30,6 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_alignRight="@+id/button1"
             android:layout_below="@+id/linearLayout"
+            android:background="@color/bg_color"
+            android:textSize="18dp"
             android:text="网络设置" />
 
         <RadioGroup
@@ -66,6 +69,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/radioGroup"
+            android:textSize="18dp"
+            android:background="@color/bg_color"
             android:text="缓存位置" />
 
         <TextView
@@ -74,8 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/textView1"
-            android:layout_toLeftOf="@+id/button1"
-            android:text="/storage/..." />
+            android:layout_toLeftOf="@+id/button1"/>
 
         <Button
             android:id="@+id/button1"
@@ -83,23 +87,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/textView1"
-            android:text="..." />
+            android:text="浏览" />
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/linearLayout"
-            android:text="TextView" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/textView4"
-            android:text="清除缓存" />
     </RelativeLayout>
 
 </RelativeLayout>

@@ -19,6 +19,7 @@ public class DownloadActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_download);
+		initTitle();
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class DownloadActivity extends Activity {
 			}
 		});
 		TextView titleText = (TextView) findViewById(R.id.titleText);
-		titleText.setText("下载".toUpperCase());
+		titleText.setText("离线包".toUpperCase());
 	}
 	private void navigateUp() {
 		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
