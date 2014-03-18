@@ -332,4 +332,9 @@ public class WordsDao {
 		return wordList;
 	}
 
+	public void updateFamiliar(int familiar) {
+		SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
+		//TODO 
+	}
+
 }
