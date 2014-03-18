@@ -71,7 +71,7 @@ public class SettingsActivity extends Activity {
 			}
 		});
 		TextView titleText = (TextView) findViewById(R.id.titleText);
-		titleText.setText("设置");
+		titleText.setText("系统设置");
 
 	}
 

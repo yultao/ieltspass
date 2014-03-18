@@ -306,7 +306,7 @@ public class WordsDao {
 
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "getWordList, E: " + e.getMessage());
+			Logger.e(TAG, "getWordList, E: " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			if (cursor != null)

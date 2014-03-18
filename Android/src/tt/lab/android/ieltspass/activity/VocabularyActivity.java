@@ -176,7 +176,7 @@ public class VocabularyActivity extends FragmentActivity {
 			});
 
 		} catch (Exception e) {
-			Logger.i(TAG, "Exception: " + e.getMessage());
+			Logger.e(TAG, "Exception: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -300,7 +300,7 @@ public class VocabularyActivity extends FragmentActivity {
 				player.setDataSource(url);
 				player.prepareAsync();
 			} catch (Exception e) {
-				Logger.i(this.getClass().getName(), "Exception: " + e.getMessage());
+				Logger.e(this.getClass().getName(), "Exception: " + e.getMessage());
 				e.printStackTrace();
 			}			
 		}

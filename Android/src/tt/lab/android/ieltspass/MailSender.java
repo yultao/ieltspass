@@ -237,7 +237,7 @@ public class MailSender {
 			b = true;
 
 		} catch (Throwable e) {
-			Logger.i(TAG , "send: e: "+e);
+			Logger.e(TAG , "send: e: "+e);
 			e.printStackTrace();
 		} finally {
 			System.out.println("Sent.");

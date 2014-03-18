@@ -294,7 +294,7 @@ public class SpeakingActivity extends FragmentActivity {
 				currentPosition.setText(Utilities.formatTime(player.getCurrentPosition()));
 				refreshButtonText();
 			} catch (Exception e) {
-				Logger.i(TAG, "start: " + e);
+				Logger.e(TAG, "start: " + e);
 				e.printStackTrace();
 			}
 		}
@@ -328,7 +328,7 @@ public class SpeakingActivity extends FragmentActivity {
 			refreshButtonText();
 			handler.removeCallbacks(updateProgressThread);
 		} catch (Exception e) {
-			Logger.i(TAG, "release: E: " + e);
+			Logger.e(TAG, "release: E: " + e);
 			e.printStackTrace();
 		}
 	}
@@ -340,7 +340,7 @@ public class SpeakingActivity extends FragmentActivity {
 				seekBar.setProgress(cp);
 				handler.postDelayed(updateProgressThread, 500);// No need to update UI so frequently, 500 is enough.
 			} catch (Exception e) {
-				Logger.i(TAG, "updateProgressThread: " + e.getMessage());
+				Logger.e(TAG, "updateProgressThread: " + e.getMessage());
 			}
 
 		}
@@ -357,7 +357,7 @@ public class SpeakingActivity extends FragmentActivity {
 					stopRecording();
 				}
 			} catch (Exception e) {
-				Logger.i(TAG, "updateDurationThread: " + e.getMessage());
+				Logger.e(TAG, "updateDurationThread: " + e.getMessage());
 			}
 
 		}

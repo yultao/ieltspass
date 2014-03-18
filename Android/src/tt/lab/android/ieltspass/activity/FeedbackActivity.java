@@ -118,7 +118,7 @@ public class FeedbackActivity extends Activity {
 				msg.what = sent ? 0x0 : 0x1;
 				handler.sendMessage(msg);
 			} catch (Throwable e) {
-				Logger.i(TAG, "post E: " + e);
+				Logger.e(TAG, "post E: " + e);
 				e.printStackTrace();
 			}
 		}

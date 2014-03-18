@@ -123,7 +123,7 @@ public class CenterFragmentVocabulary extends Fragment {
 
 						// Toast.makeText(context, "第 " + currentPage +" 页  "+totalItemCount,Toast.LENGTH_LONG).show();
 						Logger.i(TAG, "Loading " + ((currentPage) * pageSize + 1) + "-"
-								+ ((currentPage + 1) * pageSize) + "toend: " + firstVisibleItem + ", "
+								+ ((currentPage + 1) * pageSize) + ", toend: " + firstVisibleItem + ", "
 								+ visibleItemCount + ", " + totalItemCount + "...");
 						loading = true;
 						new UpdateDataAsyncTask().execute();
@@ -400,7 +400,7 @@ public class CenterFragmentVocabulary extends Fragment {
 					super.setViewImage(v, value);// 会变小
 				}
 			} catch (Exception e) {
-				Logger.i(TAG, "setViewImage E: " + e + ", ImageView: " + v + ", value: " + value);
+				Logger.e(TAG, "setViewImage E: " + e + ", ImageView: " + v + ", value: " + value);
 			}
 		}
 
@@ -450,7 +450,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				listData.addAll(updateData);
 				postInitData();
 			} catch (Exception e) {
-				Logger.i(TAG, "InitDataAsyncTask onPostExecute E: " + e);
+				Logger.e(TAG, "InitDataAsyncTask onPostExecute E: " + e);
 			}
 			//Logger.i(TAG, "InitDataAsyncTask onPostExecute O");
 		}
@@ -476,7 +476,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				postUpdateData();
 
 			} catch (Exception e) {
-				Logger.i(TAG, "UpdateDataAsyncTask onPostExecute E: " + e);
+				Logger.e(TAG, "UpdateDataAsyncTask onPostExecute E: " + e);
 			}
 			//Logger.i(TAG, "UpdateDataAsyncTask onPostExecute O");
 		}
@@ -529,7 +529,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				// bitmap = BitmapFactory.decodeStream(openConnection.getInputStream());
 
 			} catch (Exception e) {
-				Logger.i(TAG, "doInBackground E: " + e.getMessage());
+				Logger.e(TAG, "doInBackground E: " + e.getMessage());
 				e.printStackTrace();
 			} finally {
 				if (is != null) {

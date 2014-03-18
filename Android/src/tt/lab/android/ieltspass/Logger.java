@@ -25,7 +25,14 @@ public class Logger {
 	public static String getFormatedDate() {
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 	}
-
+	public static void w(String tag, String msg) {
+		Log.w(tag, msg);
+		write(getFormatedDate() + ": " + tag + "\t" + msg);
+	}
+	public static void e(String tag, String msg) {
+		Log.e(tag, msg);
+		write(getFormatedDate() + ": " + tag + "\t" + msg);
+	}
 	public static void i(String tag, String msg) {
 
 		Log.i(tag, msg);
