@@ -22,10 +22,9 @@
 	<EditText
 	    android:id="@+id/editText1"
 	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
+	    android:layout_height="200dp"
 	    android:gravity="top"
 	    android:layout_below="@+id/aaa"
-	    android:layout_above="@+id/editText2"
 	    android:layout_alignParentLeft="true"
 	    android:ems="10"
 	    android:hint="请输入您的意见和建议"
@@ -41,14 +40,14 @@
 	    android:layout_centerHorizontal="true"
 	    android:ems="10"
 	    android:hint="请输入您的邮箱地址"
-	    android:layout_above="@+id/button1"
+	    android:layout_below="@+id/editText1"
 	    android:inputType="textEmailAddress" />
 	
 	<Button
 	    android:id="@+id/button1"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true"
+	    android:layout_below="@+id/editText2"
 	    android:layout_alignParentLeft="true"
 	    
 	    android:text="发送" />

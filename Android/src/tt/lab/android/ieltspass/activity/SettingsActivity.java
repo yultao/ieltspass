@@ -170,7 +170,7 @@ public class SettingsActivity extends Activity {
 	private void show() {
 		Builder builder = new Builder(this);
 		// builder.setMessage("确定删除");
-		builder.setTitle("提示");
+		builder.setTitle("选择缓存位置");
 		builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -183,7 +183,7 @@ public class SettingsActivity extends Activity {
 
 			}
 		});
-
+		
 		builder.setSingleChoiceItems(storagePaths, storageIndex, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				textView3.setText(storagePaths[which]);
