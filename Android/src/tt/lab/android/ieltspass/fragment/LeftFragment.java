@@ -87,11 +87,11 @@ public class LeftFragment extends Fragment {
 //			        myIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, mySbuject);  
 //			        myIntent.putExtra(android.content.Intent.EXTRA_TEXT, mybody);  
 //			        startActivity(Intent.createChooser(myIntent, "意见反馈"));  
-					Uri uri=Uri.parse("mailto: yulta@gmail.com");
-			        Intent emailIntent=new Intent(Intent.ACTION_SENDTO,uri);
-
-			        startActivity(emailIntent);
-					//intent.setClass(getActivity(), FeedbackActivity.class);
+//					Uri uri=Uri.parse("mailto: yulta@gmail.com");
+//			        Intent emailIntent=new Intent(Intent.ACTION_SENDTO,uri);
+//
+//			        startActivity(emailIntent);
+					intent.setClass(getActivity(), FeedbackActivity.class);
 					break;
 				case 3:
 					intent.setClass(getActivity(), AboutActivity.class);

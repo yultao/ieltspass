@@ -10,7 +10,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
 
 public class EmailSender {
 	public static void main(String[] args) {
@@ -36,9 +35,9 @@ public class EmailSender {
 	 */
 	public static void sendEmail(String to, String subject, String content) throws Exception, MessagingException {
 		String host = "smtp.gmail.com";
-		String address = "yultao@gmail.com";
-		String from = "yultao@gmail.com";
-		String password = "Aspen2012";
+		String address = "yultao@126.com";
+		String from = "yultao@126.com";
+		String password = "Aspen2010";
 		String port = "25";
 		sendEmail(host, address, from, password, to, port, subject, content);
 	}

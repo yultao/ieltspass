@@ -1,6 +1,7 @@
 package tt.lab.android.ieltspass.activity;
 
 import tt.lab.android.ieltspass.Constants;
+import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.fragment.CenterFragment;
@@ -38,6 +39,7 @@ public class LauncherActivity extends FragmentActivity {
 	}
 
 	private void initApp() {
+		Logger.initLog(Constants.SD_PATH+ "/" + Constants.ROOT_PATH + "/Logs");
 		settings = Settings.getInstance(this);//Init Settings
 		
 		//Constants.APP_PATH = getFilesDir().getAbsolutePath();

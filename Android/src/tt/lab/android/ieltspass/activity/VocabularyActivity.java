@@ -13,7 +13,6 @@ import tt.lab.android.ieltspass.model.ExplanationCategory;
 import tt.lab.android.ieltspass.model.Word;
 import android.app.ActionBar;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,10 +29,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 public class VocabularyActivity extends FragmentActivity {
@@ -161,6 +162,18 @@ public class VocabularyActivity extends FragmentActivity {
 				btnFamiliar.setBackgroundResource(R.drawable.category_5);
 			}
 			
+			View popupView = getLayoutInflater().inflate(R.layout.familiar_popupwindow, null);
+			final PopupWindow mPopupWindow = new PopupWindow(popupView, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, true);
+	        mPopupWindow.setTouchable(true);
+	        mPopupWindow.setOutsideTouchable(true);
+	        btnFamiliar.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View arg0) {
+					mPopupWindow.showAtLocation(findViewById(R.id.vocabulary_activity), Gravity.CENTER, 0, 0);
+					
+				}
+			});
 
 		} catch (Exception e) {
 			Logger.i(TAG, "Exception: " + e.getMessage());
