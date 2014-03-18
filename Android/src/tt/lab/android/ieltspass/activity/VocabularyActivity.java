@@ -12,6 +12,8 @@ import tt.lab.android.ieltspass.model.Explanation;
 import tt.lab.android.ieltspass.model.ExplanationCategory;
 import tt.lab.android.ieltspass.model.Word;
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -29,13 +31,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class VocabularyActivity extends FragmentActivity {
 	private static final String TAG = VocabularyActivity.class.getName();
@@ -59,6 +60,7 @@ public class VocabularyActivity extends FragmentActivity {
 	private ImageView imgPlayStopA;
 	private ImageView imgPlayStopB;
 	private ImageView imgCurrentPlaying = null;
+	private AlertDialog familiarDialog;
 	private Button btnFamiliar;
 	private AudioPlayer player;
 	private WordsDao wordsDao;
@@ -148,30 +150,37 @@ public class VocabularyActivity extends FragmentActivity {
 			} else if (word.getFamiliarity() == 2) {
 				btnFamiliar.setBackgroundColor(Color.GREEN);
 			}*/
-			if (word.getFamiliarity() == 0) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_1);//TODO
-			} else if (word.getFamiliarity() == 1) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_1);
-			} else if (word.getFamiliarity() == 2) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_2);
-			} else if (word.getFamiliarity() == 3) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_3);
-			} else if (word.getFamiliarity() == 4) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_4);
-			} else if (word.getFamiliarity() == 5) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_5);
-			}
+			updateFamiliarButton();
 			
-			View popupView = getLayoutInflater().inflate(R.layout.familiar_popupwindow, null);
-			final PopupWindow mPopupWindow = new PopupWindow(popupView, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, true);
-	        mPopupWindow.setTouchable(true);
-	        mPopupWindow.setOutsideTouchable(true);
+			final String[] items = new String[]{"很生","待煮","熟透"};  
+			familiarDialog = new AlertDialog.Builder(VocabularyActivity.this).setTitle("选择熟悉度").setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {  
+			    @Override  
+			    public void onClick(DialogInterface dialog, int which) {  
+			        switch (which) {  
+				        case 0:
+				            Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[0], Toast.LENGTH_SHORT).show();
+				            updateWordFamiliarity(1);
+				            familiarDialog.hide();
+				            break;  
+				        case 1:  
+				            Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[1], Toast.LENGTH_SHORT).show();
+				            updateWordFamiliarity(2);
+				            familiarDialog.hide();
+				            break;  
+				        case 2:  
+				            Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[2], Toast.LENGTH_SHORT).show();
+				            updateWordFamiliarity(3);
+				            familiarDialog.hide();
+				            break;  
+			        }  
+			    }  
+			}).create();  
+			
 	        btnFamiliar.setOnClickListener(new OnClickListener() {
 				
 				@Override
 				public void onClick(View arg0) {
-					mPopupWindow.showAtLocation(findViewById(R.id.vocabulary_activity), Gravity.CENTER, 0, 0);
-					
+					familiarDialog.show();					
 				}
 			});
 
@@ -180,6 +189,28 @@ public class VocabularyActivity extends FragmentActivity {
 			e.printStackTrace();
 		}
 	}
+	
+	private void updateFamiliarButton() {
+		if (word.getFamiliarity() == 0) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_0);
+		} else if (word.getFamiliarity() == 1) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_1);
+		} else if (word.getFamiliarity() == 2) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_2);
+		} else if (word.getFamiliarity() == 3) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_3);
+		} else if (word.getFamiliarity() == 4) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_4);
+		} else if (word.getFamiliarity() == 5) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_5);
+		}
+	}
+	
+	private void updateWordFamiliarity(int familiarity) {
+		wordsDao.updateFamiliar(familiarity);
+		word.setFamiliarity(familiarity);
+		updateFamiliarButton();
+	}	
 
 	private void initFragement() {
 		SectionBasicFragment fragment = new ChineseExplanationFragment();
