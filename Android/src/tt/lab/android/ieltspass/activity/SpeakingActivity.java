@@ -106,7 +106,7 @@ public class SpeakingActivity extends FragmentActivity {
 					}
 					currentPosition.setText(Utilities.formatTime(progress));
 				} catch (Exception e) {
-					Logger.i(TAG, "onProgressChanged: E: " + e.getMessage());
+					Logger.e(TAG, "onProgressChanged: E: " + e);
 				}
 			}
 
@@ -143,7 +143,7 @@ public class SpeakingActivity extends FragmentActivity {
 						stopRecording();
 					}
 				} catch (IOException e) {
-					Logger.i(TAG, "recording E: " + e);
+					Logger.e(TAG, "recording E: " + e);
 					e.printStackTrace();
 				}
 				Logger.i(TAG, "recording O: " + recording);
@@ -269,7 +269,7 @@ public class SpeakingActivity extends FragmentActivity {
 				player.prepareAsync();
 				percentage.setText("Preparing..");
 			} catch (Exception e) {
-				Logger.i(TAG, "resetPlayer: E " + e);
+				Logger.e(TAG, "resetPlayer: E " + e);
 				e.printStackTrace();
 			}
 		}
@@ -313,7 +313,7 @@ public class SpeakingActivity extends FragmentActivity {
 			handler.removeCallbacks(updateProgressThread);
 			refreshButtonText();
 		} catch (Exception e) {
-			Logger.i(TAG, "pause: E: " + e);
+			Logger.e(TAG, "pause: E: " + e);
 			e.printStackTrace();
 		}
 		Logger.i(TAG, "pause O");

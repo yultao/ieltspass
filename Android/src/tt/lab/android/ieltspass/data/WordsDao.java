@@ -183,7 +183,7 @@ public class WordsDao {
 				count = Integer.parseInt(cursor.getString(0));
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "getWordListCount, E: " + e.getMessage());
+			Logger.e(TAG, "getWordListCount, E: " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			if (cursor != null)
@@ -253,7 +253,7 @@ public class WordsDao {
 
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "getWordList, E: " + e.getMessage());
+			Logger.e(TAG, "getWordList, E: " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			if (cursor != null)

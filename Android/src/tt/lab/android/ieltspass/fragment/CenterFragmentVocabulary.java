@@ -260,7 +260,7 @@ public class CenterFragmentVocabulary extends Fragment {
 			
 			listWords(listData);
 		} catch (Exception e) {
-			Logger.i(TAG, "initData E:" + e);
+			Logger.e(TAG, "initData E:" + e);
 		}
 		Logger.i(TAG, "initData O");
 	}
@@ -367,7 +367,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				listData.add(map);
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "listWords E: "+e);
+			Logger.e(TAG, "listWords E: "+e);
 		}
 		Logger.i(TAG, "listWords O: "+listData.size());
 	}
@@ -421,7 +421,7 @@ public class CenterFragmentVocabulary extends Fragment {
 			try {
 				postInitData();
 			} catch (Exception e) {
-				Logger.i(TAG, "InitDataAsyncTask onPostExecute E: " + e);
+				Logger.e(TAG, "InitDataAsyncTask onPostExecute E: " + e);
 			}
 			Logger.i(TAG, "InitDataAsyncTask onPostExecute O");
 		}
@@ -536,7 +536,7 @@ public class CenterFragmentVocabulary extends Fragment {
 					try {
 						is.close();
 					} catch (IOException e) {
-						Logger.i(TAG, "doInBackground is close " + e);
+						Logger.e(TAG, "doInBackground is close " + e);
 						e.printStackTrace();
 					}
 				}
@@ -544,7 +544,7 @@ public class CenterFragmentVocabulary extends Fragment {
 					try {
 						os.close();
 					} catch (IOException e) {
-						Logger.i(TAG, "doInBackground os close " + e);
+						Logger.e(TAG, "doInBackground os close " + e);
 						e.printStackTrace();
 					}
 				}

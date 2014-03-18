@@ -169,7 +169,7 @@ public class ListeningActivity extends FragmentActivity {
 					}
 					currentPosition.setText(Utilities.formatTime(progress));
 				} catch (Exception e) {
-					Logger.i(TAG, "onProgressChanged: E: " + e.getMessage());
+					Logger.e(TAG, "onProgressChanged: E: " + e);
 				}
 			}
 

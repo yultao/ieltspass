@@ -101,7 +101,7 @@ public class Settings {
 			Logger.i(TAG, "write sb " + sb.toString());
 			writer.close();
 		} catch (FileNotFoundException e) {
-			Logger.i(TAG, "write E: " + e);
+			Logger.e(TAG, "write E: " + e);
 			e.printStackTrace();
 		}
 		Logger.i(TAG, "write O");

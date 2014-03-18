@@ -358,7 +358,7 @@ public class Utilities {
 			bufferedReader.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-			Logger.i(TAG, "getSql E: " + e.getMessage());
+			Logger.e(TAG, "getSql E: " + e.getMessage());
 		}
 		String sql  =sb.toString();
 		Logger.i(TAG, "getSql sql "+ sql);

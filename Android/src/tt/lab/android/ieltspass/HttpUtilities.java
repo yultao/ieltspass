@@ -54,7 +54,7 @@ public class HttpUtilities {
 				Logger.i(TAG, "请求服务器端失败 " + response.getStatusLine().getStatusCode());
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "doGet E: " + e);
+			Logger.e(TAG, "doGet E: " + e);
 			e.printStackTrace();
 		}
 	}
@@ -95,7 +95,7 @@ public class HttpUtilities {
 				Logger.i(TAG, "请求服务器端失败 " + response.getStatusLine().getStatusCode());
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "doPost E: " + e);
+			Logger.e(TAG, "doPost E: " + e);
 		}
 	}
 }
