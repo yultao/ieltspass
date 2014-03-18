@@ -27,8 +27,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class CenterFragmentLSRW extends Fragment {
-	private static int tabSelected;
-	private static int[][] itemSelected = new int[4][9];
+	private int tabSelected;
+	private int[][] itemSelected = new int[4][9];
 	private String TAG = CenterFragmentLSRW.class.getName();
 	private Button button1, button2, button3, button4;
 	private Button[] buttons = new Button[4];

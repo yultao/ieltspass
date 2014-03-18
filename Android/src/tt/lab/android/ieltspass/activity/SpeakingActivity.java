@@ -61,7 +61,7 @@ public class SpeakingActivity extends FragmentActivity {
 	private File currentAudio;
 
 	private long recordingStart;
-	private long MAX_RECORDING_LENGTH = 1000 + 1000 * 60 * 5;// 最长5分钟
+	private long MAX_RECORDING_LENGTH = 500 + 1000 * 60 * 60;// 最长60分钟
 	private SpeakingFragmentRecordings fragmentRecordings;
 	private Settings settings;
 	
@@ -163,7 +163,7 @@ public class SpeakingActivity extends FragmentActivity {
 		String path = settings.getSpeakingAudiosPath() + "/" + name;
 		Utilities.ensurePath(path);
 
-		currentAudio = new File(path + "/" + Utilities.getRecordingFileName() + ".amr");
+		currentAudio = new File(path + "/" + Utilities.getRecordingFileName() + ".amr.d");
 		recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
@@ -184,17 +184,19 @@ public class SpeakingActivity extends FragmentActivity {
 			recorder.release();
 			recorder = null;
 			recording = false;
-			resetPlayer(currentAudio.getAbsolutePath(), false);
+			File file = new File(currentAudio.getAbsolutePath().replace(".d",""));
+			currentAudio.renameTo(file);
+			resetPlayer(file.getAbsolutePath(), false);
 			handler.removeCallbacks(updateDurationThread);
 			btnRecordStop.setBackgroundDrawable(getResources().getDrawable(R.drawable.recordbutton));
-			write(currentAudio.getName(), recordingStart, (int) (System.currentTimeMillis() - recordingStart));
+			write(file, recordingStart, (int) (System.currentTimeMillis() - recordingStart));
 			fragmentRecordings.refreshListView();
 		}
 	}
 
-	private void write(String name, long start, int length) {
-		String s = Utilities.formatTimeLong(start) + "\t" + Utilities.formatTimeSecond(length) + "\t" + name;
-		String currentAudioLog = currentAudio.getAbsolutePath().replace("amr", "t");
+	private void write(File file, long start, int length) {
+		String s = Utilities.formatTimeLong(start) + "\t" + Utilities.formatTimeSecond(length) + "\t" + file.getName();
+		String currentAudioLog = file.getAbsolutePath().replace("amr", "t");
 		Utilities.writeFile(currentAudioLog, s);
 
 	}
