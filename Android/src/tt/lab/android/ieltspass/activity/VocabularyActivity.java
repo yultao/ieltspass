@@ -36,7 +36,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class VocabularyActivity extends FragmentActivity {
 	private static final String TAG = VocabularyActivity.class.getName();
@@ -151,36 +150,36 @@ public class VocabularyActivity extends FragmentActivity {
 				btnFamiliar.setBackgroundColor(Color.GREEN);
 			}*/
 			updateFamiliarButton();
-			
-			final String[] items = new String[]{"很生","待煮","熟透"};  
-			familiarDialog = new AlertDialog.Builder(VocabularyActivity.this).setTitle("选择熟悉度").setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {  
-			    @Override  
-			    public void onClick(DialogInterface dialog, int which) {  
-			        switch (which) {  
-				        case 0:
-				            Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[0], Toast.LENGTH_SHORT).show();
-				            updateWordFamiliarity(1);
-				            familiarDialog.hide();
-				            break;  
-				        case 1:  
-				            Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[1], Toast.LENGTH_SHORT).show();
-				            updateWordFamiliarity(2);
-				            familiarDialog.hide();
-				            break;  
-				        case 2:  
-				            Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[2], Toast.LENGTH_SHORT).show();
-				            updateWordFamiliarity(3);
-				            familiarDialog.hide();
-				            break;  
-			        }  
-			    }  
-			}).create();  
+			final int familirity = word.getFamiliarity();
 			
 	        btnFamiliar.setOnClickListener(new OnClickListener() {
 				
 				@Override
 				public void onClick(View arg0) {
-					familiarDialog.show();					
+					final String[] items = new String[]{"很生","待煮","熟透"};  
+					familiarDialog = new AlertDialog.Builder(VocabularyActivity.this).setTitle("选择熟悉度")
+							.setSingleChoiceItems(items, familirity-1, new DialogInterface.OnClickListener() {  
+					    @Override  
+					    public void onClick(DialogInterface dialog, int which) {  
+					        switch (which) {  
+						        case 0:
+						            //Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[0], Toast.LENGTH_SHORT).show();
+						            updateWordFamiliarity(1);
+						            familiarDialog.dismiss();
+						            break;  
+						        case 1:  
+						            //Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[1], Toast.LENGTH_SHORT).show();
+						            updateWordFamiliarity(2);
+						            familiarDialog.dismiss();
+						            break;  
+						        case 2:  
+						            //Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[2], Toast.LENGTH_SHORT).show();
+						            updateWordFamiliarity(3);
+						            familiarDialog.dismiss();
+						            break;  
+					        }  
+					    }  
+					}).show();					
 				}
 			});
 
@@ -207,7 +206,7 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 	
 	private void updateWordFamiliarity(int familiarity) {
-		wordsDao.updateFamiliar(familiarity);
+		wordsDao.updateFamiliar(word.getWord_vocabulary(), familiarity);
 		word.setFamiliarity(familiarity);
 		updateFamiliarButton();
 	}	
@@ -268,7 +267,7 @@ public class VocabularyActivity extends FragmentActivity {
 		String wordTitle = bundle.getString("title");
 		word = wordsDao.getSingleWordInfo(wordTitle);
 
-		title.setText(wordTitle);
+		title.setText(wordTitle.toUpperCase());
 	}
 
 	private void navigateUp() {
@@ -501,13 +500,18 @@ public class VocabularyActivity extends FragmentActivity {
 			for(Explanation explanation : wordExplains) {
 				if (explanation.getCategory().equalsIgnoreCase(ExplanationCategory.BASIC.name())) {
 					TextView tv = createTextView();
-					tv.setText(explanation.getPart_of_speech() + " " + explanation.getContent());
+					tv.setText(explanation.getPart_of_speech());
+					layout.addView(tv);
+					
+					tv = createTextView();
+					tv.setText(explanation.getContent());
+					tv.setPadding(30, 0, 0, tv.getPaddingBottom());
 					layout.addView(tv);
 				} else if (explanation.getCategory().equalsIgnoreCase(ExplanationCategory.CHINESE.name())) {
 					TextView tv = createTextView();
 					tv.setText(explanation.getContent());
-					layout.addView(tv);
 					tv.setPadding(30, 0, 0, 10);
+					layout.addView(tv);
 				}
 			}
 		}
