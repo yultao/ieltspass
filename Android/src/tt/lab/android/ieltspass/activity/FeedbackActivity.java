@@ -46,22 +46,39 @@ public class FeedbackActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				boolean canSend = false;
-				if (Utilities.isNetworkConnected()) {
-					if (settings.isNetwordForbidden()) {
-						Toast.makeText(FeedbackActivity.this, "有网络，但已设置禁止", Toast.LENGTH_SHORT).show();
-					} else {
-						if (Utilities.isWifiConnected()) {
-							canSend = true;
-						} else if (Utilities.isMobileConnected()) {
-							if (settings.isWifiAndMobile()) {
+				if(textView1.getText().toString().trim().length()==0){
+					Toast.makeText(FeedbackActivity.this, "请输入意见和建议", Toast.LENGTH_SHORT).show();
+					textView1.requestFocus();
+					canSend = false;
+				} else if (textView2.getText().toString().trim().length()==0){
+					Toast.makeText(FeedbackActivity.this, "请输入邮箱地址", Toast.LENGTH_SHORT).show();
+					textView2.requestFocus();
+					canSend = false;
+				} else {
+					canSend = true;
+				}
+				
+				if(canSend){
+					if (Utilities.isNetworkConnected()) {
+						if (settings.isNetwordForbidden()) {
+							Toast.makeText(FeedbackActivity.this, "有网络，但已设为禁止", Toast.LENGTH_SHORT).show();
+							canSend = false;
+						} else {
+							if (Utilities.isWifiConnected()) {
 								canSend = true;
-							} else {
-								Toast.makeText(FeedbackActivity.this, "仅有手机网络，但已设置禁止", Toast.LENGTH_SHORT).show();
+							} else if (Utilities.isMobileConnected()) {
+								if (settings.isWifiAndMobile()) {
+									canSend = true;
+								} else {
+									Toast.makeText(FeedbackActivity.this, "仅有手机网络，但已设为禁止", Toast.LENGTH_SHORT).show();
+									canSend = false;
+								}
 							}
 						}
+					} else {
+						Toast.makeText(FeedbackActivity.this, "无网络", Toast.LENGTH_SHORT).show();
+						canSend = false;
 					}
-				} else {
-					Toast.makeText(FeedbackActivity.this, "无网络", Toast.LENGTH_SHORT).show();
 				}
 				if (canSend) {
 					new Thread(post).start();
@@ -79,7 +96,6 @@ public class FeedbackActivity extends Activity {
 				handler.removeCallbacks(post);
 				if (msg.what == 0x0) {
 					progressDialog.dismiss();
-					navigateUp();
 				} else {
 					progressDialog.dismiss();
 				}

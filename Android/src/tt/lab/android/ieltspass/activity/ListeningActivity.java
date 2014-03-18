@@ -315,7 +315,7 @@ public class ListeningActivity extends FragmentActivity {
 		} else {
 			if (isNetworkConnected) {
 				if (settings.isNetwordForbidden()) {
-					Toast.makeText(this, "有网络，但已设置禁止", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, "有网络，但已设为禁止", Toast.LENGTH_SHORT).show();
 				} else {
 					if (wifi) {
 						initPlayer = true;
@@ -323,7 +323,7 @@ public class ListeningActivity extends FragmentActivity {
 						if (settings.isWifiAndMobile()) {
 							initPlayer = true;
 						} else {
-							Toast.makeText(this, "仅有手机网络，但已设置禁止", Toast.LENGTH_SHORT).show();
+							Toast.makeText(this, "仅有手机网络，但已设为禁止", Toast.LENGTH_SHORT).show();
 						}
 					}
 				}
