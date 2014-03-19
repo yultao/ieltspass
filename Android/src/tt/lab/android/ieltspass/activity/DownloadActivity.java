@@ -53,13 +53,12 @@ public class DownloadActivity extends Activity {
 
 		List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
 
-//		for (Word word : wordList) {
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("name", "单词图片");
 			map.put("progressBar1", "20");
 			map.put("current", "2MB");
 			map.put("length", "12MB");
-			map.put("button1", "Pause");
+			map.put("button1", "Downaloding");
 			listData.add(map);
 			
 			map = new HashMap<String, String>();
@@ -69,21 +68,18 @@ public class DownloadActivity extends Activity {
 			map.put("length", "20MB");
 			map.put("button1", "Stop");
 			listData.add(map);
-//		}
 		
 		return listData;
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.download, menu);
+		//getMenuInflater().inflate(R.menu.download, menu);
 		return true;
 	}
 
 	private void initTitle() {
 		Button back = (Button) findViewById(R.id.menuButton);
-		// back.setBackground(Resources.getSystem().getDrawable(R.drawable.back));
 		back.setBackgroundResource(R.drawable.backbutton);
 		back.setOnClickListener(new OnClickListener() {
 			@Override
@@ -185,6 +181,13 @@ public class DownloadActivity extends Activity {
 	                                    " should be bound to a Boolean, not a " +
 	                                    (data == null ? "<unknown type>" : data.getClass()));
 	                        }
+	                    } else if (v instanceof Button) {
+	                    	Button button  = (Button)v;
+	                    	if("Stop".equals(text)){
+	                    		button.setBackgroundResource(R.drawable.playbutton);
+	                    	} else if ("Downaloding".equals(text)){
+	                    		button.setBackgroundResource(R.drawable.pausebutton);
+	                    	}
 	                    } else if (v instanceof TextView) {
 	                        // Note: keep the instanceof TextView check at the bottom of these
 	                        // ifs since a lot of views are TextViews (e.g. CheckBoxes).

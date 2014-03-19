@@ -52,8 +52,7 @@
     </RelativeLayout>
 	<Button
             android:id="@+id/button1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="浏览" />
+           android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true" />
 </RelativeLayout>
