@@ -169,7 +169,7 @@ public class ListeningActivity extends FragmentActivity {
 					}
 					currentPosition.setText(Utilities.formatTime(progress));
 				} catch (Exception e) {
-					Logger.i(TAG, "onProgressChanged: E: " + e.getMessage());
+					Logger.e(TAG, "onProgressChanged: E: " + e);
 				}
 			}
 
@@ -202,7 +202,7 @@ public class ListeningActivity extends FragmentActivity {
 
 	private void initPlayer() {
 		boolean fromLocal = file.exists();
-		String url = fromLocal ? file.getAbsolutePath() : "http://taog.ueuo.com/" + audio;
+		String url = fromLocal ? file.getAbsolutePath() : Constants.LISTENING_AUDIOS_URL + audio;
 		if (checkNetwork(fromLocal)) {
 			if (!fromLocal) {
 				new DownloadAsyncTask(seekBar, url).execute();
@@ -298,7 +298,7 @@ public class ListeningActivity extends FragmentActivity {
 				// Logger.i(TAG, "initPlayer " + 5);
 
 			} catch (Exception e) {
-				Logger.i(TAG, "initPlayer: E " + e.getMessage());
+				Logger.e(TAG, "initPlayer: E " + e.getMessage());
 				e.printStackTrace();
 			}
 
@@ -315,7 +315,7 @@ public class ListeningActivity extends FragmentActivity {
 		} else {
 			if (isNetworkConnected) {
 				if (settings.isNetwordForbidden()) {
-					Toast.makeText(this, "有网络，但已设置禁止", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, "有网络，但已设为禁止", Toast.LENGTH_SHORT).show();
 				} else {
 					if (wifi) {
 						initPlayer = true;
@@ -323,7 +323,7 @@ public class ListeningActivity extends FragmentActivity {
 						if (settings.isWifiAndMobile()) {
 							initPlayer = true;
 						} else {
-							Toast.makeText(this, "仅有手机网络，但已设置禁止", Toast.LENGTH_SHORT).show();
+							Toast.makeText(this, "仅有手机网络，但已设为禁止", Toast.LENGTH_SHORT).show();
 						}
 					}
 				}
@@ -368,7 +368,7 @@ public class ListeningActivity extends FragmentActivity {
 				seekBar.setProgress(cp);
 				handler.postDelayed(updateProgressThread, 500);// No need to update UI so frequently, 500 is enough.
 			} catch (Exception e) {
-				Logger.i(TAG, "updateProgressThread: " + e.getMessage());
+				Logger.e(TAG, "updateProgressThread: " + e.getMessage());
 			}
 
 		}
@@ -379,7 +379,7 @@ public class ListeningActivity extends FragmentActivity {
 			try {
 
 			} catch (Exception e) {
-				Logger.i(TAG, "downloadThread: " + e.getMessage());
+				Logger.e(TAG, "downloadThread: " + e.getMessage());
 			}
 
 		}
@@ -395,7 +395,7 @@ public class ListeningActivity extends FragmentActivity {
 				currentPosition.setText(Utilities.formatTime(player.getCurrentPosition()));
 				refreshButtonText();
 			} catch (Exception e) {
-				Logger.i(TAG, "start: " + e.getMessage());
+				Logger.e(TAG, "start: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -414,7 +414,7 @@ public class ListeningActivity extends FragmentActivity {
 			}
 
 		} catch (Exception e) {
-			Logger.i(TAG, "pause: E: " + e.getMessage());
+			Logger.e(TAG, "pause: E: " + e.getMessage());
 			e.printStackTrace();
 		}
 		// Logger.i(TAG, "pause O");
@@ -435,7 +435,7 @@ public class ListeningActivity extends FragmentActivity {
 				// Logger.i(TAG, "release: 3: ");
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "release: E: " + e.getMessage());
+			Logger.e(TAG, "release: E: " + e.getMessage());
 			e.printStackTrace();
 		}
 		// Logger.i(TAG, "release O");
@@ -512,12 +512,10 @@ public class ListeningActivity extends FragmentActivity {
 				URLConnection openConnection = url.openConnection();
 
 				is = openConnection.getInputStream();
-				int available = is.available();
-				// Logger.i(TAG, "doInBackground "+21+", "+available);
-				String filename = settings.getListeningAudiosPath() + "/" + name;
-				// Logger.i(TAG, "doInBackground filename " + filename + ", " + available);
+				String listeningAudiosPath = settings.getListeningAudiosPath();
+				Utilities.ensurePath(listeningAudiosPath);
+				String filename = listeningAudiosPath + "/" + name;
 				String tmpfilename = filename + ".d";
-				// Logger.i(TAG, "doInBackground tmpfilename " + tmpfilename);
 				File tmp = new File(tmpfilename);
 				os = new FileOutputStream(tmp);
 				byte[] buffer = new byte[1024];

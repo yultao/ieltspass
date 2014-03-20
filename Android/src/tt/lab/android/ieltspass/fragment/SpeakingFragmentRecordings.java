@@ -138,31 +138,41 @@ public class SpeakingFragmentRecordings extends Fragment {
 					}
 				})) {
 					String name = null;
-					String length = null;
+					String duration = null;
 					String datetime = null;
+					String length = null;
+					long len = file.length();
+					if(len>=1024*1024){
+						length = len/1024/1024+"MB";
+					} else if (len>=1024){
+						length = len/1024+"KB";
+					} else {
+						length = len+"B";
+					}
 					List<String> readFile = Utilities.readFile(file.getAbsolutePath().replace("amr", "t"));
 
 					if (readFile.size() == 1) {
 						String[] ss = readFile.get(0).split("\t");
 						if (ss.length == 3) {
 							datetime = ss[0];
-							length = ss[1];
+							duration = ss[1];
 							name = ss[2];
 						}
 					} else {
 						name = file.getName();
 					}
-
+					
 					Map<String, String> map = new HashMap<String, String>();
 					map.put("name", name);
 					map.put("datetime", datetime);
-					map.put("length", length);
+					//map.put("duration", duration);
+					map.put("length", length+"  "+duration);
 					map.put("absFileName", file.getAbsolutePath());
 					data.add(map);
 				}
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "listAudios: " + e);
+			Logger.e(TAG, "listAudios: " + e);
 		}
 		Logger.i(TAG, "listAudios: " + data.size());
 		return data;

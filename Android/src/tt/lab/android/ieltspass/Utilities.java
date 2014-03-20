@@ -155,7 +155,7 @@ public class Utilities {
 						previousSentence = sentence;
 					}
 				} catch (Exception e) {
-					Logger.i(TAG, "parseLyrics E: " + e.getMessage());
+					Logger.e(TAG, "parseLyrics E: " + e.getMessage());
 				}
 			}
 			is.close();
@@ -299,7 +299,7 @@ public class Utilities {
 				}
 			}
 		} catch (Exception e){
-			Logger.i(TAG, "getTinyPic E:"+e);
+			Logger.e(TAG, "getTinyPic E:"+e);
 		}
 		//Logger.i(TAG, "getTinyPic O "+url);
 		return url;
@@ -327,7 +327,7 @@ public class Utilities {
 			}
 			bufferedReader.close();
 		} catch (Exception e) {
-			Logger.i(TAG, "readFile E: " + e);
+			Logger.e(TAG, "readFile E: " + e);
 			e.printStackTrace();
 		}
 		return list;
@@ -339,7 +339,7 @@ public class Utilities {
 			writer.println(s);
 			writer.close();
 		} catch (FileNotFoundException e) {
-			Logger.i(TAG, "writeFile E: " + e);
+			Logger.e(TAG, "writeFile E: " + e);
 			e.printStackTrace();
 		}
 	}
@@ -358,7 +358,7 @@ public class Utilities {
 			bufferedReader.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-			Logger.i(TAG, "getSql E: " + e.getMessage());
+			Logger.e(TAG, "getSql E: " + e.getMessage());
 		}
 		String sql  =sb.toString();
 		Logger.i(TAG, "getSql sql "+ sql);

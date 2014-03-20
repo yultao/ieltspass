@@ -61,7 +61,7 @@ public class SpeakingActivity extends FragmentActivity {
 	private File currentAudio;
 
 	private long recordingStart;
-	private long MAX_RECORDING_LENGTH = 1000 + 1000 * 60 * 5;// 最长5分钟
+	private long MAX_RECORDING_LENGTH = 500 + 1000 * 60 * 60;// 最长60分钟
 	private SpeakingFragmentRecordings fragmentRecordings;
 	private Settings settings;
 	
@@ -106,7 +106,7 @@ public class SpeakingActivity extends FragmentActivity {
 					}
 					currentPosition.setText(Utilities.formatTime(progress));
 				} catch (Exception e) {
-					Logger.i(TAG, "onProgressChanged: E: " + e.getMessage());
+					Logger.e(TAG, "onProgressChanged: E: " + e);
 				}
 			}
 
@@ -143,7 +143,7 @@ public class SpeakingActivity extends FragmentActivity {
 						stopRecording();
 					}
 				} catch (IOException e) {
-					Logger.i(TAG, "recording E: " + e);
+					Logger.e(TAG, "recording E: " + e);
 					e.printStackTrace();
 				}
 				Logger.i(TAG, "recording O: " + recording);
@@ -163,7 +163,7 @@ public class SpeakingActivity extends FragmentActivity {
 		String path = settings.getSpeakingAudiosPath() + "/" + name;
 		Utilities.ensurePath(path);
 
-		currentAudio = new File(path + "/" + Utilities.getRecordingFileName() + ".amr");
+		currentAudio = new File(path + "/" + Utilities.getRecordingFileName() + ".amr.d");
 		recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
@@ -184,17 +184,19 @@ public class SpeakingActivity extends FragmentActivity {
 			recorder.release();
 			recorder = null;
 			recording = false;
-			resetPlayer(currentAudio.getAbsolutePath(), false);
+			File file = new File(currentAudio.getAbsolutePath().replace(".d",""));
+			currentAudio.renameTo(file);
+			resetPlayer(file.getAbsolutePath(), false);
 			handler.removeCallbacks(updateDurationThread);
 			btnRecordStop.setBackgroundDrawable(getResources().getDrawable(R.drawable.recordbutton));
-			write(currentAudio.getName(), recordingStart, (int) (System.currentTimeMillis() - recordingStart));
+			write(file, recordingStart, (int) (System.currentTimeMillis() - recordingStart));
 			fragmentRecordings.refreshListView();
 		}
 	}
 
-	private void write(String name, long start, int length) {
-		String s = Utilities.formatTimeLong(start) + "\t" + Utilities.formatTimeSecond(length) + "\t" + name;
-		String currentAudioLog = currentAudio.getAbsolutePath().replace("amr", "t");
+	private void write(File file, long start, int length) {
+		String s = Utilities.formatTimeLong(start) + "\t" + Utilities.formatTimeSecond(length) + "\t" + file.getName();
+		String currentAudioLog = file.getAbsolutePath().replace("amr", "t");
 		Utilities.writeFile(currentAudioLog, s);
 
 	}
@@ -269,7 +271,7 @@ public class SpeakingActivity extends FragmentActivity {
 				player.prepareAsync();
 				percentage.setText("Preparing..");
 			} catch (Exception e) {
-				Logger.i(TAG, "resetPlayer: E " + e);
+				Logger.e(TAG, "resetPlayer: E " + e);
 				e.printStackTrace();
 			}
 		}
@@ -294,7 +296,7 @@ public class SpeakingActivity extends FragmentActivity {
 				currentPosition.setText(Utilities.formatTime(player.getCurrentPosition()));
 				refreshButtonText();
 			} catch (Exception e) {
-				Logger.i(TAG, "start: " + e);
+				Logger.e(TAG, "start: " + e);
 				e.printStackTrace();
 			}
 		}
@@ -313,7 +315,7 @@ public class SpeakingActivity extends FragmentActivity {
 			handler.removeCallbacks(updateProgressThread);
 			refreshButtonText();
 		} catch (Exception e) {
-			Logger.i(TAG, "pause: E: " + e);
+			Logger.e(TAG, "pause: E: " + e);
 			e.printStackTrace();
 		}
 		Logger.i(TAG, "pause O");
@@ -328,7 +330,7 @@ public class SpeakingActivity extends FragmentActivity {
 			refreshButtonText();
 			handler.removeCallbacks(updateProgressThread);
 		} catch (Exception e) {
-			Logger.i(TAG, "release: E: " + e);
+			Logger.e(TAG, "release: E: " + e);
 			e.printStackTrace();
 		}
 	}
@@ -340,7 +342,7 @@ public class SpeakingActivity extends FragmentActivity {
 				seekBar.setProgress(cp);
 				handler.postDelayed(updateProgressThread, 500);// No need to update UI so frequently, 500 is enough.
 			} catch (Exception e) {
-				Logger.i(TAG, "updateProgressThread: " + e.getMessage());
+				Logger.e(TAG, "updateProgressThread: " + e.getMessage());
 			}
 
 		}
@@ -357,7 +359,7 @@ public class SpeakingActivity extends FragmentActivity {
 					stopRecording();
 				}
 			} catch (Exception e) {
-				Logger.i(TAG, "updateDurationThread: " + e.getMessage());
+				Logger.e(TAG, "updateDurationThread: " + e.getMessage());
 			}
 
 		}

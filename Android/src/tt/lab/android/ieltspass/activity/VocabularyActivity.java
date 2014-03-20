@@ -12,6 +12,8 @@ import tt.lab.android.ieltspass.model.Explanation;
 import tt.lab.android.ieltspass.model.ExplanationCategory;
 import tt.lab.android.ieltspass.model.Word;
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -29,12 +31,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 public class VocabularyActivity extends FragmentActivity {
@@ -59,6 +59,7 @@ public class VocabularyActivity extends FragmentActivity {
 	private ImageView imgPlayStopA;
 	private ImageView imgPlayStopB;
 	private ImageView imgCurrentPlaying = null;
+	private AlertDialog familiarDialog;
 	private Button btnFamiliar;
 	private AudioPlayer player;
 	private WordsDao wordsDao;
@@ -148,38 +149,67 @@ public class VocabularyActivity extends FragmentActivity {
 			} else if (word.getFamiliarity() == 2) {
 				btnFamiliar.setBackgroundColor(Color.GREEN);
 			}*/
-			if (word.getFamiliarity() == 0) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_1);//TODO
-			} else if (word.getFamiliarity() == 1) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_1);
-			} else if (word.getFamiliarity() == 2) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_2);
-			} else if (word.getFamiliarity() == 3) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_3);
-			} else if (word.getFamiliarity() == 4) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_4);
-			} else if (word.getFamiliarity() == 5) {
-				btnFamiliar.setBackgroundResource(R.drawable.category_5);
-			}
+			updateFamiliarButton();
+			final int familirity = word.getFamiliarity();
 			
-			View popupView = getLayoutInflater().inflate(R.layout.familiar_popupwindow, null);
-			final PopupWindow mPopupWindow = new PopupWindow(popupView, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, true);
-	        mPopupWindow.setTouchable(true);
-	        mPopupWindow.setOutsideTouchable(true);
 	        btnFamiliar.setOnClickListener(new OnClickListener() {
 				
 				@Override
 				public void onClick(View arg0) {
-					mPopupWindow.showAtLocation(findViewById(R.id.vocabulary_activity), Gravity.CENTER, 0, 0);
-					
+					final String[] items = new String[]{"很生","待煮","熟透"};  
+					familiarDialog = new AlertDialog.Builder(VocabularyActivity.this).setTitle("选择熟悉度")
+							.setSingleChoiceItems(items, familirity-1, new DialogInterface.OnClickListener() {  
+					    @Override  
+					    public void onClick(DialogInterface dialog, int which) {  
+					        switch (which) {  
+						        case 0:
+						            //Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[0], Toast.LENGTH_SHORT).show();
+						            updateWordFamiliarity(1);
+						            familiarDialog.dismiss();
+						            break;  
+						        case 1:  
+						            //Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[1], Toast.LENGTH_SHORT).show();
+						            updateWordFamiliarity(2);
+						            familiarDialog.dismiss();
+						            break;  
+						        case 2:  
+						            //Toast.makeText(VocabularyActivity.this, "你选择的是:"+items[2], Toast.LENGTH_SHORT).show();
+						            updateWordFamiliarity(3);
+						            familiarDialog.dismiss();
+						            break;  
+					        }  
+					    }  
+					}).show();					
 				}
 			});
 
 		} catch (Exception e) {
-			Logger.i(TAG, "Exception: " + e.getMessage());
+			Logger.e(TAG, "Exception: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
+	
+	private void updateFamiliarButton() {
+		if (word.getFamiliarity() == 0) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_0);
+		} else if (word.getFamiliarity() == 1) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_1);
+		} else if (word.getFamiliarity() == 2) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_2);
+		} else if (word.getFamiliarity() == 3) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_3);
+		} else if (word.getFamiliarity() == 4) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_4);
+		} else if (word.getFamiliarity() == 5) {
+			btnFamiliar.setBackgroundResource(R.drawable.category_5);
+		}
+	}
+	
+	private void updateWordFamiliarity(int familiarity) {
+		wordsDao.updateFamiliar(word.getWord_vocabulary(), familiarity);
+		word.setFamiliarity(familiarity);
+		updateFamiliarButton();
+	}	
 
 	private void initFragement() {
 		SectionBasicFragment fragment = new ChineseExplanationFragment();
@@ -237,7 +267,7 @@ public class VocabularyActivity extends FragmentActivity {
 		String wordTitle = bundle.getString("title");
 		word = wordsDao.getSingleWordInfo(wordTitle);
 
-		title.setText(wordTitle);
+		title.setText(wordTitle.toUpperCase());
 	}
 
 	private void navigateUp() {
@@ -300,7 +330,7 @@ public class VocabularyActivity extends FragmentActivity {
 				player.setDataSource(url);
 				player.prepareAsync();
 			} catch (Exception e) {
-				Logger.i(this.getClass().getName(), "Exception: " + e.getMessage());
+				Logger.e(this.getClass().getName(), "Exception: " + e.getMessage());
 				e.printStackTrace();
 			}			
 		}
@@ -470,13 +500,18 @@ public class VocabularyActivity extends FragmentActivity {
 			for(Explanation explanation : wordExplains) {
 				if (explanation.getCategory().equalsIgnoreCase(ExplanationCategory.BASIC.name())) {
 					TextView tv = createTextView();
-					tv.setText(explanation.getPart_of_speech() + " " + explanation.getContent());
+					tv.setText(explanation.getPart_of_speech());
+					layout.addView(tv);
+					
+					tv = createTextView();
+					tv.setText(explanation.getContent());
+					tv.setPadding(30, 0, 0, tv.getPaddingBottom());
 					layout.addView(tv);
 				} else if (explanation.getCategory().equalsIgnoreCase(ExplanationCategory.CHINESE.name())) {
 					TextView tv = createTextView();
 					tv.setText(explanation.getContent());
-					layout.addView(tv);
 					tv.setPadding(30, 0, 0, 10);
+					layout.addView(tv);
 				}
 			}
 		}
