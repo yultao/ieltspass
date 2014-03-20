@@ -140,15 +140,7 @@ public class SpeakingFragmentRecordings extends Fragment {
 					String name = null;
 					String duration = null;
 					String datetime = null;
-					String length = null;
-					long len = file.length();
-					if(len>=1024*1024){
-						length = len/1024/1024+"MB";
-					} else if (len>=1024){
-						length = len/1024+"KB";
-					} else {
-						length = len+"B";
-					}
+					String length = Utilities.formatFizeSize(file.length());
 					List<String> readFile = Utilities.readFile(file.getAbsolutePath().replace("amr", "t"));
 
 					if (readFile.size() == 1) {

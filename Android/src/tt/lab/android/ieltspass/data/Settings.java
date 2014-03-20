@@ -160,6 +160,10 @@ public class Settings {
 		return this.getStorage() + "/" + Constants.ROOT_PATH + "/Reading/Questions";
 	}
 
+	public String getDownloadPath() {
+		return this.getStorage() + "/" + Constants.ROOT_PATH + "/Download";
+	}
+	
 	public String getSpeakingQuestionsPath() {
 		// TODO Auto-generated method stub
 		return null;

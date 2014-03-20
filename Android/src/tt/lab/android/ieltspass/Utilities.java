@@ -27,6 +27,18 @@ public class Utilities {
 		parseTime("03:02:01.83");
 	}
 
+	public static String formatFizeSize(long len) {
+		String length;
+		if(len>=1024*1024){
+			length = len/1024/1024+"MB";
+		} else if (len>=1024){
+			length = len/1024+"KB";
+		} else {
+			length = len+"B";
+		}
+		return length;
+	}
+	
 	public static String getRecordingFileName() {
 		return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 	}

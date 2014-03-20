@@ -1,16 +1,27 @@
 package tt.lab.android.ieltspass.activity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.RandomAccess;
 
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.R.layout;
 import tt.lab.android.ieltspass.R.menu;
+import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.model.Word;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -26,17 +37,23 @@ import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.SimpleAdapter.ViewBinder;
 
 public class DownloadActivity extends Activity {
+	public static final String TAG = DownloadActivity.class.getName();
 	private SimpleAdapter simpleAdapter;
 	private ListView listView;
-
+	private Settings settings;
+	private List<Map<String, String>> listData = new ArrayList<Map<String, String>>(); 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		settings = Settings.getInstance(this);
 		setContentView(R.layout.activity_download);
 		initTitle();
 		initListView();
@@ -44,9 +61,12 @@ public class DownloadActivity extends Activity {
 
 	private void initListView() {
 		listView = (ListView) findViewById(R.id.listView1);
-		simpleAdapter = new DownloadSimpleAdapter(this, getListData(), R.layout.activity_download_vlist, new String[] {
+		listData = getListData();
+		simpleAdapter = new DownloadSimpleAdapter(this, listData, R.layout.activity_download_vlist, new String[] {
 				"name", "progressBar1", "current", "length", "button1" }, new int[] { R.id.name, R.id.progressBar1, R.id.current, R.id.length,R.id.button1});
 		listView.setAdapter(simpleAdapter);
+		
+		
 	}
 
 	private List<Map<String, String>> getListData() {
@@ -54,21 +74,18 @@ public class DownloadActivity extends Activity {
 		List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
 
 			Map<String, String> map = new HashMap<String, String>();
-			map.put("name", "单词图片");
-			map.put("progressBar1", "20");
-			map.put("current", "2MB");
-			map.put("length", "12MB");
-			map.put("button1", "Downaloding");
-			listData.add(map);
 			
-			map = new HashMap<String, String>();
-			map.put("name", "单词读音（英）");
-			map.put("progressBar1", "90");
-			map.put("current", "12MB");
-			map.put("length", "20MB");
-			map.put("button1", "Stop");
+			int current = 189102;
+			int max = 1189102;
+			map.put("name", "单词图片");
+			map.put("progressBar1", String.valueOf(current));//已下载字节数
+			map.put("current", Utilities.formatFizeSize(current));
+			map.put("length", Utilities.formatFizeSize(1189102));
+			map.put("button1", "true");
+			
+			map.put("url", "http://ieltspass-ieltspass.stor.sinaapp.com/cb/6-1-2.mp3");
+			map.put("maxbyte", String.valueOf(max));//最大字节数
 			listData.add(map);
-		
 		return listData;
 	}
 
@@ -111,12 +128,13 @@ public class DownloadActivity extends Activity {
 	private class DownloadSimpleAdapter extends SimpleAdapter{
 		
 		private int mResource;
-		private List<? extends Map<String, ?>> mData;
+		private List<Map<String, String>> mData;
 		private String[] mFrom;
 		private int[] mTo;
 		private LayoutInflater mInflater;
-
-		public DownloadSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from,
+		private List<ProgressBar> progressBars = new ArrayList<ProgressBar>();
+		private List<TextView> currents = new ArrayList<TextView>();
+		public DownloadSimpleAdapter(Context context, List<Map<String, String>> data, int resource, String[] from,
 				int[] to) {
 			super(context, data, resource, from, to);
 			mData = data;
@@ -124,6 +142,7 @@ public class DownloadActivity extends Activity {
 	        mFrom = from;
 	        mTo = to;
 	        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	        
 		}
 		
 		public View getView(int position, View convertView, ViewGroup parent) {
@@ -143,8 +162,8 @@ public class DownloadActivity extends Activity {
 
 	        return v;
 	    }
-	    private void bindView(int position, View view) {
-	        final Map dataSet = mData.get(position);
+	    private void bindView(final int position, View view) {
+	        final Map<String, String> dataSet = mData.get(position);
 	        if (dataSet == null) {
 	            return;
 	        }
@@ -154,10 +173,11 @@ public class DownloadActivity extends Activity {
 	        final int[] to = mTo;
 	        final int count = to.length;
 
+	        //遍历一条中的所有组件
 	        for (int i = 0; i < count; i++) {
-	            final View v = view.findViewById(to[i]);
-	            if (v != null) {
-	                final Object data = dataSet.get(from[i]);
+	            final View currentView = view.findViewById(to[i]);
+	            if (currentView != null) {
+	                final String data = dataSet.get(from[i]);//Map<1,2> 2
 	                String text = data == null ? "" : data.toString();
 	                if (text == null) {
 	                    text = "";
@@ -165,49 +185,146 @@ public class DownloadActivity extends Activity {
 
 	                boolean bound = false;
 	                if (binder != null) {
-	                    bound = binder.setViewValue(v, data, text);
+	                    bound = binder.setViewValue(currentView, data, text);
 	                }
 
 	                if (!bound) {
-	                    if (v instanceof Checkable) {
-	                        if (data instanceof Boolean) {
-	                            ((Checkable) v).setChecked((Boolean) data);
-	                        } else if (v instanceof TextView) {
-	                            // Note: keep the instanceof TextView check at the bottom of these
-	                            // ifs since a lot of views are TextViews (e.g. CheckBoxes).
-	                            setViewText((TextView) v, text);
-	                        } else {
-	                            throw new IllegalStateException(v.getClass().getName() +
-	                                    " should be bound to a Boolean, not a " +
-	                                    (data == null ? "<unknown type>" : data.getClass()));
-	                        }
-	                    } else if (v instanceof Button) {
-	                    	Button button  = (Button)v;
-	                    	if("Stop".equals(text)){
+	                    if (currentView instanceof Button) {
+	                    	final Button button  = (Button)currentView;
+	                    	if(Boolean.valueOf(text)){
 	                    		button.setBackgroundResource(R.drawable.playbutton);
-	                    	} else if ("Downaloding".equals(text)){
+	                    	} else {
 	                    		button.setBackgroundResource(R.drawable.pausebutton);
 	                    	}
-	                    } else if (v instanceof TextView) {
-	                        // Note: keep the instanceof TextView check at the bottom of these
-	                        // ifs since a lot of views are TextViews (e.g. CheckBoxes).
-	                        setViewText((TextView) v, text);
-	                    } else if (v instanceof ImageView) {
-	                        if (data instanceof Integer) {
-	                            setViewImage((ImageView) v, (Integer) data);                            
-	                        } else {
-	                            setViewImage((ImageView) v, text);
-	                        }
-	                    } else if (v instanceof ProgressBar) {
-	                    	ProgressBar progressBar = ((ProgressBar) v);
+	                    	button.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									if(isPause(position)){
+										Map<String, String> map = mData.get(position);
+										String strurl = map.get("url");
+										int startbyte = Integer.parseInt(map.get("progressBar1"));
+										int maxbyte = Integer.parseInt(map.get("maxbyte"));
+										//Toast.makeText(DownloadActivity.this, "strurl: "+strurl+", startbyte: "+startbyte, Toast.LENGTH_SHORT).show();
+										ProgressBar progressBar = progressBars.get(position);
+										TextView textView = currents.get(position);
+										new DownloadAsyncTask(position, progressBar,textView,button, strurl, startbyte, maxbyte).execute();
+										setPause(position, false);
+										button.setBackgroundResource(R.drawable.pausebutton);
+									} else {
+										setPause(position, true);
+										button.setBackgroundResource(R.drawable.playbutton);
+									}
+								}
+							});
+	                    } else if (currentView instanceof ImageView) {
+	                       setViewImage((ImageView) currentView, text);
+	                    } else if (currentView instanceof ProgressBar) {
+	                    	Map<String, String> map = mData.get(position);
+	                    	ProgressBar progressBar = ((ProgressBar) currentView);
+	                    	progressBar.setMax(Integer.parseInt(map.get("maxbyte")));
 	                    	progressBar.setProgress(Integer.parseInt(text));
+	                    	progressBars.add(progressBar);
+	                    } else if (currentView instanceof TextView) {
+	                    	TextView textView = (TextView) currentView;
+	                    	if(textView.getId()==R.id.current){
+	                    		currents.add(textView);
+	                    	}
+	                        setViewText(textView, text);
 	                    } else {
-	                        throw new IllegalStateException(v.getClass().getName() + " is not a " +
+	                        throw new IllegalStateException(currentView.getClass().getName() + " is not a " +
 	                                " view that can be bounds by this SimpleAdapter");
 	                    }
 	                }
 	            }
 	        }
 	    }
+	}
+	
+	
+	private boolean isPause(int position){
+		return Boolean.valueOf(listData.get(position).get("button1"));
+	}
+	private void setPause(int position, boolean pause){
+		listData.get(position).put("button1", String.valueOf(pause));
+	}
+	private class DownloadAsyncTask extends AsyncTask<Integer, Integer, String> {
+		private ProgressBar progressBar;
+		private TextView current;
+		private Button button;
+		private String strurl;
+		private int startbyte;
+		private int currentByte;
+		private int max;
+		private int position;
+		public DownloadAsyncTask(int position, ProgressBar progressBar, TextView current, Button button, String strurl, int startbyte, int max) {
+			this.position = position;
+			this.progressBar = progressBar;
+			this.current = current;
+			this.button = button;
+			this.strurl = strurl;
+			this.startbyte = startbyte;
+			this.max = max;
+		}
+
+		@Override
+		protected String doInBackground(Integer... arg0) {
+			try {
+				URL url = new URL(strurl);
+				URLConnection openConnection = url.openConnection();
+				openConnection.setRequestProperty("RANGE","bytes="+startbyte+"-");//0-1023, 1024-...
+
+				InputStream is = openConnection.getInputStream();
+				String downloadPath = settings.getDownloadPath();
+				Utilities.ensurePath(downloadPath);
+				
+				String name = strurl.substring(strurl.lastIndexOf("/") + 1);
+				String filename = downloadPath + "/" + name;
+				String tmpfilename = filename + ".d";
+				
+				RandomAccessFile randomAccessFile = new RandomAccessFile(tmpfilename,"rw");   
+				randomAccessFile.seek(startbyte);
+				byte[] buffer = new byte[1024];
+				int len;
+				int readbyte = 0;
+				while ((len = is.read(buffer)) != -1 && !isPause(position)) {
+					readbyte += len;
+					randomAccessFile.write(buffer, 0, len);
+					currentByte = startbyte+readbyte;
+					publishProgress(currentByte);
+					Utilities.writeFile(downloadPath+"/"+name+".t",readbyte+"/"+currentByte);
+					try{
+						Thread.sleep(10);
+					} catch (Exception e){
+						
+					}
+				}
+				is.close();
+				randomAccessFile.close();
+				if(currentByte == max){//重命名
+					File tmp = new File(tmpfilename);
+					tmp.renameTo(new File(filename));
+				}
+			} catch (Exception e) {
+				Logger.e(TAG, "doInBackground E: " + e);
+				e.printStackTrace();
+			}
+			return "DONE.";
+		}
+
+		@Override
+		protected void onPreExecute() {
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			button.setBackgroundResource(R.drawable.playbutton);
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... values) {
+			int value = values[0];
+			progressBar.setProgress(value);
+			current.setText(Utilities.formatFizeSize(value));
+		}
 	}
 }
