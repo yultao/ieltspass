@@ -71,7 +71,7 @@ public class CenterFragmentVocabulary extends Fragment {
 	private String queryStr = "";
 	private int familarityClass;
 	private String orderby = "random()", order = "";
-	private int totalCount, currentPage = 0, pageSize = 20, maxPage;
+	private int totalCount, currentPage = 0, pageSize = 30, maxPage;
 	private WordsDao wordsDao;
 	private Settings settings;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -123,7 +123,7 @@ public class CenterFragmentVocabulary extends Fragment {
 
 						// Toast.makeText(context, "第 " + currentPage +" 页  "+totalItemCount,Toast.LENGTH_LONG).show();
 						Logger.i(TAG, "Loading " + ((currentPage) * pageSize + 1) + "-"
-								+ ((currentPage + 1) * pageSize) + "toend: " + firstVisibleItem + ", "
+								+ ((currentPage + 1) * pageSize) + ", toend: " + firstVisibleItem + ", "
 								+ visibleItemCount + ", " + totalItemCount + "...");
 						loading = true;
 						new UpdateDataAsyncTask().execute();
@@ -207,7 +207,7 @@ public class CenterFragmentVocabulary extends Fragment {
 	}
 
 	private void initFilterSpinner() {
-		final String[] filters = { "0.全部", "1.很生", "2.较生", "3.一般", "4.较熟", "5.很熟" };
+		final String[] filters = { "   全部", "1.很生", "2.较生", "3.一般", "4.较熟", "5.很熟" };
 		filterSpinner = (Spinner) view.findViewById(R.id.spinner2);
 		ArrayAdapter<String> filtersArrayAdapter = new ArrayAdapter<String>(context,
 				android.R.layout.simple_spinner_item, filters);
@@ -260,7 +260,7 @@ public class CenterFragmentVocabulary extends Fragment {
 			
 			listWords(listData);
 		} catch (Exception e) {
-			Logger.i(TAG, "initData E:" + e);
+			Logger.e(TAG, "initData E:" + e);
 		}
 		Logger.i(TAG, "initData O");
 	}
@@ -367,7 +367,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				listData.add(map);
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "listWords E: "+e);
+			Logger.e(TAG, "listWords E: "+e);
 		}
 		Logger.i(TAG, "listWords O: "+listData.size());
 	}
@@ -400,7 +400,7 @@ public class CenterFragmentVocabulary extends Fragment {
 					super.setViewImage(v, value);// 会变小
 				}
 			} catch (Exception e) {
-				Logger.i(TAG, "setViewImage E: " + e + ", ImageView: " + v + ", value: " + value);
+				Logger.e(TAG, "setViewImage E: " + e + ", ImageView: " + v + ", value: " + value);
 			}
 		}
 
@@ -421,7 +421,7 @@ public class CenterFragmentVocabulary extends Fragment {
 			try {
 				postInitData();
 			} catch (Exception e) {
-				Logger.i(TAG, "InitDataAsyncTask onPostExecute E: " + e);
+				Logger.e(TAG, "InitDataAsyncTask onPostExecute E: " + e);
 			}
 			Logger.i(TAG, "InitDataAsyncTask onPostExecute O");
 		}
@@ -450,7 +450,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				listData.addAll(updateData);
 				postInitData();
 			} catch (Exception e) {
-				Logger.i(TAG, "InitDataAsyncTask onPostExecute E: " + e);
+				Logger.e(TAG, "InitDataAsyncTask onPostExecute E: " + e);
 			}
 			//Logger.i(TAG, "InitDataAsyncTask onPostExecute O");
 		}
@@ -476,7 +476,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				postUpdateData();
 
 			} catch (Exception e) {
-				Logger.i(TAG, "UpdateDataAsyncTask onPostExecute E: " + e);
+				Logger.e(TAG, "UpdateDataAsyncTask onPostExecute E: " + e);
 			}
 			//Logger.i(TAG, "UpdateDataAsyncTask onPostExecute O");
 		}
@@ -529,14 +529,14 @@ public class CenterFragmentVocabulary extends Fragment {
 				// bitmap = BitmapFactory.decodeStream(openConnection.getInputStream());
 
 			} catch (Exception e) {
-				Logger.i(TAG, "doInBackground E: " + e.getMessage());
+				Logger.e(TAG, "doInBackground E: " + e.getMessage());
 				e.printStackTrace();
 			} finally {
 				if (is != null) {
 					try {
 						is.close();
 					} catch (IOException e) {
-						Logger.i(TAG, "doInBackground is close " + e);
+						Logger.e(TAG, "doInBackground is close " + e);
 						e.printStackTrace();
 					}
 				}
@@ -544,7 +544,7 @@ public class CenterFragmentVocabulary extends Fragment {
 					try {
 						os.close();
 					} catch (IOException e) {
-						Logger.i(TAG, "doInBackground os close " + e);
+						Logger.e(TAG, "doInBackground os close " + e);
 						e.printStackTrace();
 					}
 				}

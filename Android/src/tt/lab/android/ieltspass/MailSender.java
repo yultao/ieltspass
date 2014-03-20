@@ -8,10 +8,12 @@ package tt.lab.android.ieltspass;
 
 import java.util.*;
 
-//import javax.activation.DataHandler;
+import javax.activation.DataHandler;
+import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -26,7 +28,7 @@ import javax.mail.internet.MimeMultipart;
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
  *         Code Templates
  */
-public class MailSender implements Runnable {
+public class MailSender {
 
 	private static String TAG = MailSender.class.getName();
 	private String fromDisplayName;
@@ -125,8 +127,14 @@ public class MailSender implements Runnable {
 			Properties props = new Properties();
 			props.put("mail.smtp.host", this.smtpServer);
 			props.put("mail.smtp.auth", "true");
+//			Session s = Session.getInstance(props,new Authenticator() {
+//				@Override
+//				protected PasswordAuthentication getPasswordAuthentication() {
+//					return new PasswordAuthentication(fromEmailAddress, password); 
+//				}
+//			});
 			Session s = Session.getInstance(props);
-			s.setDebug(false);
+			s.setDebug(true);
 
 			MimeMessage message = new MimeMessage(s);
 			// FROM
@@ -164,16 +172,22 @@ public class MailSender implements Runnable {
 			/* single */
 			// InternetAddress toAddress=new InternetAddress(this.to);
 			// message.setRecipient(Message.RecipientType.TO,toAddress);
+			
+			//SUBJECT
 			message.setSubject(this.subject);
+			
+			//SEND DATE
 			message.setSentDate(new Date());
 			
+			//CONTENT
+			Multipart mimeMultipart = new MimeMultipart();
 			
-			Multipart mm = new MimeMultipart();
+			//MIME body
 			BodyPart mdp = new MimeBodyPart();
 			//DataHandler dh = new DataHandler(this.content, this.type + ";charset=UTF-8");
 			//mdp.setDataHandler(dh);
 			mdp.setContent(this.content, this.type + ";charset=UTF-8");
-			mm.addBodyPart(mdp);
+			mimeMultipart.addBodyPart(mdp);
 			/*
 			
 			for (int i = 0; i < this.txtList.size(); i++) {
@@ -206,7 +220,10 @@ public class MailSender implements Runnable {
 				mm.addBodyPart(mdp);
 			}
 */
-			message.setContent(mm);
+			message.setContent(mimeMultipart);
+			
+			//Text
+			//message.setText("plan text ");
 			message.saveChanges();
 			
 			Transport transport = s.getTransport("smtp");
@@ -219,8 +236,8 @@ public class MailSender implements Runnable {
 			transport.close();
 			b = true;
 
-		} catch (Exception e) {
-			//Logger.i(TAG , "send: e: "+e);
+		} catch (Throwable e) {
+			Logger.e(TAG , "send: e: "+e);
 			e.printStackTrace();
 		} finally {
 			System.out.println("Sent.");
@@ -230,34 +247,18 @@ public class MailSender implements Runnable {
 	}
 
 
-	
-	public void run() {
-		send();
-	}
 
-	public void start() {
-		new Thread(this).start();
-	}
-
-	public static void main(String args[]) {
-		exec();
-	}
-
-	private static void exec() {
-		prepareAndSendAsync("mail.to.txt");
-	}
-
-	public static void prepareAndSendAsync(String content) {
+	public  boolean prepareAndSend(String content) {
 		//Logger.i(TAG , "prepareAndSendAsync: "+content);
 		/* Basic Settings */
 		MailSender mailSender = new MailSender();
 		mailSender.setFromDisplayName("IELTSPASS Android 用户");
-		mailSender.setFromEmailAddress("ieltspassandroid@126.com");
+		mailSender.setFromEmailAddress("ieltspassuser@126.com");
 		mailSender.setFromPassword("ieltspass123");
 		mailSender.setSmtpServer("smtp.126.com");
 		mailSender.setTo("ieltspassandroid@126.com");
 		mailSender.setToDisplayName("IELTSPASS Android 意见反馈邮箱");
-		mailSender.setSubject("IELTSPASS Android 意见反馈");
+		mailSender.setSubject("IELTSPASS Android V0.1 意见反馈");
 		mailSender.setContent(content);
 		mailSender.setType("text/plain");//"text/html";// "text/plain"
 
@@ -274,15 +275,10 @@ public class MailSender implements Runnable {
 		// System.out.println(mailSender.send());
 		//Logger.i(TAG , "prepareAndSendAsync: 1");
 		boolean send = mailSender.send();
-		//Logger.i(TAG , "prepareAndSendAsync O: "+send);
+		
+		Logger.i(TAG , "prepareAndSendAsync O: "+send);
+		return send;
 	}
 
-	public static String convertTo(String s) {
-		s = s.replaceAll("\r\n", ",");
-		if (s.endsWith(","))
-			s = s.substring(0, s.length() - 1);
-		// s = s+",boocui@sohu.com";
-		// System.out.println(s);
-		return s;
-	}
+
 }

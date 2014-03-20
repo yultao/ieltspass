@@ -1,11 +1,7 @@
 package tt.lab.android.ieltspass.data;
 
-import android.app.ActivityManager;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import tt.lab.android.ieltspass.Logger;
@@ -13,9 +9,15 @@ import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.model.Example;
 import tt.lab.android.ieltspass.model.Explanation;
 import tt.lab.android.ieltspass.model.ExplanationCategory;
+import tt.lab.android.ieltspass.model.Familiarity;
 import tt.lab.android.ieltspass.model.MemoryMethod;
 import tt.lab.android.ieltspass.model.Pic;
 import tt.lab.android.ieltspass.model.Word;
+import android.app.ActivityManager;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 /**
  * Created with IntelliJ IDEA. User: hejind Date: 3/1/14 Time: 10:16 PM To change this template use File | Settings |
@@ -59,6 +61,8 @@ public class WordsDao {
 		word.setPicList(getPicsForSingleWord(word_vocabulary));
 		word.setMmList(getMmsForSingleWord(word_vocabulary));
 		word.setExplanationList(getExplanationsForSingleWord(word_vocabulary));
+		String familirity = getFamiliarity(word_vocabulary).getFamiliarity_class();
+		word.setFamiliarity(familirity == null ? 0 : Integer.valueOf(familirity));
 
 		return word;
 	}
@@ -183,7 +187,7 @@ public class WordsDao {
 				count = Integer.parseInt(cursor.getString(0));
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "getWordListCount, E: " + e.getMessage());
+			Logger.e(TAG, "getWordListCount, E: " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			if (cursor != null)
@@ -253,7 +257,7 @@ public class WordsDao {
 
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "getWordList, E: " + e.getMessage());
+			Logger.e(TAG, "getWordList, E: " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			if (cursor != null)
@@ -306,7 +310,7 @@ public class WordsDao {
 
 			}
 		} catch (Exception e) {
-			Logger.i(TAG, "getWordList, E: " + e.getMessage());
+			Logger.e(TAG, "getWordList, E: " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			if (cursor != null)
@@ -330,6 +334,44 @@ public class WordsDao {
 			wordList.add(getSingleWordInfo(word_vocabulary));
 		}
 		return wordList;
+	}
+	
+	public Familiarity getFamiliarity(String word_vocabulary) {
+		Familiarity familirity = new Familiarity();
+		SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
+		Cursor cursor = db.rawQuery("select * from Familiarity where word_vocabulary=?", new String[] { word_vocabulary });
+		while (cursor.moveToNext()) {
+
+			String familiarity_class = cursor.getString(0);
+			Date create_time = new Date(cursor.getLong(2));
+			Date update_time = new Date(cursor.getLong(3));
+			String user_name = cursor.getString(4);
+
+			familirity.setFamiliarity_class(familiarity_class);
+			familirity.setWord_vocabulary(word_vocabulary);
+			familirity.setCreate_time(create_time);
+			familirity.setUpdate_time(update_time);
+			familirity.setUser_name(user_name);
+		}
+
+		return familirity;
+	}
+
+	public void updateFamiliar(String word_vocabulary, int familiar) {
+		Familiarity familirity = getFamiliarity(word_vocabulary);
+		SQLiteDatabase db = DataBaseHelper.getInstance(context).getWordsDB();
+		ContentValues cv = new ContentValues();
+		cv.put("familiarity_class", familiar);
+		cv.put("update_time", (new Date()).getTime());
+		if (familirity.getWord_vocabulary() == null) {
+			cv.put("word_vocabulary", word_vocabulary);
+			cv.put("create_time", (new Date()).getTime());
+			db.insert("familiarity", null, cv);
+		}
+		else {
+			String[] args = {String.valueOf(word_vocabulary)};
+			db.update("familiarity", cv, "word_vocabulary=?",args);
+		}
 	}
 
 }

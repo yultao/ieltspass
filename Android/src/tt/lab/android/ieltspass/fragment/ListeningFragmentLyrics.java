@@ -75,7 +75,7 @@ public class ListeningFragmentLyrics extends Fragment {
 			//Logger.i(TAG, "lyrics: \n"+ lyrics);
 			handler.post(updateLyricsThread);
 		} catch (Exception e) {
-			Logger.i(TAG, "addView e: " + e.getMessage());
+			Logger.e(TAG, "addView e: " + e.getMessage());
 		}
 		return rootView;
 	}
@@ -86,7 +86,7 @@ public class ListeningFragmentLyrics extends Fragment {
 				algorithm2();
 				handler.postDelayed(updateLyricsThread, 10);
 			} catch (Exception e) {
-				Logger.i(TAG, "updateLyricsThread e: " + e.getMessage());
+				Logger.e(TAG, "updateLyricsThread e: " + e.getMessage());
 			}
 
 		}

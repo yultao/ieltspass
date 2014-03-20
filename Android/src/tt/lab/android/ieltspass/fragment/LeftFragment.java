@@ -38,17 +38,18 @@ public class LeftFragment extends Fragment {
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		view = inflater.inflate(R.layout.left, null);
-		TextView name = (TextView) view.findViewById(R.id.name_textview);
-		name.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.setClass(getActivity(), LoginActivity.class);
-				intent.putExtra("title", "");
-				startActivity(intent);
-			}
-		});
+		
+//		TextView name = (TextView) view.findViewById(R.id.name_textview);
+//		name.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//				Intent intent = new Intent();
+//				intent.setClass(getActivity(), LoginActivity.class);
+//				intent.putExtra("title", "");
+//				startActivity(intent);
+//			}
+//		});
 		initList();
 		return view;
 	}
