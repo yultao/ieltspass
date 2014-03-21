@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.Utilities;
@@ -25,6 +26,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -68,67 +70,56 @@ public class DownloadActivity extends Activity {
 	private List<Map<String, String>> getListData() {
 
 		List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
+		List<String> downloads = Utilities.readAsset("download");
+		for (String download : downloads) {
+			try {
+				if (download.trim().length() != 0) {
+					download = download.trim();
+					// 剑桥雅思9-听力 22180042 IELTSPASS_Listening_Audios_9.zip
+					String[] split = download.split("\t");
+					String name = split[0];
+					int max = Integer.parseInt(split[1]);
+					String filename = split[2];
 
-		// {
-		// Map<String, String> map = new HashMap<String, String>();
-		// int current = 0;
-		// int max = 1189102;
-		// String filename = "6-1-2.mp3";
-		// String info = Settings.getDownloadPathStatic() + "/" + filename + ".t";
-		// List<String> readFile = Utilities.readFile(info);
-		// if (readFile.size() > 0) {
-		// current = Integer.parseInt(readFile.get(0));
-		// }
-		// map.put("name", "单词图片");
-		// map.put("progressBar1", String.valueOf(current));// 已下载字节数
-		// map.put("current", Utilities.formatFizeSize(current));
-		// map.put("length", Utilities.formatFizeSize(1189102));
-		// map.put("button1", "false");
-		// map.put("url", "http://ieltspass-ieltspass.stor.sinaapp.com/cb/" + filename);
-		// map.put("maxbyte", String.valueOf(max));// 最大字节数
-		// listData.add(map);
-		// }
+					Map<String, String> map = new HashMap<String, String>();
 
-		{
-			Map<String, String> map = new HashMap<String, String>();
-			int current = 0;
-			int state = 0;// 默认未下载完
-			int max = 22180042;
-			String filename = "IELTSPASS_Listening_Audios_6.zip";
-			String cFile = Settings.getDownloadPathStatic() + "/" + filename + ".c";
-			String tFile = Settings.getDownloadPathStatic() + "/" + filename + ".t";
+					// 读取各条下载和解压情况。Simple way, to be refactored.
+					int current = 0;
+					int state = 0;// 默认未下载完
+					String tFile = Settings.getDownloadPathStatic() + "/" + filename + ".t";
 
-			if (Utilities.isFileExist(cFile)) {
-				state = 2;// 已解压
-				current = max;
-			} else if (Utilities.isFileExist(tFile)) {// 曾经下载过
-
-				List<String> readFile = Utilities.readFile(tFile);
-				if (readFile.size() > 0) {
-					current = Integer.parseInt(readFile.get(0));
-					if (current == max) {
-						state = 1;// 下载完，未解压
+					if (Utilities.isFileExist(tFile)) {// 曾经下载过
+						List<String> readFile = Utilities.readFile(tFile);
+						if (readFile.size() > 0) {
+							current = Integer.parseInt(readFile.get(0));
+							if (current == -1) {
+								state = UNZIP_COMPLETE;// 已解压
+								current = max;
+							} else if (current == max) {
+								state = DOWNLOAD_COMPLETE;// 下载完，未解压（极端情况下，或者压缩包有问题解压失败）
+							}
+						}
 					}
-				}
-			}
-			map.put("name", "剑桥雅思6-听力");
-			map.put("progressBar1", String.valueOf(current));// 已下载字节数
-			map.put("current", Utilities.formatFizeSize(current));
-			map.put("length", Utilities.formatFizeSize(max));
-			map.put("button1", String.valueOf(state));
-			map.put("startstop", String.valueOf(false));
-			map.put("url", "http://ieltspass-ieltspass.stor.sinaapp.com/download/" + filename);
-			map.put("maxbyte", String.valueOf(max));// 最大字节数
-			listData.add(map);
 
+					// 以下6行用于ui显示
+					map.put("name", name);
+					map.put("progressBar1", String.valueOf(current));// 已下载字节数
+					map.put("current", Utilities.formatFizeSize(current));// 已下载字节数
+					map.put("length", Utilities.formatFizeSize(max));
+					map.put("button1", String.valueOf(state));
+
+					// 以下3行用于控制
+					map.put("startstop", String.valueOf(false));
+					map.put("url", Constants.DOWNLOAD_URL + "/" + filename);
+					map.put("maxbyte", String.valueOf(max));
+
+					listData.add(map);
+				}
+			} catch (Exception e) {
+				Logger.e(TAG, "getListData E: " + e);
+			}
 		}
 		return listData;
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// getMenuInflater().inflate(R.menu.download, menu);
-		return true;
 	}
 
 	private void initTitle() {
@@ -158,7 +149,23 @@ public class DownloadActivity extends Activity {
 	}
 
 	private void navigateUp() {
+
 		NavUtils.navigateUpTo(this, new Intent(this, LauncherActivity.class));
+
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		stopAll();
 	}
 
 	private class DownloadSimpleAdapter extends SimpleAdapter {
@@ -230,9 +237,8 @@ public class DownloadActivity extends Activity {
 
 						if (currentView instanceof Button) {// Button
 							final Button button = (Button) currentView;
-							Map<String, String> map = mData.get(position);
+							final Map<String, String> map = mData.get(position);
 							final String strurl = map.get("url");
-							final int startbyte = Integer.parseInt(map.get("progressBar1"));
 							final int maxbyte = Integer.parseInt(map.get("maxbyte"));
 
 							// 控制按钮图标
@@ -249,7 +255,7 @@ public class DownloadActivity extends Activity {
 							button.setOnClickListener(new OnClickListener() {
 								@Override
 								public void onClick(View v) {
-
+									int startbyte = Integer.parseInt(map.get("progressBar1"));
 									// 控制开始停止
 									if (isStart(position)) {
 										setStart(position, false);
@@ -257,14 +263,13 @@ public class DownloadActivity extends Activity {
 									} else {
 										setStart(position, true);
 										button.setBackgroundResource(R.drawable.pausebutton);
-										
+
 										ProgressBar progressBar = progressBars.get(position);
 										TextView currentTextView = currents.get(position);
 										TextView lengthTextView = lengths.get(position);
-										new DownloadAsyncTask(position, progressBar, currentTextView,lengthTextView, button, strurl,
-												startbyte, maxbyte).execute();
-										
-										
+										new DownloadAsyncTask(position, progressBar, currentTextView, lengthTextView,
+												button, strurl, startbyte, maxbyte).execute();
+
 									}
 								}
 							});
@@ -280,6 +285,11 @@ public class DownloadActivity extends Activity {
 						} else if (currentView instanceof TextView) {// TextView
 							TextView textView = (TextView) currentView;
 							if (textView.getId() == R.id.current) {
+								Map<String, String> map = mData.get(position);
+								int parseInt = Integer.parseInt(map.get("button1"));
+								if (parseInt == UNZIP_COMPLETE) {
+									text = "安装完成";
+								}
 								currents.add(textView);
 							} else if (textView.getId() == R.id.length) {
 								lengths.add(textView);
@@ -311,6 +321,16 @@ public class DownloadActivity extends Activity {
 		listData.get(position).put("startstop", String.valueOf(start));
 	}
 
+	private void stopAll() {
+		for (Map<String, String> m : listData) {
+			m.put("startstop", "false");
+		}
+	}
+
+	private void setProgress(int position, int progress) {
+		listData.get(position).put("progressBar1", String.valueOf(progress));
+	}
+
 	private class DownloadAsyncTask extends AsyncTask<Integer, Integer, String> {
 
 		private ProgressBar progressBar;
@@ -324,7 +344,9 @@ public class DownloadActivity extends Activity {
 		private int state = DOWNLOAD_INCOMPLETE;
 		private String zipFileName;
 
-		String downloadPath = Settings.getDownloadPathStatic();
+		private String downloadPath = Settings.getDownloadPathStatic();
+		private String zipAbsFileName;
+		private String infoAbsFileName;
 
 		public DownloadAsyncTask(int position, ProgressBar progressBar, TextView current, TextView length,
 				Button button, String strurl, int startbyte, int max) {
@@ -340,7 +362,8 @@ public class DownloadActivity extends Activity {
 				state = DOWNLOAD_COMPLETE;
 			}
 			zipFileName = strurl.substring(strurl.lastIndexOf("/") + 1);
-
+			zipAbsFileName = downloadPath + "/" + zipFileName;
+			infoAbsFileName = zipAbsFileName + ".t";
 		}
 
 		@Override
@@ -356,30 +379,26 @@ public class DownloadActivity extends Activity {
 					InputStream is = openConnection.getInputStream();
 					Utilities.ensurePath(downloadPath);
 
-					String zipAbsFileName = downloadPath + "/" + zipFileName;
 					String tmpfilename = zipAbsFileName + ".d";
-					String infoAbsFileName = zipAbsFileName + ".t";
+
 					RandomAccessFile randomAccessFile = new RandomAccessFile(tmpfilename, "rw");
 					randomAccessFile.seek(startbyte);
 					byte[] buffer = new byte[1024];
 					int len;
 					int readbyte = 0;
-					int currentByte = 0;
+					int progress = 0;
 					while ((len = is.read(buffer)) != -1 && isStart(position)) {
 						readbyte += len;
 						randomAccessFile.write(buffer, 0, len);
-						currentByte = startbyte + readbyte;
-						publishProgress(currentByte);
-						Utilities.writeFile(infoAbsFileName, currentByte + "");
-						try {
-							Thread.sleep(10);
-						} catch (Exception e) {
+						progress = startbyte + readbyte;
 
-						}
+						publishProgress(progress);// 保证界面中最新
+						setProgress(position, progress);// 保证内存中最新
+						Utilities.writeFile(infoAbsFileName, String.valueOf(progress));// 保证外存中最新
 					}
 					is.close();
 					randomAccessFile.close();
-					if (currentByte == max) {// 重命名
+					if (progress == max) {// 重命名
 						File tmp = new File(tmpfilename);
 						tmp.renameTo(new File(zipAbsFileName));
 						state = DOWNLOAD_COMPLETE;
@@ -394,22 +413,27 @@ public class DownloadActivity extends Activity {
 			if (state == DOWNLOAD_COMPLETE) {
 				publishProgress(0);// 下载完成
 				try {
-					ZipFile zfile = new ZipFile(downloadPath + "/" + zipFileName);
+					ZipFile zfile = new ZipFile(zipAbsFileName);
 					String folderPath = Settings.getStorageStatic();
 					Enumeration zList = zfile.entries();
 					ZipEntry zipEntry = null;
 					byte[] buf = new byte[1024];
-					int size = zfile.size();
-					int curr = 0;
+
+					int size = 0;
 					while (zList.hasMoreElements()) {
 						zipEntry = (ZipEntry) zList.nextElement();
+						if (!zipEntry.isDirectory())
+							size++;
+					}
+
+					zList = zfile.entries();
+					int curr = 0;
+					while (zList.hasMoreElements()) {// 解压过程不可暂停（暂定），但有可能强制退出或断电，这样下次需要重新再来。
+						zipEntry = (ZipEntry) zList.nextElement();
 						if (zipEntry.isDirectory()) {
-							Logger.i("upZipFile", "ze.getName() = " + zipEntry.getName());
 							String dirstr = folderPath + "/" + zipEntry.getName();
-							Logger.i("upZipFile", "str = " + dirstr);
 							Utilities.ensurePath(dirstr);
 						} else {
-							Logger.i("upZipFile", "ze.getName() = " + zipEntry.getName());
 							OutputStream os = new FileOutputStream(folderPath + "/" + zipEntry.getName());
 							InputStream is = zfile.getInputStream(zipEntry);
 							int readLen = 0;
@@ -418,13 +442,15 @@ public class DownloadActivity extends Activity {
 							}
 							is.close();
 							os.close();
+							publishProgress(++curr, size);
 						}
-						publishProgress(++curr, size);
+
 					}
 					zfile.close();
 
-					File tmp = new File(downloadPath + "/" + zipFileName + ".t");
-					tmp.renameTo(new File(downloadPath + "/" + zipFileName + ".c"));
+					// 解压完全成功，修改标志文件，删除压缩包
+					Utilities.writeFile(infoAbsFileName, String.valueOf(-1));// -1表示解压完成
+					new File(zipAbsFileName).delete();
 					state = UNZIP_COMPLETE;
 				} catch (Exception e) {
 					Logger.e(TAG, "doInBackground unziping E: " + e);
@@ -455,12 +481,10 @@ public class DownloadActivity extends Activity {
 		@Override
 		protected void onProgressUpdate(Integer... values) {
 			int progress = values[0];
-
 			progressBar.setProgress(progress);
 			if (values.length == 2) {
-				int max = values[1];
+				max = values[1];
 				progressBar.setMax(max);
-				lengthTextView.setText(String.valueOf(progress*100/max)+"%");
 			}
 
 			// 中间状态只有下载完成与否
@@ -469,7 +493,7 @@ public class DownloadActivity extends Activity {
 			} else if (state == DOWNLOAD_COMPLETE) {
 				button.setBackgroundResource(R.drawable.unzip);
 				button.setEnabled(false);// 解压时候不能停止
-				currentTextView.setText("正在安装...");
+				currentTextView.setText("正在安装... (" + String.valueOf(progress * 100 / max) + "%)");
 			}
 		}
 	}

@@ -25,6 +25,7 @@ public class Constants {
 	public static final String LISTENING_LYRICS_PATH = "Listening/Lyrics";
 
 	public static final String LISTENING_AUDIOS_URL = "http://ieltspass-ieltspass.stor.sinaapp.com/cb/";
+	public static final String DOWNLOAD_URL = "http://ieltspass-ieltspass.stor.sinaapp.com/download";
 
 
 }

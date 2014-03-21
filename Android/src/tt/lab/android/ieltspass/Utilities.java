@@ -359,7 +359,23 @@ public class Utilities {
 		}
 		return list;
 	}
-
+	
+	public static List<String> readAsset(String absFileName) {
+		List<String> list = new ArrayList<String>();
+		try {
+			InputStream inputStream = Constants.assetManager.open(absFileName);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+			String s = null;
+			while ((s = bufferedReader.readLine()) != null) {
+				list.add(s);
+			}
+			bufferedReader.close();
+		} catch (Exception e) {
+			Logger.e(TAG, "readFile E: " + e);
+			e.printStackTrace();
+		}
+		return list;
+	}
 	public static void writeFile(String absFileName, String s) {
 		try {
 			PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(absFileName)));
