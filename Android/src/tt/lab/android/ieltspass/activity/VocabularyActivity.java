@@ -206,7 +206,7 @@ public class VocabularyActivity extends FragmentActivity {
 	}
 	
 	private void updateWordFamiliarity(int familiarity) {
-		wordsDao.updateFamiliar(word.getWord_vocabulary(), familiarity);
+		wordsDao.updateFamiliar(word.getWord_Id(), familiarity);
 		word.setFamiliarity(familiarity);
 		updateFamiliarButton();
 	}	
@@ -496,7 +496,7 @@ public class VocabularyActivity extends FragmentActivity {
 
 		@Override
 		public void buildContent(View rootView, ViewGroup container, Bundle savedInstanceState) {
-			List<Explanation> wordExplains = wordsDao.getExplanationsForSingleWord(word.getWord_vocabulary());
+			List<Explanation> wordExplains = wordsDao.getExplanationsForSingleWord(word.getWord_Id());
 			
 			LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
 			
@@ -540,7 +540,7 @@ public class VocabularyActivity extends FragmentActivity {
 
 		@Override
 		public void buildContent(View rootView, ViewGroup container, Bundle savedInstanceState) {
-			List<Explanation> wordExplains = wordsDao.getExplanationsForSingleWord(word.getWord_vocabulary());
+			List<Explanation> wordExplains = wordsDao.getExplanationsForSingleWord(word.getWord_Id());
 			
 			LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
 			for(Explanation explanation : wordExplains) {
@@ -594,7 +594,7 @@ public class VocabularyActivity extends FragmentActivity {
 		
 		@Override
 		public void buildContent(View rootView, ViewGroup container, Bundle savedInstanceState) {
-			List<Example> examples = wordsDao.getExamplesForSingleWord(word.getWord_vocabulary());
+			List<Example> examples = wordsDao.getExamplesForSingleWord(word.getWord_Id());
 			
 			LinearLayout mainLayout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
 

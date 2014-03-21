@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class Familiarity {
 	private String familiarity_class;
-	private String word_vocabulary;
+	private int word_Id;
 	private Date create_time;
 	private Date update_time;
 	private String user_name;
@@ -14,12 +14,12 @@ public class Familiarity {
 	}
 	public void setFamiliarity_class(String familiarity_class) {
 		this.familiarity_class = familiarity_class;
+	}	
+	public int getWord_Id() {
+		return word_Id;
 	}
-	public String getWord_vocabulary() {
-		return word_vocabulary;
-	}
-	public void setWord_vocabulary(String word_vocabulary) {
-		this.word_vocabulary = word_vocabulary;
+	public void setWord_Id(int word_Id) {
+		this.word_Id = word_Id;
 	}
 	public Date getCreate_time() {
 		return create_time;

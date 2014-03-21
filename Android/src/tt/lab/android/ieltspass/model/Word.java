@@ -11,16 +11,17 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class Word {
-    String BE_phonetic_symbol;
-    String AE_phonetic_symbol;
-    String BE_sound;
-    String AE_sound;
-    String word_vocabulary;
-    String logo;
-    int is_listening=0;
-    int is_speaking=0;
-    int is_reading=0;
-    int is_writing=0;
+	private int word_Id;
+	private String BE_phonetic_symbol;
+	private String AE_phonetic_symbol;
+	private String BE_sound;
+	private String AE_sound;
+	private String word_vocabulary;
+	private String logo;
+	private int is_listening=0;
+	private int is_speaking=0;
+	private int is_reading=0;
+	private int is_writing=0;
     
     private String part_of_speech;
     private String explanation;
@@ -35,7 +36,15 @@ public class Word {
     List<Explanation> explanationList=null;
     String category;
 
-    public List<Example> getExampleList() {
+	public int getWord_Id() {
+		return word_Id;
+	}
+
+	public void setWord_Id(int word_Id) {
+		this.word_Id = word_Id;
+	}
+
+	public List<Example> getExampleList() {
         return exampleList;
     }
 
