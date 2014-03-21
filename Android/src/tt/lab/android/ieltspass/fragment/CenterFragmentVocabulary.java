@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import tt.lab.android.ieltspass.Constants;
+import tt.lab.android.ieltspass.DownloadImageAsyncTask;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.Utilities;
@@ -379,7 +380,7 @@ public class CenterFragmentVocabulary extends Fragment {
 			super(context, data, resource, from, to);
 		}
 
-		public void setViewImage(ImageView v, String value) {
+		public void setViewImage(final ImageView v, String value) {
 			try {
 
 				// Logger.i(TAG, "setViewImage: "+v.getId()+", "+value);
@@ -387,7 +388,14 @@ public class CenterFragmentVocabulary extends Fragment {
 				if (value != null && value.toLowerCase().startsWith("http")) {
 					if (!settings.isNetwordForbidden() && (Utilities.isWifiConnected()
 							|| (Utilities.isMobileConnected() && settings.isWifiAndMobile()))) {
-						new DownloadImageAsyncTask(v, value).execute();
+						DownloadImageAsyncTask downloadImageTask = new DownloadImageAsyncTask(settings, value) {
+
+							@Override
+							public void onPostExecute(Bitmap bitmap) {
+								v.setImageBitmap(bitmap);								
+							}							
+						};
+						downloadImageTask.execute();
 					} else {
 						super.setViewImage(v, String.valueOf(R.drawable.no_net));
 					}
@@ -479,83 +487,6 @@ public class CenterFragmentVocabulary extends Fragment {
 				Logger.e(TAG, "UpdateDataAsyncTask onPostExecute E: " + e);
 			}
 			//Logger.i(TAG, "UpdateDataAsyncTask onPostExecute O");
-		}
-	}
-
-	private class DownloadImageAsyncTask extends AsyncTask<Integer, Integer, String> {
-		private String strurl;
-		private ImageView imageView;
-		private Bitmap bitmap;
-
-		public DownloadImageAsyncTask(ImageView imageView, String url) {
-			this.strurl = url;
-			this.imageView = imageView;
-		}
-
-		/**
-		 * 先缓存到本地
-		 */
-		@Override
-		protected String doInBackground(Integer... arg0) {
-			InputStream is = null;
-			OutputStream os = null;
-			try {
-				URL url = new URL(strurl);
-				URLConnection openConnection = url.openConnection();
-				is = openConnection.getInputStream();
-
-				String name = strurl.substring(strurl.lastIndexOf("/") + 1);
-				Utilities.ensurePath(settings.getVocabularyImagesPath());
-				String filename = settings.getVocabularyImagesPath() + "/" + name;
-				String tmpfilename = filename + ".d";
-				File tmp = new File(tmpfilename);
-				os = new FileOutputStream(tmp);
-				byte[] buffer = new byte[1024];
-				int len;
-				int read = 0;
-				while ((len = is.read(buffer)) != -1) {
-					read += len;
-					os.write(buffer, 0, len);
-				}
-				if (read > 1024) {// >1k
-					File file = new File(filename);
-					boolean renameTo = tmp.renameTo(file);
-					bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
-					// Logger.i(TAG, "doInBackground renameTo " + renameTo);
-				} else {
-					boolean delete = tmp.delete();
-					// Logger.i(TAG, "doInBackground delete " + delete);
-				}
-				// bitmap = BitmapFactory.decodeStream(openConnection.getInputStream());
-
-			} catch (Exception e) {
-				Logger.e(TAG, "doInBackground E: " + e.getMessage());
-				e.printStackTrace();
-			} finally {
-				if (is != null) {
-					try {
-						is.close();
-					} catch (IOException e) {
-						Logger.e(TAG, "doInBackground is close " + e);
-						e.printStackTrace();
-					}
-				}
-				if (os != null) {
-					try {
-						os.close();
-					} catch (IOException e) {
-						Logger.e(TAG, "doInBackground os close " + e);
-						e.printStackTrace();
-					}
-				}
-			}
-			return "DONE.";
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			if (bitmap != null)
-				imageView.setImageBitmap(bitmap);
 		}
 	}
 

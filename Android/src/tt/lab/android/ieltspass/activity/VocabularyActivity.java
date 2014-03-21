@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import tt.lab.android.ieltspass.DownloadImageAsyncTask;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
+import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.data.WordsDao;
 import tt.lab.android.ieltspass.model.Example;
 import tt.lab.android.ieltspass.model.Explanation;
@@ -15,6 +17,7 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,6 +26,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ClickableSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -31,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -142,13 +149,6 @@ public class VocabularyActivity extends FragmentActivity {
 				}
 			});
 			
-			/*if (word.getFamiliarity() == 0) {
-				btnFamiliar.setBackgroundColor(Color.CYAN);
-			} else if (word.getFamiliarity() == 1) {
-				btnFamiliar.setBackgroundColor(Color.BLUE);
-			} else if (word.getFamiliarity() == 2) {
-				btnFamiliar.setBackgroundColor(Color.GREEN);
-			}*/
 			updateFamiliarButton();
 			final int familirity = word.getFamiliarity();
 			
@@ -435,6 +435,7 @@ public class VocabularyActivity extends FragmentActivity {
 	 * 
 	 */
 	public static abstract class SectionBasicFragment extends Fragment {
+		protected Settings settings;
 		protected WordsDao wordsDao;
 		protected Word word;
 		protected AudioPlayer player;
@@ -445,6 +446,7 @@ public class VocabularyActivity extends FragmentActivity {
 		public static final String ARG_SECTION_NUMBER = "section_number";
 
 		public SectionBasicFragment() {
+			settings = Settings.getInstance(this.getActivity());
 		}
 
 		public void setWord(Word word) {
@@ -497,6 +499,22 @@ public class VocabularyActivity extends FragmentActivity {
 			List<Explanation> wordExplains = wordsDao.getExplanationsForSingleWord(word.getWord_vocabulary());
 			
 			LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
+			
+			if ( word.getPicList() != null && word.getPicList().size() > 0 ) {
+				final ImageView image = createImageView();
+				AbsListView.LayoutParams params = new AbsListView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				image.setLayoutParams(params);
+				DownloadImageAsyncTask downloadImageTask = new DownloadImageAsyncTask(settings, word.getPicList().get(0).getNormalPic()) {
+
+					@Override
+					public void onPostExecute(Bitmap bitmap) {
+						image.setImageBitmap(bitmap);								
+					}							
+				};
+				downloadImageTask.execute();
+				layout.addView(image);
+			}
+			
 			for(Explanation explanation : wordExplains) {
 				if (explanation.getCategory().equalsIgnoreCase(ExplanationCategory.BASIC.name())) {
 					TextView tv = createTextView();
@@ -527,9 +545,45 @@ public class VocabularyActivity extends FragmentActivity {
 			LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
 			for(Explanation explanation : wordExplains) {
 				if (explanation.getCategory().equalsIgnoreCase(ExplanationCategory.ENGLISH.name())) {
-					TextView tv = createTextView();
-					tv.setText(explanation.getContent());
-					layout.addView(tv);
+					String englishExplanation = explanation.getContent();
+					String[] explanatons = englishExplanation.split("###");
+					for(String oneExplanation : explanatons) {
+						if (oneExplanation.trim().length() == 0) continue;
+						
+						String[] explanationDetail = oneExplanation.split(";");
+						for(String e1 : explanationDetail) {
+							if (e1.contains("\"\"")) {
+								String[] examples =e1.split("\"\"");
+								for(String example : examples) {
+									example = example.trim();
+									if (!example.startsWith("\"")) {
+										example = "\"" + example;
+									}
+									if (!example.endsWith("\"")) {
+										example = example + "\"";
+									}
+									TextView tv = createTextView();
+									tv.setText(example);
+									layout.addView(tv);
+									//System.out.println(example);
+								}
+							} else {
+								if (e1.trim().length() > 0) { 
+									TextView tv = createTextView();
+									tv.setText(e1.trim());
+									layout.addView(tv);
+
+									//System.out.println(e1);
+								}
+							}
+						}
+						
+						TextView tv = createTextView();
+						tv.setText("  ");
+						tv.setTextSize(5);
+						layout.addView(tv);
+					}
+					
 				}
 			}			
 		}
@@ -545,7 +599,7 @@ public class VocabularyActivity extends FragmentActivity {
 			LinearLayout mainLayout = (LinearLayout) rootView.findViewById(R.id.vacabulary_section_basic);
 
 			for(final Example example : examples) {
-				LinearLayout exampleSetenseLayout = new LinearLayout(this.getActivity());
+				/*LinearLayout exampleSetenseLayout = new LinearLayout(this.getActivity());
 				exampleSetenseLayout.setOrientation(LinearLayout.HORIZONTAL);
 				AbsListView.LayoutParams params = new AbsListView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);				
 				exampleSetenseLayout.setLayoutParams(params);
@@ -565,11 +619,40 @@ public class VocabularyActivity extends FragmentActivity {
 						
 					}
 				});
-				exampleSetenseLayout.addView(imageView);
+				exampleSetenseLayout.addView(imageView);*/
+				
+				/*SpannableString spannableString1 = new SpannableString(example.getSentence());
+				 spannableString1.setSpan(new ClickableSpan()
+			        {
+                       //  在onClick方法中可以编写单击链接时要执行的动作
+			            @Override
+			            public void onClick(View widget) {
+			            	if (player != null) {
+								player.play(example.getSentence_sound());
+								//play(imageView, example.getSentence_sound());
+							}
+			            }
+			        }, 0, example.getSentence().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);*/
 				
 				TextView tv = createTextView();
+				tv.setClickable(true);
+				tv.setFocusable(true);
+				tv.setSelected(true);
+				tv.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						if (player != null) {
+							player.play(example.getSentence_sound());
+						}						
+					}
+				});
 				tv.setText(example.getSentence());
-				exampleSetenseLayout.addView(tv);
+				//float textSize = (float) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, this.getResources().getDisplayMetrics());
+				//tv.getPaint().setTextSize(textSize);
+				tv.setTextSize(14);
+				mainLayout.addView(tv);
+				
 
 				tv = createTextView();
 				tv.setText(example.getCn_explanation());

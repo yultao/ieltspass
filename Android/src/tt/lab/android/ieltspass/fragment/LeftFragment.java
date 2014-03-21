@@ -15,6 +15,7 @@ import tt.lab.android.ieltspass.activity.DownloadActivity;
 import tt.lab.android.ieltspass.activity.FeedbackActivity;
 import tt.lab.android.ieltspass.activity.LoginActivity;
 import tt.lab.android.ieltspass.activity.SettingsActivity;
+import tt.lab.android.ieltspass.data.Settings;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -39,6 +41,13 @@ public class LeftFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		view = inflater.inflate(R.layout.left, null);
 		
+		ImageView headView = (ImageView)view.findViewById(R.id.head_view);
+		headView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Utilities.upZip("IELTSPASS_1.zip");
+			}
+		});
 //		TextView name = (TextView) view.findViewById(R.id.name_textview);
 //		name.setOnClickListener(new OnClickListener() {
 //
