@@ -117,7 +117,7 @@ public class DownloadActivity extends Activity {
 			map.put("length", Utilities.formatFizeSize(max));
 			map.put("button1", String.valueOf(state));
 			map.put("startstop", String.valueOf(false));
-			map.put("url", "http://ieltspass-ieltspass.stor.sinaapp.com/cb/" + filename);
+			map.put("url", "http://ieltspass-ieltspass.stor.sinaapp.com/download/" + filename);
 			map.put("maxbyte", String.valueOf(max));// 最大字节数
 			listData.add(map);
 
