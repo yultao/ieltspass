@@ -441,7 +441,9 @@ public class DownloadActivity extends Activity {
 		@Override
 		protected void onPostExecute(String result) {
 			setStart(position, false);
-			if (state == DOWNLOAD_COMPLETE) {
+			if (state == DOWNLOAD_INCOMPLETE) {
+				button.setBackgroundResource(R.drawable.playbutton);
+			} else if (state == DOWNLOAD_COMPLETE) {
 				button.setBackgroundResource(R.drawable.unzip);
 			} else if (state == UNZIP_COMPLETE) {
 				button.setBackgroundResource(R.drawable.complete);
