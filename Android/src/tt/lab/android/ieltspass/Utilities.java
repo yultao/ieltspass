@@ -7,13 +7,20 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.model.Lyrics;
 import tt.lab.android.ieltspass.model.Sentence;
 import android.net.ConnectivityManager;
@@ -22,6 +29,7 @@ import android.net.NetworkInfo;
 public class Utilities {
 	public static ConnectivityManager connectivityManager;
 	private static final String TAG = Utilities.class.getName();
+	private static Format f = new DecimalFormat(".#");
 
 	public static void main(String args[]) {
 		parseTime("03:02:01.83");
@@ -29,16 +37,20 @@ public class Utilities {
 
 	public static String formatFizeSize(long len) {
 		String length;
-		if(len>=1024*1024){
-			length = len/1024/1024+"MB";
-		} else if (len>=1024){
-			length = len/1024+"KB";
+		if (len >= 1024 * 1024) {
+			length = f(((double) len) / 1024 / 1024) + "MB";
+		} else if (len >= 1024) {
+			length = len / 1024 + "KB";
 		} else {
-			length = len+"B";
+			length = len + "B";
 		}
 		return length;
 	}
-	
+
+	private static String f(double d) {
+		return f.format(d);
+	}
+
 	public static String getRecordingFileName() {
 		return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 	}
@@ -298,9 +310,9 @@ public class Utilities {
 	 * @return
 	 */
 	public static String getTinyPic(String imagePath, String picurl) {
-		//Logger.i(TAG, "getTinyPic I "+picurl);
+		// Logger.i(TAG, "getTinyPic I "+picurl);
 		String url = picurl;
-		try{
+		try {
 			if (picurl != null) {
 				String filename = picurl.substring(picurl.lastIndexOf("/") + 1);
 				File file = new File(imagePath + "/" + filename);
@@ -310,10 +322,10 @@ public class Utilities {
 					url = picurl;
 				}
 			}
-		} catch (Exception e){
-			Logger.e(TAG, "getTinyPic E:"+e);
+		} catch (Exception e) {
+			Logger.e(TAG, "getTinyPic E:" + e);
 		}
-		//Logger.i(TAG, "getTinyPic O "+url);
+		// Logger.i(TAG, "getTinyPic O "+url);
 		return url;
 	}
 
@@ -329,6 +341,9 @@ public class Utilities {
 		return getFormatedDate(date);
 	}
 
+	public static boolean isFileExist(String absFileName) {
+		return new File(absFileName).exists();
+	}
 	public static List<String> readFile(String absFileName) {
 		List<String> list = new ArrayList<String>();
 		try {
@@ -355,16 +370,16 @@ public class Utilities {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static String getSql(String sqlFile) {
-		Logger.i(TAG, "getSql sqlFile "+ sqlFile);
+		Logger.i(TAG, "getSql sqlFile " + sqlFile);
 		StringBuilder sb = new StringBuilder();
 		try {
-			InputStream is = Constants.assetManager.open("sqls/"+sqlFile+".sql");
+			InputStream is = Constants.assetManager.open("sqls/" + sqlFile + ".sql");
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 			String s = null;
 			while ((s = bufferedReader.readLine()) != null) {
-				sb.append("\n "+s );
+				sb.append("\n " + s);
 			}
 			is.close();
 			bufferedReader.close();
@@ -372,8 +387,43 @@ public class Utilities {
 			e.printStackTrace();
 			Logger.e(TAG, "getSql E: " + e.getMessage());
 		}
-		String sql  =sb.toString();
-		Logger.i(TAG, "getSql sql "+ sql);
+		String sql = sb.toString();
+		Logger.i(TAG, "getSql sql " + sql);
 		return sql;
+	}
+
+	public static void upZip(String zipFile) {
+		try {
+			
+			ZipFile zfile = new ZipFile(Settings.getDownloadPathStatic()+"/"+zipFile);
+			String folderPath = Settings.getStorageStatic();
+			Enumeration zList = zfile.entries();
+			ZipEntry zipEntry = null;
+			byte[] buf = new byte[1024];
+			while (zList.hasMoreElements()) {
+				zipEntry = (ZipEntry) zList.nextElement();
+				if (zipEntry.isDirectory()) {
+					Logger.i("upZipFile", "ze.getName() = " + zipEntry.getName());
+					String dirstr = folderPath + "/" +zipEntry.getName();
+					Logger.i("upZipFile", "str = " + dirstr);
+					Utilities.ensurePath(dirstr);
+				} else {
+					Logger.i("upZipFile", "ze.getName() = " + zipEntry.getName());
+					OutputStream os = new FileOutputStream(folderPath + "/" + zipEntry.getName());
+					InputStream is = zfile.getInputStream(zipEntry);
+					int readLen = 0;
+					while ((readLen = is.read(buf)) != -1) {
+						os.write(buf, 0, readLen);
+					}
+					is.close();
+					os.close();
+				}
+			}
+			zfile.close();
+			Logger.i("upZipFile", "finishssssssssssssssssssss");
+
+		} catch (Exception e) {
+			Logger.e(TAG, "upZip: " + e);
+		}
 	}
 }

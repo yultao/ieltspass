@@ -32,6 +32,7 @@ public class Settings {
 
 	private String internet = SETTINGS_VALUE_INTERNET_WIFI;
 	private String storage = Constants.SD_PATH;
+	private static String storageStatic = Constants.SD_PATH;
 
 	public boolean isNetwordForbidden() {
 		return SETTINGS_VALUE_INTERNET_NO.equals(internet);
@@ -113,6 +114,7 @@ public class Settings {
 
 	public void setStorage(String storage) {
 		this.storage = storage;
+		storageStatic = storage;
 		Logger.initLog(getLogsPath());
 	}
 
@@ -123,7 +125,11 @@ public class Settings {
 	public void setInternet(String internet) {
 		this.internet = internet;
 	}
-
+	
+	public static String getStorageStatic() {
+		return storageStatic;
+	}
+	
 	public final String getDataPath() {
 		return this.getStorage() + "/" + Constants.ROOT_PATH + "/DATA";
 	}
@@ -162,6 +168,10 @@ public class Settings {
 
 	public String getDownloadPath() {
 		return this.getStorage() + "/" + Constants.ROOT_PATH + "/Download";
+	}
+	
+	public static String getDownloadPathStatic() {
+		return getStorageStatic() + "/" + Constants.ROOT_PATH + "/Download";
 	}
 	
 	public String getSpeakingQuestionsPath() {
