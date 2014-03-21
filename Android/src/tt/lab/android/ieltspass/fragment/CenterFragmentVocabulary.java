@@ -400,8 +400,6 @@ public class CenterFragmentVocabulary extends Fragment {
 						super.setViewImage(v, String.valueOf(R.drawable.no_net));
 					}
 				} else if (value.startsWith("/")) {
-					// super.setViewImage(v, value);
-					// new DisplayImageAsyncTask(v, value).execute();
 					Bitmap bitmap = BitmapFactory.decodeFile(value);
 					v.setImageBitmap(bitmap);
 				} else {

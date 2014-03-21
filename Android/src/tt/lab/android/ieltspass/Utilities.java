@@ -319,7 +319,7 @@ public class Utilities {
 				if (file.exists()) {
 					url = file.getAbsolutePath();
 				} else {
-					url = picurl;
+					url = Constants.SERVER_URL+picurl;
 				}
 			}
 		} catch (Exception e) {

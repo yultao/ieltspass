@@ -23,9 +23,9 @@ public class Constants {
 	public static final String DATA_NAME = "word.txt";
 
 	public static final String LISTENING_LYRICS_PATH = "Listening/Lyrics";
-
-	public static final String LISTENING_AUDIOS_URL = "http://ieltspass-ieltspass.stor.sinaapp.com/cb/";
-	public static final String DOWNLOAD_URL = "http://ieltspass-ieltspass.stor.sinaapp.com/download";
+	public static final String SERVER_URL = "http://ieltspass-ieltspass.stor.sinaapp.com";
+	public static final String LISTENING_AUDIOS_URL = SERVER_URL+"/cb/";
+	public static final String DOWNLOAD_URL = SERVER_URL+"/download";
 
 
 }
