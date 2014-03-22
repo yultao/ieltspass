@@ -45,6 +45,8 @@ public class DownloadActivity extends Activity {
 	private static final int UNZIP_COMPLETE = 2;
 
 	public static final String TAG = DownloadActivity.class.getName();
+	
+	//private static Map<Integer, DownloadAsyncTask> downloadTasks = new HashMap<Integer, DownloadAsyncTask>();
 	private SimpleAdapter simpleAdapter;
 	private ListView listView;
 	private List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
@@ -71,7 +73,8 @@ public class DownloadActivity extends Activity {
 
 		List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
 		List<String> downloads = Utilities.readAsset("download");
-		for (String download : downloads) {
+		for (int i=0;i<downloads.size();i++) {
+			String download = downloads.get(i);
 			try {
 				if (download.trim().length() != 0) {
 					download = download.trim();
@@ -109,7 +112,12 @@ public class DownloadActivity extends Activity {
 					map.put("button1", String.valueOf(state));
 
 					// 以下3行用于控制
-					map.put("startstop", String.valueOf(false));
+					//if(downloadTasks.containsKey(i)){
+						//map.put("startstop", String.valueOf(true));
+					//} else {
+						map.put("startstop", String.valueOf(false));
+					//}
+					
 					map.put("url", Constants.DOWNLOAD_URL + "/" + filename);
 					map.put("maxbyte", String.valueOf(max));
 
@@ -165,6 +173,7 @@ public class DownloadActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		Logger.i(TAG, "onDestroy");
 		stopAll();
 	}
 
@@ -243,7 +252,11 @@ public class DownloadActivity extends Activity {
 
 							// 控制按钮图标
 							if (Integer.valueOf(text) == DOWNLOAD_INCOMPLETE) {
-								button.setBackgroundResource(R.drawable.playbutton);
+								if (isStart(position)) {
+									button.setBackgroundResource(R.drawable.pausebutton);
+								} else {
+									button.setBackgroundResource(R.drawable.playbutton);
+								}
 								button.setEnabled(true);
 							} else if (Integer.valueOf(text) == DOWNLOAD_COMPLETE) {
 								button.setBackgroundResource(R.drawable.unzipbutton);
@@ -255,20 +268,25 @@ public class DownloadActivity extends Activity {
 							button.setOnClickListener(new OnClickListener() {
 								@Override
 								public void onClick(View v) {
-									int startbyte = Integer.parseInt(map.get("progressBar1"));
+									boolean start = isStart(position);
+									Logger.i(TAG, "preparing to download: "+map+", "+position+", "+start);
 									// 控制开始停止
-									if (isStart(position)) {
+									if (start) {
 										setStart(position, false);
 										button.setBackgroundResource(R.drawable.playbutton);
 									} else {
 										setStart(position, true);
 										button.setBackgroundResource(R.drawable.pausebutton);
-
+										int startbyte = Integer.parseInt(map.get("progressBar1"));
+										int state = Integer.parseInt(map.get("button1"));
+										
 										ProgressBar progressBar = progressBars.get(position);
 										TextView currentTextView = currents.get(position);
 										TextView lengthTextView = lengths.get(position);
-										new DownloadAsyncTask(position, progressBar, currentTextView, lengthTextView,
-												button, strurl, startbyte, maxbyte).execute();
+										DownloadAsyncTask downloadTask = new DownloadAsyncTask(position, progressBar, currentTextView, lengthTextView,
+												button, strurl, startbyte, maxbyte,state);
+										//downloadTasks.put(position, downloadTask);
+										downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 									}
 								}
@@ -305,7 +323,7 @@ public class DownloadActivity extends Activity {
 		}
 	}
 
-	private int setState(int position) {
+	private int getState(int position) {
 		return Integer.valueOf(listData.get(position).get("button1"));
 	}
 
@@ -341,7 +359,7 @@ public class DownloadActivity extends Activity {
 		private int startbyte;
 		private int max;
 		private int position;
-		private int state = DOWNLOAD_INCOMPLETE;
+		private int state;
 		private String zipFileName;
 
 		private String downloadPath = Settings.getDownloadPathStatic();
@@ -349,7 +367,7 @@ public class DownloadActivity extends Activity {
 		private String infoAbsFileName;
 
 		public DownloadAsyncTask(int position, ProgressBar progressBar, TextView current, TextView length,
-				Button button, String strurl, int startbyte, int max) {
+				Button button, String strurl, int startbyte, int max, int state) {
 			this.position = position;
 			this.progressBar = progressBar;
 			this.currentTextView = current;
@@ -358,12 +376,11 @@ public class DownloadActivity extends Activity {
 			this.strurl = strurl;
 			this.startbyte = startbyte;
 			this.max = max;
-			if (max == startbyte) {
-				state = DOWNLOAD_COMPLETE;
-			}
+			this.state = state;
 			zipFileName = strurl.substring(strurl.lastIndexOf("/") + 1);
 			zipAbsFileName = downloadPath + "/" + zipFileName;
 			infoAbsFileName = zipAbsFileName + ".t";
+			
 		}
 
 		@Override
@@ -383,10 +400,12 @@ public class DownloadActivity extends Activity {
 
 					RandomAccessFile randomAccessFile = new RandomAccessFile(tmpfilename, "rw");
 					randomAccessFile.seek(startbyte);
-					byte[] buffer = new byte[1024];
+					byte[] buffer = new byte[40960];
 					int len;
 					int readbyte = 0;
 					int progress = 0;
+					//FileOutputStream fileOutputStream = new FileOutputStream(infoAbsFileName);
+					
 					while ((len = is.read(buffer)) != -1 && isStart(position)) {
 						readbyte += len;
 						randomAccessFile.write(buffer, 0, len);
@@ -394,8 +413,13 @@ public class DownloadActivity extends Activity {
 
 						publishProgress(progress);// 保证界面中最新
 						setProgress(position, progress);// 保证内存中最新
+						//fileOutputStream.write(String.valueOf(progress).getBytes());
 						Utilities.writeFile(infoAbsFileName, String.valueOf(progress));// 保证外存中最新
 					}
+					
+
+					//fileOutputStream.close();
+					
 					is.close();
 					randomAccessFile.close();
 					if (progress == max) {// 重命名
@@ -417,7 +441,7 @@ public class DownloadActivity extends Activity {
 					String folderPath = Settings.getStorageStatic();
 					Enumeration zList = zfile.entries();
 					ZipEntry zipEntry = null;
-					byte[] buf = new byte[1024];
+					byte[] buf = new byte[4096];
 
 					int size = 0;
 					while (zList.hasMoreElements()) {
@@ -467,6 +491,7 @@ public class DownloadActivity extends Activity {
 		@Override
 		protected void onPostExecute(String result) {
 			setStart(position, false);
+			//downloadTasks.remove(position);
 			if (state == DOWNLOAD_INCOMPLETE) {
 				button.setBackgroundResource(R.drawable.playbutton);
 			} else if (state == DOWNLOAD_COMPLETE) {

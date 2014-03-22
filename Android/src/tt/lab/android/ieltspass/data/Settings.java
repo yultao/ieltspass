@@ -30,19 +30,19 @@ public class Settings {
 	private Map<String, String> map = new HashMap<String, String>();
 	// public static boolean onlyUseWifi = true;
 
-	private String internet = SETTINGS_VALUE_INTERNET_WIFI;
+	private static String internet = SETTINGS_VALUE_INTERNET_WIFI;
 	private String storage = Constants.SD_PATH;
 	private static String storageStatic = Constants.SD_PATH;
 
-	public boolean isNetwordForbidden() {
+	public static boolean isNetwordForbidden() {
 		return SETTINGS_VALUE_INTERNET_NO.equals(internet);
 	}
 
-	public boolean isOnlyUseWifi() {
+	public static boolean isOnlyUseWifi() {
 		return SETTINGS_VALUE_INTERNET_WIFI.equals(internet);
 	}
 
-	public boolean isWifiAndMobile() {
+	public static boolean isWifiAndMobile() {
 		return SETTINGS_VALUE_INTERNET_MOBILE.equals(internet);
 	}
 
@@ -122,8 +122,8 @@ public class Settings {
 		return storage;
 	}
 
-	public void setInternet(String internet) {
-		this.internet = internet;
+	public void setInternet(String net) {
+		internet = net;
 	}
 	
 	public static String getStorageStatic() {
@@ -150,10 +150,16 @@ public class Settings {
 		return this.getStorage() + "/" + Constants.ROOT_PATH + "/Speaking/Audios";
 	}
 
-	public final String getVocabularyImagesPath() {
-		return this.getStorage() + "/" + Constants.ROOT_PATH + "/Vocabulary/Images";
+	public static final String getVocabularyImagesPath1() {
+		return getStorageStatic() + "/" + Constants.ROOT_PATH + "/Vocabulary/Images";
 	}
-
+	
+	public static final String getVocabularyImagesThumbnailsPath() {
+		return getStorageStatic() + "/" + Constants.ROOT_PATH + "/Vocabulary/Images/Thumbnails";
+	}
+	public static final String getVocabularyImagesLogoPath() {
+		return getStorageStatic() + "/" + Constants.ROOT_PATH + "/Vocabulary/Images/Logo";
+	}
 	public final String getVocabularyAudiosPath() {
 		return this.getStorage() + "/" + Constants.ROOT_PATH + "/Vocabulary/Audios";
 	}
@@ -166,9 +172,6 @@ public class Settings {
 		return this.getStorage() + "/" + Constants.ROOT_PATH + "/Reading/Questions";
 	}
 
-	public String getDownloadPath() {
-		return this.getStorage() + "/" + Constants.ROOT_PATH + "/Download";
-	}
 	
 	public static String getDownloadPathStatic() {
 		return getStorageStatic() + "/" + Constants.ROOT_PATH + "/Download";

@@ -74,11 +74,9 @@ public class CenterFragmentVocabulary extends Fragment {
 	private String orderby = "random()", order = "";
 	private int totalCount, currentPage = 0, pageSize = 30, maxPage;
 	private WordsDao wordsDao;
-	private Settings settings;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Logger.i(TAG, "onCreateView");
 		context = this.getActivity();
-		settings = Settings.getInstance(context);
 		view = inflater.inflate(R.layout.center_fragment_vocabulary, null);
 		wordsDao = new WordsDao(context);
 
@@ -361,8 +359,7 @@ public class CenterFragmentVocabulary extends Fragment {
 				if (word.getTinyPic() == null || word.getTinyPic().trim().equals("")) {
 					map.put("img", String.valueOf(R.drawable.no_pic));
 				} else {
-
-					map.put("img", Utilities.getTinyPic(settings.getVocabularyImagesPath(), word.getTinyPic()));
+					map.put("img", Utilities.getTinyPic(Settings.getVocabularyImagesLogoPath(), word.getTinyPic()));
 				}
 
 				listData.add(map);
@@ -386,16 +383,16 @@ public class CenterFragmentVocabulary extends Fragment {
 				// Logger.i(TAG, "setViewImage: "+v.getId()+", "+value);
 				// 从网络下载
 				if (value != null && value.toLowerCase().startsWith("http")) {
-					if (!settings.isNetwordForbidden() && (Utilities.isWifiConnected()
-							|| (Utilities.isMobileConnected() && settings.isWifiAndMobile()))) {
-						DownloadImageAsyncTask downloadImageTask = new DownloadImageAsyncTask(settings, value) {
+					if (!Settings.isNetwordForbidden() && (Utilities.isWifiConnected()
+							|| (Utilities.isMobileConnected() && Settings.isWifiAndMobile()))) {
+						DownloadImageAsyncTask downloadImageTask = new DownloadImageAsyncTask(value,Settings.getVocabularyImagesLogoPath()) {
 
 							@Override
 							public void onPostExecute(Bitmap bitmap) {
 								v.setImageBitmap(bitmap);								
 							}							
 						};
-						downloadImageTask.execute();
+						downloadImageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 					} else {
 						super.setViewImage(v, String.valueOf(R.drawable.no_net));
 					}

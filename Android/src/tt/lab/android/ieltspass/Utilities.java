@@ -378,10 +378,13 @@ public class Utilities {
 	}
 	public static void writeFile(String absFileName, String s) {
 		try {
-			PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(absFileName)));
-			writer.println(s);
-			writer.close();
-		} catch (FileNotFoundException e) {
+			FileOutputStream fileOutputStream = new FileOutputStream(absFileName);
+			fileOutputStream.write(s.getBytes());
+			//PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(absFileName)));
+			//writer.println(s);
+			///writer.close();
+			fileOutputStream.close();
+		} catch (Exception e) {
 			Logger.e(TAG, "writeFile E: " + e);
 			e.printStackTrace();
 		}

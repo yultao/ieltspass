@@ -18,14 +18,13 @@ public abstract class DownloadImageAsyncTask extends
 		AsyncTask<Integer, Integer, String> {
 
 	private static final String TAG = DownloadImageAsyncTask.class.getName();
-
-	private Settings settings;
 	private String strurl;
+	private String localPath;
 	private Bitmap bitmap;
 
-	public DownloadImageAsyncTask(Settings settings, String url) {
-		this.settings = settings;
+	public DownloadImageAsyncTask(String url, String localPath) {
 		this.strurl = url;
+		this.localPath = localPath;
 	}
 
 	/**
@@ -41,8 +40,8 @@ public abstract class DownloadImageAsyncTask extends
 			is = openConnection.getInputStream();
 
 			String name = strurl.substring(strurl.lastIndexOf("/") + 1);
-			Utilities.ensurePath(settings.getVocabularyImagesPath());
-			String filename = settings.getVocabularyImagesPath() + "/" + name;
+			Utilities.ensurePath(localPath);
+			String filename = localPath + "/" + name;
 			String tmpfilename = filename + ".d";
 			File tmp = new File(tmpfilename);
 			os = new FileOutputStream(tmp);

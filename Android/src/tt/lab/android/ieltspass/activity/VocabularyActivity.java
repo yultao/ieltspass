@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.DownloadImageAsyncTask;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
@@ -435,7 +436,6 @@ public class VocabularyActivity extends FragmentActivity {
 	 * 
 	 */
 	public static abstract class SectionBasicFragment extends Fragment {
-		protected Settings settings;
 		protected WordsDao wordsDao;
 		protected Word word;
 		protected AudioPlayer player;
@@ -446,7 +446,6 @@ public class VocabularyActivity extends FragmentActivity {
 		public static final String ARG_SECTION_NUMBER = "section_number";
 
 		public SectionBasicFragment() {
-			settings = Settings.getInstance(this.getActivity());
 		}
 
 		public void setWord(Word word) {
@@ -504,7 +503,7 @@ public class VocabularyActivity extends FragmentActivity {
 				final ImageView image = createImageView();
 				AbsListView.LayoutParams params = new AbsListView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 				image.setLayoutParams(params);
-				DownloadImageAsyncTask downloadImageTask = new DownloadImageAsyncTask(settings, word.getPicList().get(0).getNormalPic()) {
+				DownloadImageAsyncTask downloadImageTask = new DownloadImageAsyncTask(Constants.SERVER_URL+word.getPicList().get(0).getNormalPic(),Settings.getVocabularyImagesThumbnailsPath()) {
 
 					@Override
 					public void onPostExecute(Bitmap bitmap) {
