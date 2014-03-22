@@ -269,7 +269,7 @@ public class DownloadActivity extends Activity {
 								@Override
 								public void onClick(View v) {
 									boolean start = isStart(position);
-									Logger.i(TAG, "preparing to download: "+map+", "+position+", "+start);
+									//Logger.i(TAG, "preparing to download: "+map+", "+position+", "+start);
 									// 控制开始停止
 									if (start) {
 										setStart(position, false);
@@ -400,12 +400,10 @@ public class DownloadActivity extends Activity {
 
 					RandomAccessFile randomAccessFile = new RandomAccessFile(tmpfilename, "rw");
 					randomAccessFile.seek(startbyte);
-					byte[] buffer = new byte[40960];
+					byte[] buffer = new byte[4096];
 					int len;
 					int readbyte = 0;
 					int progress = 0;
-					//FileOutputStream fileOutputStream = new FileOutputStream(infoAbsFileName);
-					
 					while ((len = is.read(buffer)) != -1 && isStart(position)) {
 						readbyte += len;
 						randomAccessFile.write(buffer, 0, len);
@@ -413,13 +411,13 @@ public class DownloadActivity extends Activity {
 
 						publishProgress(progress);// 保证界面中最新
 						setProgress(position, progress);// 保证内存中最新
-						//fileOutputStream.write(String.valueOf(progress).getBytes());
+
+						//Utilities.writeFile(infoAbsFileName, String.valueOf(progress));// 保证外存中最新
+					}
+					if(progress!=0){
 						Utilities.writeFile(infoAbsFileName, String.valueOf(progress));// 保证外存中最新
 					}
-					
 
-					//fileOutputStream.close();
-					
 					is.close();
 					randomAccessFile.close();
 					if (progress == max) {// 重命名

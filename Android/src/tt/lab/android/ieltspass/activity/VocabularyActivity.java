@@ -8,6 +8,7 @@ import tt.lab.android.ieltspass.Constants;
 import tt.lab.android.ieltspass.DownloadImageAsyncTask;
 import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
+import tt.lab.android.ieltspass.Utilities;
 import tt.lab.android.ieltspass.data.Settings;
 import tt.lab.android.ieltspass.data.WordsDao;
 import tt.lab.android.ieltspass.model.Example;
@@ -19,6 +20,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -503,14 +505,27 @@ public class VocabularyActivity extends FragmentActivity {
 				final ImageView image = createImageView();
 				AbsListView.LayoutParams params = new AbsListView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 				image.setLayoutParams(params);
-				DownloadImageAsyncTask downloadImageTask = new DownloadImageAsyncTask(Constants.SERVER_URL+word.getPicList().get(0).getNormalPic(),Settings.getVocabularyImagesThumbnailsPath()) {
-
-					@Override
-					public void onPostExecute(Bitmap bitmap) {
-						image.setImageBitmap(bitmap);								
-					}							
-				};
-				downloadImageTask.execute();
+				//TODO
+				String tinyPic = Utilities.getTinyPic(Settings.getVocabularyImagesThumbnailsPath(), word.getPicList().get(0).getTinyPic());
+				if(tinyPic.startsWith("http")){
+					if (!Settings.isNetwordForbidden() && (Utilities.isWifiConnected()
+							|| (Utilities.isMobileConnected() && Settings.isWifiAndMobile()))) {
+						
+						DownloadImageAsyncTask downloadImageTask = new DownloadImageAsyncTask(Constants.SERVER_URL+word.getPicList().get(0).getTinyPic(),Settings.getVocabularyImagesThumbnailsPath()) {
+		
+							@Override
+							public void onPostExecute(Bitmap bitmap) {
+								image.setImageBitmap(bitmap);								
+							}							
+						};
+						downloadImageTask.execute();
+					}
+				} else if (tinyPic.startsWith("/")) {
+					Bitmap bitmap = BitmapFactory.decodeFile(tinyPic);
+					image.setImageBitmap(bitmap);
+				} else {
+					//无图片不管
+				}
 				layout.addView(image);
 			}
 			
