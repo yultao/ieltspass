@@ -1,5 +1,6 @@
 package tt.lab.android.ieltspass.fragment;
 
+import tt.lab.android.ieltspass.Logger;
 import tt.lab.android.ieltspass.R;
 import tt.lab.android.ieltspass.activity.ListeningActivity;
 import tt.lab.android.ieltspass.activity.ReadingActivity;
@@ -188,7 +189,12 @@ public class CenterFragmentLSRW extends Fragment {
 					intent.putExtra("answers", lsrwItem.getAnswers());
 					break;
 				}
-				startActivity(intent);
+				try {
+					Logger.i(TAG, "setOnChildClickListener type: "+lsrwItem.getType());
+					startActivity(intent);
+				} catch (Exception e ) {
+					Logger.e(TAG, "setOnChildClickListener Exception: "+lsrwItem.getType()+", "+e);
+				}
 				return false;
 			}
 		});
