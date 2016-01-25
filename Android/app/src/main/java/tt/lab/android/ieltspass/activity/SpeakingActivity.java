@@ -431,6 +431,7 @@ public class SpeakingActivity extends FragmentActivity {
 		pagerItemList.add(fragmentAnswers);
 
 		mSectionsPagerAdapter.notifyDataSetChanged();
+
 	}
 
 	@Override
