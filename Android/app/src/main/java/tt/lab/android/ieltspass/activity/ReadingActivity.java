@@ -105,6 +105,8 @@ public class ReadingActivity extends FragmentActivity {
 		
 		ReadingFragmentAnswers fragmentAnswers = new ReadingFragmentAnswers();
 		pagerItemList.add(fragmentAnswers);
+
+		mSectionsPagerAdapter.notifyDataSetChanged();
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

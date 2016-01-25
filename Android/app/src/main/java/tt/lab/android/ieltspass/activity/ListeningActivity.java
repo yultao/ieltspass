@@ -137,6 +137,7 @@ public class ListeningActivity extends FragmentActivity {
 		fragmentAnswers.setAnswers(answers);
 		pagerItemList.add(fragmentAnswers);
 
+		mSectionsPagerAdapter.notifyDataSetChanged();
 	}
 
 	private void enablePlayStopButton(boolean enabled) {

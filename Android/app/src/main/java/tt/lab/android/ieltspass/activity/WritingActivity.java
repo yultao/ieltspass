@@ -105,6 +105,8 @@ public class WritingActivity extends FragmentActivity {
 
 		WritingFragmentScripts fragmentAnswers = new WritingFragmentScripts();
 		pagerItemList.add(fragmentAnswers);
+
+		mSectionsPagerAdapter.notifyDataSetChanged();
 	}
 
 	@Override

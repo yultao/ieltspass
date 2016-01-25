@@ -429,6 +429,9 @@ public class SpeakingActivity extends FragmentActivity {
 
 		SpeakingFragmentScripts fragmentAnswers = new SpeakingFragmentScripts();
 		pagerItemList.add(fragmentAnswers);
+
+		mSectionsPagerAdapter.notifyDataSetChanged();
+
 	}
 
 	@Override

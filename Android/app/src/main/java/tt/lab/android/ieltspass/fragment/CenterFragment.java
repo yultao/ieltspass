@@ -122,7 +122,7 @@ public class CenterFragment extends Fragment {
 		underlinePageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
-				Log.i("onPageScrollStateChanged", arg0+"");
+				Log.i("onPageScrollStateChange", arg0+"");
 			}
 
 			public void onPageScrolled(int arg0, float arg1, int arg2) {
