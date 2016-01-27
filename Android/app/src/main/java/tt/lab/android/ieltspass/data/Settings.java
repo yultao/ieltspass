@@ -53,7 +53,7 @@ public class Settings {
 	}
 
 	private void read() {
-		tt.lab.android.ieltspass.Logger.i(TAG, "read I");
+		tt.lab.android.ieltspass.Logger.i(TAG, "read I "+this.context.getFilesDir());
 		try {
 			// InputStream is = tt.lab.android.ieltspass.Constants.assetManager.open();
 			FileInputStream is = this.context.openFileInput(Constants.SETTINGS_NAME);
@@ -176,18 +176,15 @@ public class Settings {
 	}
 	
 	public String getSpeakingQuestionsPath() {
-		// TODO Auto-generated method stub
-		return null;
+		return getStorageStatic() + "/" + Constants.ROOT_PATH + "/Speaking/Questions";
 	}
 
 	public String getSpeakingScriptsPath() {
-		// TODO Auto-generated method stub
-		return null;
+		return getStorageStatic() + "/" + Constants.ROOT_PATH + "/Speaking/Scripts";
 	}
 
 	public String getReadingAnswersPath() {
-		// TODO Auto-generated method stub
-		return null;
+		return getStorageStatic() + "/" + Constants.ROOT_PATH + "/Speaking/Answers";
 	}
 
 }

@@ -3,8 +3,6 @@ package tt.lab.android.ieltspass.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.nfc.Tag;
-import android.os.Environment;
 
 import java.io.*;
 
@@ -29,7 +27,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 //            + Environment.getDataDirectory().getAbsolutePath() + "/"
 //            + PACKAGE_NAME + "/";
 
-    public static final String DB_PATH = Constants.SD_PATH+ "/" + Constants.ROOT_PATH+"/Data/";
+    public static String DB_PATH;// = Constants.SD_PATH+ "/" + Constants.ROOT_PATH+"/Data2/";
     public SQLiteDatabase db = null;
     private static Context context = null;
 
@@ -44,6 +42,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        DB_PATH = context.getFilesDir().getAbsolutePath();
         initData();
     }
 
@@ -65,16 +64,16 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     private void initData() {
-        File file = new File(DB_PATH + DATABASE_NAME);
+        File file = new File(DB_PATH + "/" + DATABASE_NAME);
+
         if (file.exists()) {
             Logger.i(TAG, "data file exists: "+file.getAbsolutePath());
-            db = openDatabase(DB_PATH + DATABASE_NAME);
         } else {
-            Logger.i(TAG, "data file does not exist: "+file.getAbsolutePath());
+            Logger.i(TAG, "data file does not exist: " + file.getAbsolutePath());
             deepFile(context, DATABASE_NAME);
-            db = openDatabase(DB_PATH + DATABASE_NAME);
         }
 
+        db = openDatabase(DB_PATH + "/"+ DATABASE_NAME);
     }
 
 
@@ -170,7 +169,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String str[] = ctxDealFile.getAssets().list(path);
             if (str.length > 0) {//如果是目录
 
-                File file = new File(DB_PATH + path);
+                File file = new File(DB_PATH + "/"+ path);
                 Logger.i(TAG, "file: "+ file.getAbsolutePath());
                 file.mkdirs();
 
@@ -189,9 +188,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 }
 
             } else {//如果是文件
-                Logger.i(TAG, "copy file: "+ DB_PATH+ path);
+                Logger.i(TAG, "copy file: " + DB_PATH + "/"+path);
                 InputStream is = ctxDealFile.getAssets().open(path);
-                FileOutputStream fos = new FileOutputStream(new File(DB_PATH+ path));
+                File file = new File(DB_PATH+"/"+ path);
+                if(!file.getParentFile().exists())
+                    file.getParentFile().mkdirs();
+                FileOutputStream fos = new FileOutputStream(file);
 
                 byte[] buffer = new byte[1024];
 
